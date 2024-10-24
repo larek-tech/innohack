@@ -2,11 +2,15 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
+	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/google/uuid"
+	"github.com/larek-tech/innohack/backend/templ/pages"
 	"github.com/rs/zerolog/log"
 )
 
@@ -35,12 +39,24 @@ func New(cfg *Config, modules ...Module) (*Server, error) {
 		AllowCredentials: true,
 	}))
 
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{"page": "index"})
+	})
+
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"hostname": nodeID})
 	})
+	app.Static("/static", "./static")
 
+	// not found route
+	app.Use(func(c *fiber.Ctx) error {
+		return adaptor.HTTPHandler(templ.Handler(pages.NotFound(c.Path())))(c)
+	})
+
+	fmt.Print(len(modules))
 	for _, m := range modules {
 		err := m.InitRoutes(app)
+		log.Info().Msgf("Module %s initialized", m.Name())
 		if err != nil {
 			log.Err(err).Str("module", m.Name()).Msg("unable to init")
 		}

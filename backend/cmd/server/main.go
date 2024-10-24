@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/larek-tech/innohack/backend/auth"
 	"github.com/larek-tech/innohack/backend/config"
 	"github.com/larek-tech/innohack/backend/internal/server"
 )
@@ -10,7 +11,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	srv, err := server.New(cfg.Server)
+
+	srv, err := server.New(cfg.Server, auth.NewAuthModule())
 	if err != nil {
 		panic(err)
 	}

@@ -1,0 +1,14 @@
+package layout
+
+templ Layout(title ...string) {
+<html lang="ru">
+if len(title) == 1{
+@Head(title[0])
+}else{
+@Head()
+}
+{ children... }
+<footer></footer>
+
+</html>
+}

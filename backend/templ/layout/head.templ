@@ -1,0 +1,23 @@
+package layout
+
+
+templ title(pageTitle ...string){
+
+}
+
+// Head - component which includes basic head for application
+// add all required dependencies such as htmx and css.
+templ Head(pageTitle ...string) {
+
+<head>
+	<script src="/static/js/htmx.min.js"></script>
+	<script src="/static/js/index.js"></script>
+	<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+	<link rel="stylesheet" href="/static/css/tailwind.css" />
+	if len(pageTitle) == 1{
+	<title>{pageTitle[0] }</title>
+	}else{
+	<title> Innohack</title>
+	}
+</head>
+}
