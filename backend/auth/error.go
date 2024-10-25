@@ -7,4 +7,5 @@ var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrPasswordMismatch   = errors.New("passwords are mismatched")
 	ErrEmailAlreadyTaken  = errors.New("email is already taken")
+	ErrUnprocessable      = errors.New("can't process request")
 )

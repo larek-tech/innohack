@@ -30,8 +30,16 @@ func New(cfg *Config, modules ...Module) (*Server, error) {
 	}
 
 	app := fiber.New(fiber.Config{
-		ServerHeader: "larek",
+		ServerHeader: "larek.tech",
 		BodyLimit:    5 * 1024 * 1024,
+		ErrorHandler: func(c *fiber.Ctx, e error) error {
+			var fiberErr *fiber.Error
+			if errors.As(e, &fiberErr) && fiberErr.Code == fiber.StatusNotFound {
+				err := adaptor.HTTPHandler(templ.Handler(pages.NotFound(c.Path())))(c)
+				return err
+			}
+			return e
+		},
 	})
 
 	app.Use(cors.New(cors.Config{
@@ -47,11 +55,6 @@ func New(cfg *Config, modules ...Module) (*Server, error) {
 		return c.JSON(fiber.Map{"hostname": nodeID})
 	})
 	app.Static("/static", "./static")
-
-	// not found route
-	app.Use(func(c *fiber.Ctx) error {
-		return adaptor.HTTPHandler(templ.Handler(pages.NotFound(c.Path())))(c)
-	})
 
 	fmt.Print(len(modules))
 	for _, m := range modules {

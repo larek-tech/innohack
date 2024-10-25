@@ -1,7 +1,7 @@
 package layout
 
 templ Layout(title ...string) {
-<html lang="ru">
+<html lang="ru" hx-ext="response-targets">
 if len(title) == 1{
 @Head(title[0])
 }else{
