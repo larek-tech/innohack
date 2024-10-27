@@ -1,3 +1,6 @@
+volumes:
+  pg_admin:
+
 services:
   grafana:
     image: grafana/grafana
@@ -50,6 +53,17 @@ services:
       - "5432:5432"
     volumes:
       - ./data/pg:/var/lib/postgresql/data
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - pg_admin:/var/lib/pgadmin
+    ports:
+      - "8888:80"
   minio:
    image: minio/minio:latest
    command: server --console-address ":9001" /data/
