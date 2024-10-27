@@ -29,10 +29,14 @@ migration-up:
 	goose -dir "$(MIGRATION_FOLDER)" postgres "$(POSTGRES_SETUP_TEST)" up
 
 .PHONY: migration-down
-migration-up:
+migration-down:
 	goose -dir "$(MIGRATION_FOLDER)" postgres "$(POSTGRES_SETUP_TEST)" down
 
 
 .PHONY: gen-sql
 gen-sql:
 	sqlc generate
+
+.PHONY: infra
+infra:
+    docker compose -f infra/compose.yaml up -d

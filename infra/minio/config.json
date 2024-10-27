@@ -1,0 +1,19 @@
+{
+    "cors": {
+        "allowedOrigins": [
+            "http://127.0.0.1:9999",
+            "https://inno.larek.tech"
+        ],
+        "allowedMethods": [
+            "GET",
+            "PUT",
+            "HEAD",
+            "POST",
+            "DELETE"
+        ],
+        "allowedHeaders": [
+            "*"
+        ],
+        "maxAgeSeconds": 3600
+    }
+}
