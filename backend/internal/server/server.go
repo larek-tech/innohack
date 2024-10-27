@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/google/uuid"
+	"github.com/larek-tech/innohack/backend/internal/server/view"
 	"github.com/larek-tech/innohack/backend/templ/pages"
 	"github.com/rs/zerolog/log"
 )
@@ -48,7 +49,8 @@ func New(cfg *Config, modules ...Module) (*Server, error) {
 	}))
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{"page": "index"})
+		index := view.Index()
+		return adaptor.HTTPHandler(templ.Handler(index))(c)
 	})
 
 	app.Get("/health", func(c *fiber.Ctx) error {

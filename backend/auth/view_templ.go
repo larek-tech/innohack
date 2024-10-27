@@ -43,7 +43,7 @@ func LoginPage(input LoginInput) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body class=\"flex items-center justify-center h-screen bg-gray-100\"><div class=\"mx-auto bg-white shadow-md rounded-lg p-8 w-full max-w-md h-auto max-h-[600px]\"><div class=\"flex items-center justify-center mb-6\"><img src=\"/static/favicon.ico\" class=\"w-10 h-10\"><h2 class=\"text-2xl font-bold text-gray-800 ml-2\">Login</h2></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body class=\"flex items-center justify-center min-h-screen bg-gray-100\"><div class=\"mx-auto bg-white shadow-md rounded-lg p-4 sm:p-8 w-full max-w-full sm:max-w-sm md:max-w-md h-auto\"><div class=\"flex items-center justify-center mb-4 sm:mb-6\"><img src=\"/static/favicon.ico\" class=\"w-10 h-10\"><h2 class=\"text-2xl font-bold text-gray-800 ml-2\">Login</h2></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -99,7 +99,7 @@ func RegisterPage(input RegistrationInput) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body class=\"flex items-center justify-center h-screen bg-gray-100\"><div class=\"mx-auto bg-white shadow-md rounded-lg p-8 w-full max-w-md h-auto max-h-[600px]\"><div class=\"flex items-center justify-center mb-6\"><img src=\"/static/favicon.ico\" class=\"w-10 h-10\"><h2 class=\"text-2xl font-bold text-gray-800 ml-2\">Registration</h2></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body class=\"flex items-center justify-center min-h-screen bg-gray-100\"><div class=\"mx-auto bg-white shadow-md rounded-lg p-4 sm:p-8 w-full max-w-full sm:max-w-sm md:max-w-md h-auto\"><div class=\"flex items-center justify-center mb-4 sm:mb-6\"><img src=\"/static/favicon.ico\" class=\"w-10 h-10\"><h2 class=\"text-2xl font-bold text-gray-800 ml-2\">Registration</h2></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -150,7 +150,7 @@ func EmailField(value string, err error) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/view.templ`, Line: 46, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/view.templ`, Line: 45, Col: 17}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -168,7 +168,7 @@ func EmailField(value string, err error) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/view.templ`, Line: 54, Col: 55}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/view.templ`, Line: 60, Col: 17}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -233,7 +233,7 @@ func RegisterForm(email, password, passwordConfirm string) templ.Component {
 			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"any-errors\" class=\"modal modal-blur fade\" style=\"display: none\" aria-hidden=\"false\" tabindex=\"-1\"></div><form hx-post=\"/auth/sing-up\" hx-target=\"#reg-form\" class=\"space-y-4 max-w-md\" id=\"reg-form\" hx-target-4*=\"#any-errors\"><div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"any-errors\" class=\"modal modal-blur fade\" style=\"display: none\" aria-hidden=\"false\" tabindex=\"-1\"></div><form hx-post=\"/auth/sing-up\" hx-target=\"#reg-form\" class=\"space-y-4 w-full max-w-full sm:max-w-md\" id=\"reg-form\"><div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -278,14 +278,14 @@ func LoginForm(email, password string, err error) templ.Component {
 			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form hx-post=\"/auth/login\" hx-target=\"#login-form\" class=\"space-y-4 max-w-md\" id=\"login-form\" hx-target-4*=\"#login-form\"><div><label for=\"email\" class=\"block text-gray-700 font-bold mb-2\">Email</label> <input type=\"email\" id=\"email\" name=\"email\" class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50\" placeholder=\"Enter your email\" required value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form hx-post=\"/auth/login\" hx-target=\"#login-form\" class=\"space-y-4 w-full max-w-full sm:max-w-md\" id=\"login-form\"><div><label for=\"email\" class=\"block text-gray-700 font-bold mb-2\">Email</label> <input type=\"email\" id=\"email\" name=\"email\" class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50\" placeholder=\"Enter your email\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/view.templ`, Line: 121, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/view.templ`, Line: 137, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -298,7 +298,7 @@ func LoginForm(email, password string, err error) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(password)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/view.templ`, Line: 127, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/view.templ`, Line: 149, Col: 20}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -349,7 +349,7 @@ func ErrDiv(err error) templ.Component {
 			var templ_7745c5c3_Var14 string
 			templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(err.Error())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/view.templ`, Line: 140, Col: 14}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `auth/view.templ`, Line: 167, Col: 16}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 			if templ_7745c5c3_Err != nil {
