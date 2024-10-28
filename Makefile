@@ -1,5 +1,5 @@
 LOCAL_BIN:=$(CURDIR)/bin
-BACKEND_DIR := $(CURDIR)/backend
+BACKEND_DIR := $(CURDIR)/backend # TODO: переименовать в нужный сервис
 GOLANGCI_BIN:=$(LOCAL_BIN)/golangci-lint
 GOLANGCI_TAG:=1.61.0
 
@@ -32,7 +32,19 @@ migration-up:
 migration-up:
 	goose -dir "$(MIGRATION_FOLDER)" postgres "$(POSTGRES_SETUP_TEST)" down
 
-
 .PHONY: gen-sql
 gen-sql:
 	sqlc generate
+
+.PHONY: lint
+lint: # TODO: указать путь до golangci-lint через переменную
+	@echo "Starting linter"
+	@for dir in $(shell find . -type f -name go.mod -exec dirname {} \;); do \
+		echo "Running linter in $$dir"; \
+		cd $$dir && golangci-lint run --config $(CURDIR)/.golangci.yml && cd ..; \
+	done
+
+.PHONY: run
+run:
+	@echo "Staring app"
+	cd $(BACKEND_DIR) && air

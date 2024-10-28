@@ -1,86 +1,77 @@
 package server
 
 import (
-	"errors"
-	"fmt"
+	"net"
+	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 
-	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	recovermw "github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/google/uuid"
-	"github.com/larek-tech/innohack/backend/internal/server/view"
-	"github.com/larek-tech/innohack/backend/templ/pages"
+	"github.com/larek-tech/innohack/backend/config"
+	"github.com/larek-tech/innohack/backend/pkg"
 	"github.com/rs/zerolog/log"
 )
 
+const (
+	srvHeader   = "larek.tech"
+	bodyLimitMb = 5
+)
+
 type Server struct {
-	router *fiber.App
-	cfg    *Config
+	app *fiber.App
+	cfg config.Config
 }
 
-func New(cfg *Config, modules ...Module) (*Server, error) {
-	nodeID := uuid.NewString()
-	if cfg == nil {
-		return nil, errors.New("invalid server config")
-	}
-	err := cfg.Validate()
-	if err != nil {
-		return nil, err
+func New(cfg config.Config) Server {
+	if err := cfg.Server.Validate(); err != nil {
+		panic(pkg.WrapErr(err, "config validation"))
 	}
 
 	app := fiber.New(fiber.Config{
-		ServerHeader: "larek.tech",
-		BodyLimit:    5 * 1024 * 1024,
-		ErrorHandler: func(c *fiber.Ctx, e error) error {
-			var fiberErr *fiber.Error
-			if errors.As(e, &fiberErr) && fiberErr.Code == fiber.StatusNotFound {
-				err := adaptor.HTTPHandler(templ.Handler(pages.NotFound(c.Path())))(c)
-				return err
-			}
-			return e
-		},
+		ServerHeader: srvHeader,
+		BodyLimit:    bodyLimitMb * 1024 * 1024,
+		ErrorHandler: errorHandler,
 	})
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     cfg.GetOriginsString(),
+		AllowOrigins:     cfg.Server.GetOrigins(),
 		AllowCredentials: true,
 	}))
+	app.Use(logger.New())
+	app.Use(recovermw.New())
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		index := view.Index()
-		return adaptor.HTTPHandler(templ.Handler(index))(c)
-	})
-
-	app.Get("/health", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{"hostname": nodeID})
-	})
+	app.Get("/", indexHanlder)
+	app.Get("/health", healtCheckHandler(uuid.NewString()))
 	app.Static("/static", "./static")
 
-	fmt.Print(len(modules))
-	for _, m := range modules {
-		err := m.InitRoutes(app)
-		log.Info().Msgf("Module %s initialized", m.Name())
-		if err != nil {
-			log.Err(err).Str("module", m.Name()).Msg("unable to init")
-		}
+	return Server{
+		app: app,
+		cfg: cfg,
 	}
-
-	return &Server{
-		router: app,
-		cfg:    cfg,
-	}, nil
 }
 
-func (s *Server) Serve() error {
-	if s.cfg == nil {
-		return errors.New("unable to load config for server")
-	}
-	if s.router == nil {
-		return errors.New("fiber app was not configured")
-	}
-	addr := "0.0.0.0:" + strconv.FormatInt(int64(s.cfg.Port), 10)
+func (s *Server) Serve() {
+	s.initModules()
 
-	return s.router.Listen(addr)
+	go s.listenHttp(strconv.Itoa(s.cfg.Server.Port))
+
+	shutdown := make(chan os.Signal, 1)
+	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
+	<-shutdown
+
+	if err := s.app.Shutdown(); err != nil {
+		log.Err(pkg.WrapErr(err)).Msg("graceful shutdown")
+	}
+}
+
+func (s *Server) listenHttp(port string) {
+	addr := net.JoinHostPort("0.0.0.0", port)
+	if err := s.app.Listen(addr); err != nil {
+		log.Err(pkg.WrapErr(err)).Msg("application interrupted")
+	}
 }

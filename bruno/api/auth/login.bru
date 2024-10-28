@@ -1,0 +1,27 @@
+meta {
+  name: login
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:9999/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "test@test.com",
+    "password": "password"
+  }
+}
+
+body:form-urlencoded {
+  email: test@test.com
+  password: passwor
+}
