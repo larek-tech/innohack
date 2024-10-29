@@ -12,7 +12,6 @@ type MailService interface {
 }
 
 type Handler struct {
-	mail     MailService
 	log      *zerolog.Logger
 	validate *validator.Validate
 }

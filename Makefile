@@ -3,14 +3,14 @@ BACKEND_DIR := $(CURDIR)/backend # TODO: переименовать в нужн�
 GOLANGCI_BIN:=$(LOCAL_BIN)/golangci-lint
 GOLANGCI_TAG:=1.61.0
 
-MIGRATION_FOLDER=$(CURDIR)/data/sql/migrations
+MIGRATION_FOLDER=data/sql/migrations
 
 ifeq (,$(wildcard .env))
     # Если файл .env отсутствует, устанавливаем параметры по умолчанию
-    POSTGRES_USER := 'pg-user'
-    POSTGRES_PASSWORD := 'pg-pass'
-    POSTGRES_DB := 'larek-dev'
-    POSTGRES_HOST := 'localhost'
+    POSTGRES_USER := cisco
+    POSTGRES_PASSWORD := cisco
+    POSTGRES_DB := inno-dev
+    POSTGRES_HOST := 10.0.1.80
     POSTGRES_PORT := 5432
 else
     # Иначе, подключаем переменные из файла .env
@@ -18,7 +18,7 @@ else
     export
 endif
 POSTGRES_SETUP_TEST := user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=${POSTGRES_DB} host=${POSTGRES_HOST} port=${POSTGRES_PORT} sslmode=disable
-
+# PG_DSN:=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
 
 .PHONY: migration-create
 migration-create:
@@ -29,11 +29,11 @@ migration-up:
 	goose -dir "$(MIGRATION_FOLDER)" postgres "$(POSTGRES_SETUP_TEST)" up
 
 .PHONY: migration-down
-migration-up:
+migration-down:
 	goose -dir "$(MIGRATION_FOLDER)" postgres "$(POSTGRES_SETUP_TEST)" down
 
-.PHONY: gen-sql
-gen-sql:
+.PHONY: sql
+sql:
 	sqlc generate
 
 .PHONY: lint

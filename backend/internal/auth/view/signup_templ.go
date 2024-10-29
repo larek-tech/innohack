@@ -14,7 +14,7 @@ import (
 )
 
 // TODO: add oauth
-func SignupPage(input model.SignupReq) templ.Component {
+func SignupPage(input model.SignUpReq) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -51,7 +51,7 @@ func SignupPage(input model.SignupReq) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = SignupForm(input.Email, input.Password, input.PasswordConfirm).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = SignUpForm(input).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -69,7 +69,7 @@ func SignupPage(input model.SignupReq) templ.Component {
 	})
 }
 
-func SignupForm(email, password, passwordConfirm string) templ.Component {
+func SignUpForm(input model.SignUpReq) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -90,23 +90,49 @@ func SignupForm(email, password, passwordConfirm string) templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"any-errors\" class=\"modal modal-blur fade\" style=\"display: none\" aria-hidden=\"false\" tabindex=\"-1\"></div><form hx-post=\"/auth/singup\" hx-target=\"#reg-form\" class=\"space-y-4 w-full max-w-full sm:max-w-md\" id=\"reg-form\"><div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"any-errors\" class=\"modal modal-blur fade\" style=\"display: none\" aria-hidden=\"false\" tabindex=\"-1\"></div><form hx-post=\"/auth/signup\" hx-target=\"#reg-form\" class=\"space-y-4 w-full max-w-full sm:max-w-md\" id=\"reg-form\"><!-- First Name Field --><div><label for=\"first-name\" class=\"text-gray-700 font-bold mb-2\">First Name</label> <input type=\"text\" id=\"first-name\" name=\"firstName\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = EmailField(email, nil).Render(ctx, templ_7745c5c3_Buffer)
+		var templ_7745c5c3_Var4 string
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(input.FirstName)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/signup.templ`, Line: 31, Col: 76}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50\"></div><!-- Last Name Field --><div><label for=\"last-name\" class=\"text-gray-700 font-bold mb-2\">Last Name</label> <input type=\"text\" id=\"last-name\" name=\"lastName\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = PasswordFields(password, passwordConfirm).Render(ctx, templ_7745c5c3_Buffer)
+		var templ_7745c5c3_Var5 string
+		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(input.LastName)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/signup.templ`, Line: 38, Col: 73}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button type=\"submit\" data-bs-toggle=\"modal\" data-bs-target=\"#any-errors\" class=\"w-full bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-lime-200 focus:ring-opacity-50\">Register</button></form>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50\"></div><!-- Email Field --><div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = EmailField(input.Email, nil).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><!-- Password Fields -->")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = PasswordFields(input.Password, input.PasswordConfirm).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- Submit Button --><button type=\"submit\" data-bs-toggle=\"modal\" data-bs-target=\"#any-errors\" class=\"w-full bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-lime-200 focus:ring-opacity-50\">Register</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -1,6 +1,8 @@
 package model
 
-type SignupReq struct {
+type SignUpReq struct {
+	FirstName       string `validate:"required"`
+	LastName        string `validate:"required"`
 	Email           string `validate:"required,email" form:"email"`
 	Password        string `validate:"required" form:"password"`
 	PasswordConfirm string `validate:"required" form:"confirm-password"`

@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/larek-tech/innohack/backend/internal/auth/model"
+	"github.com/larek-tech/innohack/backend/internal/auth/service"
 	"github.com/larek-tech/innohack/backend/internal/shared"
 	"github.com/larek-tech/innohack/backend/pkg"
 )
@@ -20,7 +21,7 @@ func (v *View) LoginPage(c *fiber.Ctx) error {
 }
 
 func (v *View) Login(c *fiber.Ctx) error {
-	var input model.SignupReq
+	var input model.LoginReq
 
 	if err := c.BodyParser(&input); err != nil {
 		v.log.Err(pkg.WrapErr(err)).Msg("parsing login input")
@@ -32,7 +33,12 @@ func (v *View) Login(c *fiber.Ctx) error {
 		)(c)
 	}
 
-	if input.Email != "test@test.com" || input.Password != "password" {
+	token, err := v.service.LoginWithEmail(c.Context(), &service.EmailLoginData{
+		Email:    input.Email,
+		Password: input.Password,
+	}, string(c.Request().Header.UserAgent()))
+
+	if err != nil {
 		return adaptor.HTTPHandler(
 			templ.Handler(
 				LoginForm(input.Email, input.Password, shared.ErrInvalidCredentials),
@@ -40,7 +46,7 @@ func (v *View) Login(c *fiber.Ctx) error {
 			),
 		)(c)
 	}
-
+	c.Cookie(v.service.CreateAuthCookie(token))
 	c.Response().Header.Add("Hx-Redirect", "/")
 	return c.SendStatus(fiber.StatusOK)
 }

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"net"
 	"os"
 	"os/signal"
@@ -12,8 +13,13 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	recovermw "github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/larek-tech/innohack/backend/config"
+	"github.com/larek-tech/innohack/backend/internal/auth"
+	"github.com/larek-tech/innohack/backend/internal/auth/service"
+	"github.com/larek-tech/innohack/backend/internal/auth/storage"
 	"github.com/larek-tech/innohack/backend/pkg"
+	"github.com/larek-tech/innohack/backend/pkg/pg"
 	"github.com/rs/zerolog/log"
 )
 
@@ -49,14 +55,30 @@ func New(cfg config.Config) Server {
 	app.Get("/health", healtCheckHandler(uuid.NewString()))
 	app.Static("/static", "./static")
 
-	return Server{
+	s := Server{
 		app: app,
 		cfg: cfg,
 	}
+	// TODO: move queries init for pg
+	// TODO: make a way to init and define modules
+
+	pool, err := pgxpool.New(context.Background(), "postgresql://cisco:cisco@10.0.1.80:5432/inno-dev")
+	if err != nil {
+		panic(err)
+	}
+	q := pg.New(pool)
+
+	pg := storage.NewPG(pool, q)
+
+	authService := service.New(pg, pg)
+	s.initModules(
+		auth.New(authService),
+	)
+
+	return s
 }
 
 func (s *Server) Serve() {
-	s.initModules()
 
 	go s.listenHttp(strconv.Itoa(s.cfg.Server.Port))
 
