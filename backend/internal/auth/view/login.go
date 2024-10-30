@@ -5,7 +5,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/larek-tech/innohack/backend/internal/auth/model"
-	"github.com/larek-tech/innohack/backend/internal/auth/service"
 	"github.com/larek-tech/innohack/backend/internal/shared"
 	"github.com/larek-tech/innohack/backend/pkg"
 )
@@ -33,7 +32,7 @@ func (v *View) Login(c *fiber.Ctx) error {
 		)(c)
 	}
 
-	token, err := v.service.LoginWithEmail(c.Context(), &service.EmailLoginData{
+	token, err := v.service.LoginWithEmail(c.Context(), &model.EmailLoginData{
 		Email:    input.Email,
 		Password: input.Password,
 	}, string(c.Request().Header.UserAgent()))

@@ -5,7 +5,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 	"github.com/larek-tech/innohack/backend/internal/auth/model"
-	"github.com/larek-tech/innohack/backend/internal/auth/service"
 )
 
 func (v *View) SignUpPage(c *fiber.Ctx) error {
@@ -14,17 +13,17 @@ func (v *View) SignUpPage(c *fiber.Ctx) error {
 	// TODO: return rendered template with sign-up form
 	return adaptor.HTTPHandler(
 		templ.Handler(
-			SignupPage(inp),
+			SignUpPage(inp),
 		),
 	)(c)
 }
 
-func (v *View) SignUp(c *fiber.Ctx) error {
+func (view *View) SignUp(c *fiber.Ctx) error {
 	// TODO: receive sing-up information for email auth
 	var input model.SignUpReq
 	err := c.BodyParser(&input)
 	if err != nil {
-		v.log.Err(err).Msg("unable to parse")
+		view.log.Err(err).Msg("unable to parse")
 		return adaptor.HTTPHandler(
 			templ.Handler(
 				SignUpForm(input),
@@ -33,9 +32,9 @@ func (v *View) SignUp(c *fiber.Ctx) error {
 		)(c)
 	}
 	// 0. Invalid struct
-	err = v.validate.Struct(&input)
+	err = view.validate.Struct(&input)
 	if err != nil {
-		v.log.Err(err).Msg("unable to parse")
+		view.log.Err(err).Msg("unable to parse")
 		return adaptor.HTTPHandler(
 			templ.Handler(
 				SignUpForm(input),
@@ -55,7 +54,7 @@ func (v *View) SignUp(c *fiber.Ctx) error {
 		)(c)
 	}
 
-	token, err := v.service.RegisterEmail(c.Context(), &service.EmailRegisterData{
+	token, err := view.service.RegisterEmail(c.Context(), &model.EmailRegisterData{
 		FirstName: input.FirstName,
 		LastName:  input.LastName,
 		Email:     input.Email,
@@ -70,7 +69,7 @@ func (v *View) SignUp(c *fiber.Ctx) error {
 		)(c)
 	}
 
-	c.Cookie(v.service.CreateAuthCookie(token))
+	c.Cookie(view.service.CreateAuthCookie(token))
 	c.Response().Header.Add("Hx-Redirect", "/")
 	return c.JSON(fiber.Map{"hello": "world"})
 }

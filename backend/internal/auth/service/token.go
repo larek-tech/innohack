@@ -23,7 +23,10 @@ func createSessionToken(userID int64, email string) string {
 }
 
 func hashPassword(password string) string {
-	hash, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.MinCost)
+	if err != nil {
+		return ""
+	}
 
 	return string(hash)
 }

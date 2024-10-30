@@ -2,12 +2,14 @@ package config
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/larek-tech/innohack/backend/internal/server/config"
+	server "github.com/larek-tech/innohack/backend/internal/server/config"
+	"github.com/larek-tech/innohack/backend/internal/shared/database"
 	"github.com/larek-tech/innohack/backend/pkg"
 )
 
 type Config struct {
-	Server *server.Config `yaml:"server"`
+	Server   *server.Config           `yaml:"server"`
+	Postgres *database.PostgresConfig `yaml:"postgres"`
 }
 
 func MustNewConfig(path string) Config {

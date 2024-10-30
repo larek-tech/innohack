@@ -63,6 +63,7 @@ linters-settings:
     checks: ["all"]
 
   nolintlint:
+
     allow-unused: true
     require-explanation: true
     require-specific: true
@@ -95,6 +96,8 @@ linters-settings:
 
   govet:
     enable-all: true
+    disable:
+      - fieldalignment
 
   funlen:
     lines: 90

@@ -6,17 +6,16 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/larek-tech/innohack/backend/internal/auth/service"
+	"github.com/larek-tech/innohack/backend/internal/auth/model"
 	"github.com/larek-tech/innohack/backend/internal/shared"
 	"github.com/larek-tech/innohack/backend/pkg/pg"
+	"github.com/rs/zerolog/log"
 )
 
 type PG struct {
 	pool    *pgxpool.Pool
 	queries *pg.Queries
 }
-
-// TODO: move from pgx to sql interface
 
 func NewPG(p *pgxpool.Pool, q *pg.Queries) *PG {
 	return &PG{
@@ -25,17 +24,17 @@ func NewPG(p *pgxpool.Pool, q *pg.Queries) *PG {
 	}
 }
 
-func (p *PG) CreateUserWithEmail(ctx context.Context, payload *service.EmailRegisterData) (int64, error) {
+func (p *PG) CreateWithEmail(ctx context.Context, payload *model.EmailRegisterData) (int64, error) {
 	tx, err := p.pool.BeginTx(ctx, pgx.TxOptions{})
+	defer func() {
+		if txErr := tx.Rollback(ctx); txErr != nil {
+			log.Err(err).Msg("unable to rollback tx in Create withEmail")
+		}
+	}()
 	if err != nil {
-		// TODO: define storage level errors
 		return 0, err
 	}
 	q := p.queries.WithTx(tx)
-
-	defer func() {
-		_ = tx.Rollback(ctx)
-	}()
 
 	userID, err := q.CreateUserRecord(ctx, pg.CreateUserRecordParams{
 		Email:     payload.Email,
@@ -53,11 +52,15 @@ func (p *PG) CreateUserWithEmail(ctx context.Context, payload *service.EmailRegi
 	if err != nil {
 		return 0, shared.ErrEmailAlreadyTaken
 	}
-	tx.Commit(ctx)
+	if err = tx.Commit(ctx); err != nil {
+		log.Err(err)
+		return 0, err
+	}
+
 	return userID, nil
 }
 
-func (p *PG) SaveSessionToken(ctx context.Context, token, userAgent string, userID int64) (int64, error) {
+func (p *PG) Save(ctx context.Context, token, userAgent string, userID int64) (int64, error) {
 	return p.queries.CreateUserSession(ctx, pg.CreateUserSessionParams{
 		SessionID: token,
 		UserID:    userID,
@@ -65,12 +68,12 @@ func (p *PG) SaveSessionToken(ctx context.Context, token, userAgent string, user
 	})
 }
 
-func (p *PG) GetUserByEmail(ctx context.Context, email string) (*service.EmailUserData, error) {
+func (p *PG) GetByEmail(ctx context.Context, email string) (*model.EmailUserData, error) {
 	result, err := p.queries.GetUserByEmail(ctx, email)
 	if err != nil {
 		return nil, err
 	}
-	return &service.EmailUserData{
+	return &model.EmailUserData{
 		UserID:   result.ID,
 		Email:    result.Email,
 		Password: result.Password,
