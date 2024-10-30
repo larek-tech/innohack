@@ -1,23 +1,12 @@
 package main
 
 import (
-	"github.com/larek-tech/innohack/backend/auth"
 	"github.com/larek-tech/innohack/backend/config"
 	"github.com/larek-tech/innohack/backend/internal/server"
 )
 
 func main() {
-	cfg, err := config.LoadConfig("./config/config.yaml")
-	if err != nil {
-		panic(err)
-	}
-
-	srv, err := server.New(cfg.Server, auth.NewAuthModule())
-	if err != nil {
-		panic(err)
-	}
-	err = srv.Serve()
-	if err != nil {
-		panic(err)
-	}
+	cfg := config.MustNewConfig("./config/config.yaml")
+	srv := server.New(cfg)
+	srv.Serve()
 }
