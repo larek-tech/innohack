@@ -32,6 +32,11 @@ migration-up:
 migration-down:
 	goose -dir "$(MIGRATION_FOLDER)" postgres "$(POSTGRES_SETUP_TEST)" down
 
+
+.PHONY: infra
+infra:
+    docker compose -f infra/compose.yaml up -d
+
 .PHONY: sql
 sql:
 	sqlc generate
@@ -48,3 +53,4 @@ lint: # TODO: указать путь до golangci-lint через переме
 run:
 	@echo "Staring app"
 	cd $(BACKEND_DIR) && air
+
