@@ -1,0 +1,8 @@
+server:
+  domain: localhost
+  port: 9999
+  allow_origins:
+    - "http://localhost:9999"
+
+postgres:
+  dsn: postgresql://cisco:cisco@pg:5432/inno-dev

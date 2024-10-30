@@ -2,6 +2,16 @@ volumes:
   pg_admin:
 
 services:
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    command: ./main
+    volumes:
+      - ./config.yaml:/root/config/config.yaml
+    ports:
+      - "9999:9999"
+
   grafana:
     image: grafana/grafana
     container_name: grafana

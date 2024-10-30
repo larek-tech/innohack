@@ -45,8 +45,8 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v6
       with:
-        context: .
-        file: Dockerfile
+        context: ./backend
+        file: ./backend/Dockerfile
         platforms: linux/amd64
         tags: ghcr.io/larek-tech/innohack/control:${{ steps.extract_branch.outputs.tag }}
         push: true
