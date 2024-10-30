@@ -1,0 +1,54 @@
+package view
+
+import (
+"github.com/larek-tech/innohack/backend/internal/auth/model"
+"github.com/larek-tech/innohack/backend/templ/layout"
+)
+
+// TODO: add oauth
+templ SignUpPage(input model.SignUpReq) {
+@layout.Layout() {
+
+<body class="flex items-center justify-center min-h-screen bg-gray-100">
+	<div class="mx-auto bg-white shadow-md rounded-lg p-4 sm:p-8 w-full max-w-full sm:max-w-sm md:max-w-md h-auto">
+		<div class="flex items-center justify-center mb-4 sm:mb-6">
+			<img src="/static/favicon.ico" class="w-10 h-10" />
+			<h2 class="text-2xl font-bold text-gray-800 ml-2">Registration</h2>
+		</div>
+		@SignUpForm(input)
+	</div>
+</body>
+}
+}
+
+
+templ SignUpForm(input model.SignUpReq) {
+<div id="any-errors" class="modal modal-blur fade" style="display: none" aria-hidden="false" tabindex="-1"></div>
+<form hx-post="/auth/signup" hx-target="#reg-form" class="space-y-4 w-full max-w-full sm:max-w-md" id="reg-form">
+	<!-- First Name Field -->
+	<div>
+		<label for="first-name" class="text-gray-700 font-bold mb-2">First Name</label>
+		<input type="text" id="first-name" name="firstName" value={input.FirstName} required
+			class="w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50">
+	</div>
+
+	<!-- Last Name Field -->
+	<div>
+		<label for="last-name" class="text-gray-700 font-bold mb-2">Last Name</label>
+		<input type="text" id="last-name" name="lastName" value={input.LastName} required
+			class="w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50">
+	</div>
+
+	<!-- Email Field -->
+	<div>
+		@EmailField(input.Email, nil)
+	</div>
+
+	<!-- Password Fields -->
+	@PasswordFields(input.Password, input.PasswordConfirm)
+
+	<!-- Submit Button -->
+	<button type="submit" data-bs-toggle="modal" data-bs-target="#any-errors"
+		class="w-full bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-lime-200 focus:ring-opacity-50">Register</button>
+</form>
+}

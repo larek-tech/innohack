@@ -2,18 +2,20 @@ package config
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/larek-tech/innohack/backend/internal/server"
+	server "github.com/larek-tech/innohack/backend/internal/server/config"
+	"github.com/larek-tech/innohack/backend/internal/shared/database"
+	"github.com/larek-tech/innohack/backend/pkg"
 )
 
 type Config struct {
-	Server *server.Config `yaml:"http"`
+	Server   *server.Config           `yaml:"server"`
+	Postgres *database.PostgresConfig `yaml:"postgres"`
 }
 
-func LoadConfig(path string) (*Config, error) {
+func MustNewConfig(path string) Config {
 	var cfg Config
-	err := cleanenv.ReadConfig(path, &cfg)
-	if err != nil {
-		return nil, err
+	if err := cleanenv.ReadConfig(path, &cfg); err != nil {
+		panic(pkg.WrapErr(err, "load config"))
 	}
-	return &cfg, nil
+	return cfg
 }
