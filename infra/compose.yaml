@@ -3,6 +3,7 @@ volumes:
 
 services:
   backend:
+    image: ghcr.io/larek-tech/innohack/control:dev-d1e1d5a
     build:
       context: ../backend
       dockerfile: Dockerfile
