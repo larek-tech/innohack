@@ -46,7 +46,7 @@ func LoginPage(input model.LoginReq) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body class=\"flex items-center justify-center min-h-screen bg-gray-100\"><div class=\"mx-auto bg-white shadow-md rounded-lg p-4 sm:p-8 w-full max-w-full sm:max-w-sm md:max-w-md h-auto\"><div class=\"flex items-center justify-center mb-4 sm:mb-6\"><img src=\"/static/favicon.ico\" class=\"w-10 h-10\"><h2 class=\"text-2xl font-bold text-gray-800 ml-2\">Login</h2></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body class=\"flex flex-col items-center mx-auto py-8 md:h-screen bg-gray-100\"><div class=\"mx-auto bg-white shadow-md rounded-lg p-4 sm:p-8 w-full max-w-full sm:w-screen md:w-1/2 lg:w-1/3 h-auto flex flex-col items-center md:fixed md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2\"><div class=\"flex items-center justify-center mb-4 sm:mb-6\"><img src=\"/static/favicon.ico\" class=\"w-10 h-10\"><h2 class=\"text-2xl font-bold text-gray-800 ml-2\">Login</h2></div><div class=\"w-full\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -54,7 +54,7 @@ func LoginPage(input model.LoginReq) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></body>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div></body>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -89,33 +89,33 @@ func LoginForm(email, password string, err error) templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form hx-post=\"/auth/login\" hx-target=\"#login-form\" class=\"space-y-4 w-full max-w-full sm:max-w-md\" id=\"login-form\"><div><label for=\"email\" class=\"block text-gray-700 font-bold mb-2\">Email</label> <input type=\"email\" id=\"email\" name=\"email\" class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50\" placeholder=\"Enter your email\" required value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form hx-post=\"/auth/login\" hx-target=\"#login-form\" class=\"space-y-4 w-full max-w-full sm:max-w-md flex flex-col items-center mx-auto\" id=\"login-form\"><!-- Email Field --><div class=\"relative w-full\"><label for=\"email\" class=\"block text-gray-700 font-bold mb-2\">Email</label><div class=\"flex items-center border border-gray-300 rounded-md shadow-sm focus-within:border-lime-500 focus-within:ring focus-within:ring-lime-200 focus-within:ring-opacity-50 h-12 w-full\"><input type=\"email\" id=\"email\" name=\"email\" class=\"w-full border-0 focus:ring-0 focus:outline-none px-4 py-2\" placeholder=\"Enter your email\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/login.templ`, Line: 33, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/login.templ`, Line: 36, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></div><div><label for=\"password\" class=\"block text-gray-700 font-bold mb-2\">Password</label> <input type=\"password\" id=\"password\" name=\"password\" class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50\" placeholder=\"Enter your password\" required value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></div></div><!-- Password Field --><div class=\"relative w-full\"><label for=\"password\" class=\"block text-gray-700 font-bold mb-2\">Password</label><div class=\"flex items-center border border-gray-300 rounded-md shadow-sm focus-within:border-lime-500 focus-within:ring focus-within:ring-lime-200 focus-within:ring-opacity-50 h-12 w-full\"><input type=\"password\" id=\"password\" name=\"password\" class=\"w-full border-0 focus:ring-0 focus:outline-none px-4 py-2\" placeholder=\"Enter your password\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(password)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/login.templ`, Line: 45, Col: 20}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/login.templ`, Line: 46, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></div><div class=\"min-h-8\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <button type=\"button\" class=\"px-3 py-2 focus:outline-none\" onclick=\"togglePasswordVisibility()\"><svg class=\"h-5 w-5 text-gray-500\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M15 12a3 3 0 11-6 0 3 3 0 016 0z\"></path> <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z\"></path></svg></button></div></div><script>\n\t\tfunction togglePasswordVisibility() {\n\t\t\tvar passwordInput = document.getElementById(\"password\");\n\t\t\tif (passwordInput.type === \"password\") {\n\t\t\t\tpasswordInput.type = \"text\";\n\t\t\t} else {\n\t\t\t\tpasswordInput.type = \"password\";\n\t\t\t}\n\t\t}\n\t</script><div class=\"min-h-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

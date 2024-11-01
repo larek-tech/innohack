@@ -9,11 +9,13 @@ import (
 templ SignUpPage(input model.SignUpReq) {
 @layout.Layout() {
 
-<body class="flex items-center justify-center min-h-screen bg-gray-100">
-	<div class="mx-auto bg-white shadow-md rounded-lg p-4 sm:p-8 w-full max-w-full sm:max-w-sm md:max-w-md h-auto">
+<body class="flex flex-col items-center mx-auto py-8 md:h-screen bg-gray-100">
+	<div
+		class="mx-auto bg-white shadow-md rounded-lg p-4 sm:p-8 w-full max-w-full sm:w-screen md:w-1/2 lg:w-1/3 h-auto flex flex-col items-center md:fixed md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2">
+
 		<div class="flex items-center justify-center mb-4 sm:mb-6">
 			<img src="/static/favicon.ico" class="w-10 h-10" />
-			<h2 class="text-2xl font-bold text-gray-800 ml-2">Registration</h2>
+			<h2 class="text-2xl font-bold text-gray-800 ml-2">Register</h2>
 		</div>
 		@SignUpForm(input)
 	</div>
@@ -23,29 +25,62 @@ templ SignUpPage(input model.SignUpReq) {
 
 
 templ SignUpForm(input model.SignUpReq) {
+// <script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js"></script>
+// <script>
+// 	window.YaAuthSuggest.init(
+// 		{
+// 			client_id: "f75d39abb7464f02a99824f3e424d4c7",
+// 			response_type: "token",
+// 			redirect_uri: "http://localhost:9999/api/auth/oauth"
+// 		},
+// 		"http://localhost:9999",
+// 		{
+// 			view: "button",
+// 			parentId: "buttonContainerId",
+// 			buttonSize: 's',
+// 			buttonView: 'icon',
+// 			buttonTheme: 'light',
+// 			buttonBorderRadius: "0",
+// 			buttonIcon: 'ya',
+// 		}
+// 	)
+// 		.then(({ handler }) => handler())
+// 		.then(data => console.log('Сообщение с токеном', data))
+// 		.catch(error => console.log('Обработка ошибки', error))
+// </script>
 <div id="any-errors" class="modal modal-blur fade" style="display: none" aria-hidden="false" tabindex="-1"></div>
-<form hx-post="/auth/signup" hx-target="#reg-form" class="space-y-4 w-full max-w-full sm:max-w-md" id="reg-form">
+<form hx-post="/auth/signup" hx-target="#reg-form"
+	class="space-y-4 w-full max-w-full sm:w-full flex flex-col items-center mx-auto" id="reg-form">
 	<!-- First Name Field -->
-	<div>
+	<div class="relative w-full">
 		<label for="first-name" class="text-gray-700 font-bold mb-2">First Name</label>
-		<input type="text" id="first-name" name="firstName" value={input.FirstName} required
-			class="w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50">
+		<div
+			class="flex items-center border border-gray-300 rounded-md shadow-sm focus-within:border-lime-500 focus-within:ring focus-within:ring-lime-200 focus-within:ring-opacity-50 h-12 w-full">
+			<input type="email" id="email" name="email"
+				class="w-full border-0 focus:ring-0 focus:outline-none px-4 py-2" placeholder="Enter your first name"
+				required value={ input.FirstName } />
+		</div>
 	</div>
 
 	<!-- Last Name Field -->
-	<div>
-		<label for="last-name" class="text-gray-700 font-bold mb-2">Last Name</label>
-		<input type="text" id="last-name" name="lastName" value={input.LastName} required
-			class="w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50">
+	<div class="relative w-full">
+		<label for="first-name" class="text-gray-700 font-bold mb-2">Last Name</label>
+		<div
+			class="flex items-center border border-gray-300 rounded-md shadow-sm focus-within:border-lime-500 focus-within:ring focus-within:ring-lime-200 focus-within:ring-opacity-50 h-12 w-full">
+			<input type="email" id="email" name="email"
+				class="w-full border-0 focus:ring-0 focus:outline-none px-4 py-2" placeholder="Enter your surname"
+				required value={ input.LastName } />
+		</div>
 	</div>
 
 	<!-- Email Field -->
-	<div>
-		@EmailField(input.Email, nil)
-	</div>
+	@EmailField(input.Email, nil)
 
 	<!-- Password Fields -->
 	@PasswordFields(input.Password, input.PasswordConfirm)
+
+	<!-- Oauth -->
+	<div id="buttonContainerId"></div>
 
 	<!-- Submit Button -->
 	<button type="submit" data-bs-toggle="modal" data-bs-target="#any-errors"

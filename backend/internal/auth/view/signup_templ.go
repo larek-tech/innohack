@@ -47,7 +47,7 @@ func SignUpPage(input model.SignUpReq) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body class=\"flex items-center justify-center min-h-screen bg-gray-100\"><div class=\"mx-auto bg-white shadow-md rounded-lg p-4 sm:p-8 w-full max-w-full sm:max-w-sm md:max-w-md h-auto\"><div class=\"flex items-center justify-center mb-4 sm:mb-6\"><img src=\"/static/favicon.ico\" class=\"w-10 h-10\"><h2 class=\"text-2xl font-bold text-gray-800 ml-2\">Registration</h2></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body class=\"flex flex-col items-center mx-auto py-8 md:h-screen bg-gray-100\"><div class=\"mx-auto bg-white shadow-md rounded-lg p-4 sm:p-8 w-full max-w-full sm:w-screen md:w-1/2 lg:w-1/3 h-auto flex flex-col items-center md:fixed md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2\"><div class=\"flex items-center justify-center mb-4 sm:mb-6\"><img src=\"/static/favicon.ico\" class=\"w-10 h-10\"><h2 class=\"text-2xl font-bold text-gray-800 ml-2\">Register</h2></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -90,33 +90,33 @@ func SignUpForm(input model.SignUpReq) templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"any-errors\" class=\"modal modal-blur fade\" style=\"display: none\" aria-hidden=\"false\" tabindex=\"-1\"></div><form hx-post=\"/auth/signup\" hx-target=\"#reg-form\" class=\"space-y-4 w-full max-w-full sm:max-w-md\" id=\"reg-form\"><!-- First Name Field --><div><label for=\"first-name\" class=\"text-gray-700 font-bold mb-2\">First Name</label> <input type=\"text\" id=\"first-name\" name=\"firstName\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<script src=\"https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js\"></script><script>\n\twindow.YaAuthSuggest.init(\n\t\t{\n\t\t\tclient_id: \"f75d39abb7464f02a99824f3e424d4c7\",\n\t\t\tresponse_type: \"token\",\n\t\t\tredirect_uri: \"http://localhost:9999/api/auth/oauth\"\n\t\t},\n\t\t\"http://localhost:9999\",\n\t\t{\n\t\t\tview: \"button\",\n\t\t\tparentId: \"buttonContainerId\",\n\t\t\tbuttonSize: 's',\n\t\t\tbuttonView: 'icon',\n\t\t\tbuttonTheme: 'light',\n\t\t\tbuttonBorderRadius: \"0\",\n\t\t\tbuttonIcon: 'ya',\n\t\t}\n\t)\n\t\t.then(({ handler }) => handler())\n\t\t.then(data => console.log('Сообщение с токеном', data))\n\t\t.catch(error => console.log('Обработка ошибки', error))\n</script><div id=\"any-errors\" class=\"modal modal-blur fade\" style=\"display: none\" aria-hidden=\"false\" tabindex=\"-1\"></div><form hx-post=\"/auth/signup\" hx-target=\"#reg-form\" class=\"space-y-4 w-full max-w-full sm:w-full flex flex-col items-center mx-auto\" id=\"reg-form\"><!-- First Name Field --><div class=\"relative w-full\"><label for=\"first-name\" class=\"text-gray-700 font-bold mb-2\">First Name</label><div class=\"flex items-center border border-gray-300 rounded-md shadow-sm focus-within:border-lime-500 focus-within:ring focus-within:ring-lime-200 focus-within:ring-opacity-50 h-12 w-full\"><input type=\"email\" id=\"email\" name=\"email\" class=\"w-full border-0 focus:ring-0 focus:outline-none px-4 py-2\" placeholder=\"Enter your first name\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(input.FirstName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/signup.templ`, Line: 31, Col: 76}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/signup.templ`, Line: 61, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50\"></div><!-- Last Name Field --><div><label for=\"last-name\" class=\"text-gray-700 font-bold mb-2\">Last Name</label> <input type=\"text\" id=\"last-name\" name=\"lastName\" value=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></div></div><!-- Last Name Field --><div class=\"relative w-full\"><label for=\"first-name\" class=\"text-gray-700 font-bold mb-2\">Last Name</label><div class=\"flex items-center border border-gray-300 rounded-md shadow-sm focus-within:border-lime-500 focus-within:ring focus-within:ring-lime-200 focus-within:ring-opacity-50 h-12 w-full\"><input type=\"email\" id=\"email\" name=\"email\" class=\"w-full border-0 focus:ring-0 focus:outline-none px-4 py-2\" placeholder=\"Enter your surname\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(input.LastName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/signup.templ`, Line: 38, Col: 73}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/signup.templ`, Line: 72, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" required class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50\"></div><!-- Email Field --><div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></div></div><!-- Email Field -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -124,7 +124,7 @@ func SignUpForm(input model.SignUpReq) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><!-- Password Fields -->")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- Password Fields -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -132,7 +132,7 @@ func SignUpForm(input model.SignUpReq) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- Submit Button --><button type=\"submit\" data-bs-toggle=\"modal\" data-bs-target=\"#any-errors\" class=\"w-full bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-lime-200 focus:ring-opacity-50\">Register</button></form>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- Oauth --><div id=\"buttonContainerId\"></div><!-- Submit Button --><button type=\"submit\" data-bs-toggle=\"modal\" data-bs-target=\"#any-errors\" class=\"w-full bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-lime-200 focus:ring-opacity-50\">Register</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

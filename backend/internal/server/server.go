@@ -61,7 +61,7 @@ func New(cfg config.Config) Server {
 
 	pg := database.InitPostgres(context.Background(), cfg.Postgres.DSN)
 
-	authService := service.New(pg, pg)
+	authService := service.New(pg, pg, &cfg.Auth.Oauth)
 	s.initModules(
 		auth.New(authService),
 	)

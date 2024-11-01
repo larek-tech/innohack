@@ -21,7 +21,6 @@ type authView interface {
 	LoginPage(c *fiber.Ctx) error
 	Login(c *fiber.Ctx) error
 	ValidateEmail(c *fiber.Ctx) error
-	OAuth(c *fiber.Ctx) error
 }
 
 type AuthModule struct {
@@ -36,7 +35,7 @@ func New(s *service.Service) *AuthModule {
 	return &AuthModule{
 		s:     s,
 		log:   &logger,
-		api:   handler.New(&logger),
+		api:   handler.New(&logger, s),
 		views: view.New(&logger, s),
 	}
 }
@@ -52,7 +51,7 @@ func (m *AuthModule) InitRoutes(apiRouter, viewRouter fiber.Router) {
 func (m *AuthModule) initAPI(api fiber.Router) {
 	api.Post("/signup", m.api.SignUp)
 	api.Post("/login", m.api.Login)
-	api.Post("/oauth", m.api.OAuth)
+	api.Get("/oauth", m.api.OAuth)
 }
 
 func (m *AuthModule) initViews(views fiber.Router) {
@@ -61,5 +60,5 @@ func (m *AuthModule) initViews(views fiber.Router) {
 	views.Post("/signup/validate/email", m.views.ValidateEmail)
 	views.Get("/login", m.views.LoginPage)
 	views.Post("/login", m.views.Login)
-	views.Get("/oauth", m.views.OAuth)
+	// views.Get("/oauth", m.views.OAuth)
 }

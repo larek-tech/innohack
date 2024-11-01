@@ -30,38 +30,38 @@ func EmailField(value string, err error) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		if err != nil {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div hx-target=\"this\" hx-swap=\"outerHTML\" class=\"text-red-500\"><label for=\"email\" class=\"block text-gray-700 font-bold mb-2\">Email</label> <input type=\"email\" id=\"email\" name=\"email\" class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50\" placeholder=\"Enter your email\" required value=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div hx-target=\"this\" hx-swap=\"outerHTML\" class=\"text-red-500 relative w-full\"><label for=\"email\" class=\"block text-gray-700 font-bold mb-2\">Email</label><div class=\"flex items-center border border-gray-300 rounded-md shadow-sm focus-within:border-lime-500 focus-within:ring focus-within:ring-lime-200 focus-within:ring-opacity-50 h-12 w-full\"><input type=\"email\" id=\"email\" name=\"email\" class=\"w-full border-0 focus:ring-0 focus:outline-none px-4 py-2\" placeholder=\"Enter your email\" required value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/components.templ`, Line: 14, Col: 17}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/components.templ`, Line: 11, Col: 56}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-post=\"/auth/signup/validate/email\"><div>That email is already taken. Please enter another email.</div></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-post=\"/auth/signup/validate/email\"></div><div>That email is already taken. Please enter another email.</div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div hx-target=\"this\" hx-swap=\"outerHTML\"><label for=\"email\" class=\"block text-gray-700 font-bold mb-2\">Email</label> <input type=\"email\" id=\"email\" name=\"email\" class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50\" placeholder=\"Enter your email\" required value=\"")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div hx-target=\"this\" hx-swap=\"outerHTML\" class=\"relative w-full\"><label for=\"email\" class=\"block text-gray-700 font-bold mb-2\">Email</label><div class=\"flex items-center border border-gray-300 rounded-md shadow-sm focus-within:border-lime-500 focus-within:ring focus-within:ring-lime-200 focus-within:ring-opacity-50 h-12 w-full\"><input type=\"email\" id=\"email\" name=\"email\" class=\"w-full border-0 focus:ring-0 focus:outline-none px-4 py-2\" placeholder=\"Enter your email\" required value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(value)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/components.templ`, Line: 29, Col: 17}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/components.templ`, Line: 21, Col: 56}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-post=\"/auth/signup/validate/email\"></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" hx-post=\"/auth/signup/validate/email\"></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -91,7 +91,7 @@ func PasswordFields(password, confirmPassword string) templ.Component {
 			templ_7745c5c3_Var4 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div><label for=\"password\" class=\"block text-gray-700 font-bold mb-2\">Password</label> <input type=\"password\" id=\"password\" name=\"password\" class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50\" placeholder=\"Enter your password\" required></div><div><label for=\"confirm-password\" class=\"block text-gray-700 font-bold mb-2\">Confirm Password</label> <input type=\"password\" id=\"confirm-password\" name=\"confirm-password\" class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-lime-500 focus:ring focus:ring-lime-200 focus:ring-opacity-50\" placeholder=\"Confirm your password\" required></div><div id=\"password-warning\" class=\"text-red-500 font-bold mt-2 opacity-0\" style=\"transition: opacity 0.3s ease-in-out;\">Passwords do not match</div><script>\n\tconst passwordInput = document.getElementById('password');\n\tconst confirmPasswordInput = document.getElementById('confirm-password');\n\tconst passwordWarningDiv = document.getElementById('password-warning');\n\n\tconfirmPasswordInput.addEventListener('input', () => {\n\t\tif (passwordInput.value !== confirmPasswordInput.value) {\n\t\t\tconfirmPasswordInput.setCustomValidity('Passwords do not match');\n\t\t\tpasswordWarningDiv.style.opacity = '1';\n\t\t} else {\n\t\t\tconfirmPasswordInput.setCustomValidity('');\n\t\t\tpasswordWarningDiv.style.opacity = '0';\n\t\t}\n\t});\n</script>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"relative w-full\"><label for=\"password\" class=\"block text-gray-700 font-bold mb-2\">Password</label><div class=\"flex items-center border border-gray-300 rounded-md shadow-sm focus-within:border-lime-500 focus-within:ring focus-within:ring-lime-200 focus-within:ring-opacity-50 h-12 w-full\"><input type=\"password\" id=\"password\" name=\"password\" class=\"w-full border-0 focus:ring-0 focus:outline-none px-4 py-2\" placeholder=\"Enter your password\" required></div></div><div class=\"relative w-full\"><label for=\"confirm-password\" class=\"block text-gray-700 font-bold mb-2\">Confirm Password</label><div class=\"flex items-center border border-gray-300 rounded-md shadow-sm focus-within:border-lime-500 focus-within:ring focus-within:ring-lime-200 focus-within:ring-opacity-50 h-12 w-full\"><input type=\"password\" id=\"confirm-password\" name=\"confirm-password\" class=\"w-full border-0 focus:ring-0 focus:outline-none px-4 py-2\" placeholder=\"Confirm your password\" required></div></div><div id=\"password-warning\" class=\"text-red-500 font-bold mt-2 opacity-0\" style=\"transition: opacity 0.3s ease-in-out;\">Passwords do not match</div><script>\n\tconst passwordInput = document.getElementById('password');\n\tconst confirmPasswordInput = document.getElementById('confirm-password');\n\tconst passwordWarningDiv = document.getElementById('password-warning');\n\n\tconfirmPasswordInput.addEventListener('input', () => {\n\t\tif (passwordInput.value !== confirmPasswordInput.value) {\n\t\t\tconfirmPasswordInput.setCustomValidity('Passwords do not match');\n\t\t\tpasswordWarningDiv.style.opacity = '1';\n\t\t} else {\n\t\t\tconfirmPasswordInput.setCustomValidity('');\n\t\t\tpasswordWarningDiv.style.opacity = '0';\n\t\t}\n\t});\n</script>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -128,7 +128,7 @@ func ErrDiv(err error) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(err.Error())
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/components.templ`, Line: 82, Col: 16}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/components.templ`, Line: 69, Col: 14}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
