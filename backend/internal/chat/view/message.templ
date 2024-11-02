@@ -1,0 +1,9 @@
+package view
+
+templ Message(content string) {
+	<div id="notifications" hx-swap-oob="beforeend">
+		<div>
+			New message received: { content }
+		</div>
+	</div>
+}
