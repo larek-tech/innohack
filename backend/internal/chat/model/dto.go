@@ -1,15 +1,30 @@
 package model
 
+import "time"
+
 type Response struct {
 	SessionID   int64
+	Source      string // s3 link
+	Filename    string
+	Charts      []Chart
+	Description string // llm response
+	Multipliers Multipliers
+	CreatedAt   time.Time
+}
+
+type Chart struct {
+	Title       string
 	Records     []Record // для отрисовки графа
-	Description string   // llm response
+	Type        string   // пока что bar chart
+	Description string   // llm response TODO: возможно, не получится
 }
 
 type Record struct {
-	Source   string // s3 link
-	Filename string
-	X        string // формат: квартал - год
-	Y        float64
-	Type     string // пока что bar chart
+	X string // формат: квартал - год
+	Y float64
+}
+
+type Multipliers struct {
+	Key   string
+	Value float64
 }

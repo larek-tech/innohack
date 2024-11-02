@@ -16,6 +16,7 @@ var (
 type Config struct {
 	Port         int      `yaml:"port"`
 	AllowOrigins []string `yaml:"allow_origins"`
+	JwtSecret    string   `yaml:"jwt_secret"`
 }
 
 func (c *Config) Validate() error {

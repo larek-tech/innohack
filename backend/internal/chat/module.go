@@ -22,28 +22,19 @@ type ChatModule struct {
 	views chatView
 }
 
-func New(s *service.Service) *ChatModule {
+func New() *ChatModule {
 	logger := log.With().Str("module", "auth").Logger()
+	chatService := service.New()
 	return &ChatModule{
-		s:   s,
-		log: &logger,
-		// api:   handler.New(&logger, s),
-		views: view.New(&logger, s),
+		s:     chatService,
+		log:   &logger,
+		views: view.New(&logger, chatService),
 	}
 }
 
-func (m *ChatModule) InitRoutes(apiRouter, viewRouter fiber.Router) {
-	api := apiRouter.Group("/chat")
-	m.initAPI(api)
-
+func (m *ChatModule) InitRoutes(viewRouter fiber.Router) {
 	views := viewRouter.Group("/chat")
 	m.initViews(views)
-}
-
-func (m *ChatModule) initAPI(api fiber.Router) {
-	// api.Post("/signup", m.api.SignUp)
-	// api.Post("/login", m.api.Login)
-	// api.Get("/oauth", m.api.OAuth)
 }
 
 func (m *ChatModule) initViews(views fiber.Router) {

@@ -13,15 +13,15 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	recovermw "github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/larek-tech/innohack/backend/config"
-	"github.com/larek-tech/innohack/backend/internal/auth"
-	authService "github.com/larek-tech/innohack/backend/internal/auth/service"
-	"github.com/larek-tech/innohack/backend/internal/chat"
-	chatService "github.com/larek-tech/innohack/backend/internal/chat/service"
-	"github.com/larek-tech/innohack/backend/internal/shared/database"
 	"github.com/larek-tech/innohack/backend/pkg"
+	"github.com/larek-tech/innohack/backend/pkg/storage/postgres"
+	"github.com/larek-tech/innohack/backend/pkg/tracing"
 	"github.com/rs/zerolog/log"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
 const (
@@ -30,8 +30,11 @@ const (
 )
 
 type Server struct {
-	app *fiber.App
-	cfg config.Config
+	app      *fiber.App
+	cfg      config.Config
+	pg       *postgres.Postgres
+	tracer   trace.Tracer
+	exporter sdktrace.SpanExporter
 }
 
 func New(cfg config.Config) Server {
@@ -56,25 +59,34 @@ func New(cfg config.Config) Server {
 	app.Get("/health", healtCheckHandler(uuid.NewString()))
 	app.Static("/static", "./static")
 
+	exporter := tracing.MustNewExporter(context.Background(), cfg.Jaeger.URL())
+	provider := tracing.MustNewTraceProvider(exporter, "chat")
+	otel.SetTracerProvider(provider)
+
+	tracer := otel.Tracer("chat")
+
 	s := Server{
-		app: app,
-		cfg: cfg,
+		app:      app,
+		cfg:      cfg,
+		pg:       postgres.MustNew(cfg.Postgres, tracer),
+		tracer:   tracer,
+		exporter: exporter,
 	}
-
-	pg := database.InitPostgres(context.Background(), cfg.Postgres.DSN)
-
-	as := authService.New(pg, pg)
-	cs := chatService.New()
-	s.initModules(
-		auth.New(as),
-		chat.New(cs),
-	)
 
 	return s
 }
 
 func (s *Server) Serve() {
-	go s.listenHttp(strconv.Itoa(s.cfg.Server.Port))
+	defer func() {
+		if err := s.exporter.Shutdown(context.Background()); err != nil {
+			log.Err(err).Msg("shutodwn exporter")
+		}
+	}()
+	defer s.pg.Close()
+
+	s.initModules()
+
+	go s.listenHTTP(strconv.Itoa(s.cfg.Server.Port))
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
@@ -85,7 +97,7 @@ func (s *Server) Serve() {
 	}
 }
 
-func (s *Server) listenHttp(port string) {
+func (s *Server) listenHTTP(port string) {
 	addr := net.JoinHostPort("0.0.0.0", port)
 	if err := s.app.Listen(addr); err != nil {
 		log.Err(pkg.WrapErr(err)).Msg("application interrupted")

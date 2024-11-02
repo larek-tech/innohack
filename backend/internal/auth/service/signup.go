@@ -6,27 +6,30 @@ import (
 	"github.com/larek-tech/innohack/backend/internal/auth/model"
 	"github.com/larek-tech/innohack/backend/internal/shared"
 	"github.com/larek-tech/innohack/backend/pkg"
+	"github.com/larek-tech/innohack/backend/pkg/jwt"
 )
 
-func (s *Service) RegisterEmail(ctx context.Context, payload *model.EmailRegisterData, userAgent string) (string, error) {
-	// 1. Проверяем что данные валидные
-	err := s.validate.Struct(payload)
+func (s *Service) SignUp(ctx context.Context, req model.SignUpReq) (string, error) {
+	hashedPass, err := hashPassword(req.Password)
 	if err != nil {
 		return "", pkg.WrapErr(err)
 	}
-	payload.Password = hashPassword(payload.Password)
-	// 2. Создаем запись пользователя
-	// 3. Создаем запись о email
-	userID, err := s.users.CreateWithEmail(ctx, payload)
+
+	_, err = s.repo.InsertUser(ctx, model.User{
+		Email:    req.Email,
+		Password: hashedPass,
+	})
 	if err != nil {
-		return "", shared.ErrStorageInternal
+		if pkg.CheckDuplicateKey(err) {
+			return "", pkg.WrapErr(shared.ErrDuplicateKey, err.Error())
+		}
+		return "", pkg.WrapErr(shared.ErrStorageInternal, err.Error())
 	}
-	// 4. Получение токена для авторизации
-	sessionToken := createSessionToken(userID, payload.Email)
-	// 5*. Отправляем email с кодом подтверждения
-	_, err = s.tokens.Save(ctx, sessionToken, userAgent, userID)
+
+	token, err := jwt.CreateAccessToken(req.Email, s.jwtSecret)
 	if err != nil {
-		return "", shared.ErrStorageInternal
+		return "", pkg.WrapErr(err, "create access token")
 	}
-	return sessionToken, nil
+
+	return token, nil
 }

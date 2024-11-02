@@ -13,7 +13,6 @@ import (
 	"github.com/larek-tech/innohack/backend/templ/layout"
 )
 
-// TODO: add oauth
 func SignUpPage(input model.SignUpReq) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -90,33 +89,7 @@ func SignUpForm(input model.SignUpReq) templ.Component {
 			templ_7745c5c3_Var3 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"any-errors\" class=\"modal modal-blur fade\" style=\"display: none\" aria-hidden=\"false\" tabindex=\"-1\"></div><form hx-post=\"/auth/signup\" hx-target=\"#reg-form\" class=\"space-y-4 w-full max-w-full sm:w-full flex flex-col items-center mx-auto\" id=\"reg-form\"><!-- First Name Field --><div class=\"relative w-full\"><label for=\"first-name\" class=\"text-gray-700 font-bold mb-2\">First Name</label><div class=\"flex items-center border border-gray-300 rounded-md shadow-sm focus-within:border-lime-500 focus-within:ring focus-within:ring-lime-200 focus-within:ring-opacity-50 h-12 w-full\"><input type=\"email\" id=\"email\" name=\"email\" class=\"w-full border-0 focus:ring-0 focus:outline-none px-4 py-2\" placeholder=\"Enter your first name\" required value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(input.FirstName)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/signup.templ`, Line: 61, Col: 36}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></div></div><!-- Last Name Field --><div class=\"relative w-full\"><label for=\"first-name\" class=\"text-gray-700 font-bold mb-2\">Last Name</label><div class=\"flex items-center border border-gray-300 rounded-md shadow-sm focus-within:border-lime-500 focus-within:ring focus-within:ring-lime-200 focus-within:ring-opacity-50 h-12 w-full\"><input type=\"email\" id=\"email\" name=\"email\" class=\"w-full border-0 focus:ring-0 focus:outline-none px-4 py-2\" placeholder=\"Enter your surname\" required value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var5 string
-		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(input.LastName)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/auth/view/signup.templ`, Line: 72, Col: 35}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"></div></div><!-- Email Field -->")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<form hx-post=\"/auth/signup\" hx-target=\"#reg-form\" class=\"space-y-4 w-full max-w-full sm:w-full flex flex-col items-center mx-auto\" id=\"reg-form\"><!-- Email Field -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -132,7 +105,7 @@ func SignUpForm(input model.SignUpReq) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- Oauth --><div id=\"buttonContainerId\"></div><!-- Submit Button --><button type=\"submit\" data-bs-toggle=\"modal\" data-bs-target=\"#any-errors\" class=\"w-full bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-lime-200 focus:ring-opacity-50\">Register</button></form>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- Oauth --><div id=\"buttonContainerId\"></div><!-- Submit Button --><button type=\"submit\" data-bs-toggle=\"modal\" class=\"w-full bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring focus:ring-lime-200 focus:ring-opacity-50\">Register</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

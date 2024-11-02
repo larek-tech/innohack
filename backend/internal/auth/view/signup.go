@@ -8,68 +8,61 @@ import (
 )
 
 func (v *View) SignUpPage(c *fiber.Ctx) error {
-	inp := model.SignUpReq{}
-
-	// TODO: return rendered template with sign-up form
 	return adaptor.HTTPHandler(
 		templ.Handler(
-			SignUpPage(inp),
+			SignUpPage(model.SignUpReq{}),
 		),
 	)(c)
 }
 
-func (view *View) SignUp(c *fiber.Ctx) error {
-	// TODO: receive sing-up information for email auth
-	var input model.SignUpReq
-	err := c.BodyParser(&input)
-	if err != nil {
-		view.log.Err(err).Msg("unable to parse")
-		return adaptor.HTTPHandler(
-			templ.Handler(
-				SignUpForm(input),
-				templ.WithStatus(fiber.StatusUnprocessableEntity),
-			),
-		)(c)
-	}
-	// 0. Invalid struct
-	err = view.validate.Struct(&input)
-	if err != nil {
-		view.log.Err(err).Msg("unable to parse")
-		return adaptor.HTTPHandler(
-			templ.Handler(
-				SignUpForm(input),
-				templ.WithStatus(fiber.StatusAccepted),
-			),
-		)(c)
-	}
+func (v *View) SignUp(c *fiber.Ctx) error {
+	var req model.SignUpReq
 
-	// 1. password mismatch
-
-	if input.Password != input.PasswordConfirm {
+	// check for ivalid input
+	if err := c.BodyParser(&req); err != nil {
+		v.log.Err(err).Msg("unable to parse")
 		return adaptor.HTTPHandler(
 			templ.Handler(
-				SignUpForm(input),
+				SignUpForm(req),
 				templ.WithStatus(fiber.StatusUnprocessableEntity),
 			),
 		)(c)
 	}
 
-	token, err := view.service.RegisterEmail(c.Context(), &model.EmailRegisterData{
-		FirstName: input.FirstName,
-		LastName:  input.LastName,
-		Email:     input.Email,
-		Password:  input.Password,
-	}, string(c.Request().Header.UserAgent()))
-	if err != nil {
+	// validate input
+	if err := v.validate.Struct(&req); err != nil {
+		v.log.Err(err).Msg("unable to parse")
 		return adaptor.HTTPHandler(
 			templ.Handler(
-				SignUpForm(input),
+				SignUpForm(req),
 				templ.WithStatus(fiber.StatusUnprocessableEntity),
 			),
 		)(c)
 	}
 
-	c.Cookie(view.service.CreateAuthCookie(token))
+	// password mismatch
+	if req.Password != req.PasswordConfirm {
+		return adaptor.HTTPHandler(
+			templ.Handler(
+				SignUpForm(req),
+				templ.WithStatus(fiber.StatusBadRequest),
+			),
+		)(c)
+	}
+
+	// can't auth via jwt
+	token, err := v.service.SignUp(c.Context(), req)
+	if err != nil {
+		return adaptor.HTTPHandler(
+			templ.Handler(
+				SignUpForm(req),
+				templ.WithStatus(fiber.StatusInternalServerError),
+			),
+		)(c)
+	}
+
+	c.Cookie(v.authCookie(token))
+
 	c.Response().Header.Add("Hx-Redirect", "/")
 	return c.JSON(fiber.Map{"hello": "world"})
 }
