@@ -15,7 +15,7 @@ func (s *Service) Login(ctx context.Context, req model.LoginReq) (string, error)
 		return "", pkg.WrapErr(err, "find user by email")
 	}
 
-	if compareHashAndPassword(user.Password, req.Password) {
+	if !compareHashAndPassword(user.Password, req.Password) {
 		return "", pkg.WrapErr(shared.ErrInvalidCredentials)
 	}
 

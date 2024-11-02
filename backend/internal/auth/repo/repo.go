@@ -17,8 +17,9 @@ func New(pg *postgres.Postgres) *Repo {
 }
 
 const insertUser = `
-	insert into user(email, password)
-	values ($1, $2);
+	insert into users(email, password)
+	values ($1, $2)
+	returning id;
 `
 
 func (r *Repo) InsertUser(ctx context.Context, user model.User) (int64, error) {
@@ -32,7 +33,7 @@ func (r *Repo) InsertUser(ctx context.Context, user model.User) (int64, error) {
 }
 
 const findUserByEmail = `
-	select (id, password) from user
+	select id, email, password, created_at from users
 	where email = $1;
 `
 

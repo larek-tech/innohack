@@ -40,12 +40,12 @@ func MustNew(cfg *Config, tracer trace.Tracer) *Postgres {
 		time.Sleep(time.Second)
 		pool, err = pgxpool.New(ctx, cfg.URL())
 		if err != nil {
-			log.Err(err).Msg("failed to open new pool: %v")
+			log.Err(err).Msg("failed to open new pool")
 			continue
 		}
 
 		if err = pool.Ping(ctx); err != nil {
-			log.Err(err).Msg("can't access postgres: %v")
+			log.Err(err).Msg("can't access postgres")
 			continue
 		}
 
@@ -92,7 +92,7 @@ func (pg Postgres) CommitTx(ctx context.Context) error {
 		return errors.New("transaction not found in context")
 	}
 
-	return pkg.WrapErr(tx.Commit(ctx), "failed to commit transaction")
+	return tx.Commit(ctx)
 }
 
 // RollbackTx rolls back the transaction.
@@ -105,7 +105,7 @@ func (pg Postgres) RollbackTx(ctx context.Context) error {
 		return errors.New("transaction not found in context")
 	}
 
-	return pkg.WrapErr(tx.Rollback(ctx), "failed to rollback transaction")
+	return tx.Rollback(ctx)
 }
 
 // Query executes a query that returns a single row.
@@ -116,7 +116,7 @@ func (pg Postgres) Query(ctx context.Context, dest any, query string, args ...an
 		trace.WithAttributes(attribute.String("query", query)),
 	)
 	defer span.End()
-	return pkg.WrapErr(pgxscan.Get(ctx, pg.pool, dest, query, args...), "failed to get row")
+	return pgxscan.Get(ctx, pg.pool, dest, query, args...)
 }
 
 // QuerySlice executes a query that returns multiple rows.
@@ -127,7 +127,7 @@ func (pg Postgres) QuerySlice(ctx context.Context, dest any, query string, args 
 		trace.WithAttributes(attribute.String("query", query)),
 	)
 	defer span.End()
-	return pkg.WrapErr(pgxscan.Select(ctx, pg.pool, dest, query, args...), "failed to get rows")
+	return pgxscan.Select(ctx, pg.pool, dest, query, args...)
 }
 
 // Exec executes a query that doesn't return any rows.
@@ -140,7 +140,7 @@ func (pg Postgres) Exec(ctx context.Context, query string, args ...any) (pgconn.
 	defer span.End()
 
 	tag, err := pg.pool.Exec(ctx, query, args...)
-	return tag, pkg.WrapErr(err, "failed to exec")
+	return tag, err
 }
 
 // QueryTx executes a query that returns a single row in a transaction.
@@ -157,7 +157,7 @@ func (pg Postgres) QueryTx(ctx context.Context, dest any, query string, args ...
 		return err
 	}
 
-	return pkg.WrapErr(pgxscan.Get(ctx, tx, dest, query, args...), "failed to get row in transaction")
+	return pgxscan.Get(ctx, tx, dest, query, args...)
 }
 
 // QuerySliceTx executes a query that returns multiple rows in a transaction.
@@ -174,7 +174,7 @@ func (pg Postgres) QuerySliceTx(ctx context.Context, dest any, query string, arg
 		return err
 	}
 
-	return pkg.WrapErr(pgxscan.Select(ctx, tx, dest, query, args...), "failed to get rows in transaction")
+	return pgxscan.Select(ctx, tx, dest, query, args...)
 }
 
 // ExecTx executes a query that doesn't return any rows in a transaction.
@@ -192,7 +192,7 @@ func (pg Postgres) ExecTx(ctx context.Context, query string, args ...any) (pgcon
 	}
 
 	tag, err := tx.Exec(ctx, query, args...)
-	return tag, pkg.WrapErr(err, "failed to exec in transaction")
+	return tag, err
 }
 
 func getTxFromCtx(ctx context.Context) (pgx.Tx, error) {

@@ -6,20 +6,20 @@ create table users(
     password text not null,
     created_at timestamp default current_timestamp not null
 );
-create table session (
+create table session(
     id bigserial primary key,
     user_id bigint not null,
     created_at timestamp default current_timestamp not null,
     updated_at timestamp default current_timestamp not null,
     is_deleted boolean default false not null
 );
-create table query (
+create table query(
     id bigserial primary key,
     session_id bigint not null,
     prompt text not null,
     created_at timestamp default current_timestamp not null
 );
-create table response (
+create table response(
     id bigserial primary key,
     session_id bigint not null,
     query_id bigint not null,
@@ -30,7 +30,7 @@ create table response (
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin
-drop table user;
+drop table users;
 drop table session;
 drop table query;
 drop table response;

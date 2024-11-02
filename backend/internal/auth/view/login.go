@@ -7,6 +7,7 @@ import (
 	"github.com/larek-tech/innohack/backend/internal/auth/model"
 	"github.com/larek-tech/innohack/backend/internal/shared"
 	"github.com/larek-tech/innohack/backend/pkg"
+	"github.com/rs/zerolog/log"
 )
 
 func (v *View) LoginPage(c *fiber.Ctx) error {
@@ -33,6 +34,7 @@ func (v *View) Login(c *fiber.Ctx) error {
 
 	token, err := v.service.Login(c.Context(), req)
 	if err != nil {
+		log.Err(err).Msg(req.Password)
 		return adaptor.HTTPHandler(
 			templ.Handler(
 				LoginForm(req.Email, req.Password, shared.ErrInvalidCredentials),

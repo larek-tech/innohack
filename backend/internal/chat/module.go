@@ -13,7 +13,7 @@ import (
 
 type chatView interface {
 	ChatPage(c *fiber.Ctx) error
-	Message(c *websocket.Conn)
+	ProcessConn(c *websocket.Conn)
 }
 
 type ChatModule struct {
@@ -24,7 +24,7 @@ type ChatModule struct {
 
 func New() *ChatModule {
 	logger := log.With().Str("module", "auth").Logger()
-	chatService := service.New()
+	chatService := service.New(&logger)
 	return &ChatModule{
 		s:     chatService,
 		log:   &logger,
@@ -38,9 +38,13 @@ func (m *ChatModule) InitRoutes(viewRouter fiber.Router) {
 }
 
 func (m *ChatModule) initViews(views fiber.Router) {
-	// views.Use(middleware.WsProtocolUpgrade())
 	views.Get("/", m.views.ChatPage)
-	views.Get("/ws", websocket.New(m.views.Message, websocket.Config{
+	views.Get("/ws", websocket.New(m.views.ProcessConn, websocket.Config{
 		HandshakeTimeout: 20 * time.Second,
-	}))
+	}), func(c *fiber.Ctx) error {
+		if websocket.IsWebSocketUpgrade(c) {
+			return c.Next()
+		}
+		return fiber.ErrUpgradeRequired
+	})
 }

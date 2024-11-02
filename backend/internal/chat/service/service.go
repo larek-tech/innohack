@@ -1,19 +1,15 @@
 package service
 
 import (
-	"context"
-
-	"github.com/larek-tech/innohack/backend/internal/chat/model"
+	"github.com/rs/zerolog"
 )
 
 type Service struct {
+	log *zerolog.Logger
 }
 
-func New() *Service {
-	return &Service{}
-}
-
-func (s *Service) ProcessMessage(ctx context.Context, msg string) (model.Response, error) {
-
-	return model.Response{}, nil
+func New(log *zerolog.Logger) *Service {
+	return &Service{
+		log: log,
+	}
 }

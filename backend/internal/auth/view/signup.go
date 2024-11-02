@@ -53,6 +53,7 @@ func (v *View) SignUp(c *fiber.Ctx) error {
 	// can't auth via jwt
 	token, err := v.service.SignUp(c.Context(), req)
 	if err != nil {
+		v.log.Err(err).Msg("jwt token")
 		return adaptor.HTTPHandler(
 			templ.Handler(
 				SignUpForm(req),
@@ -64,5 +65,5 @@ func (v *View) SignUp(c *fiber.Ctx) error {
 	c.Cookie(v.authCookie(token))
 
 	c.Response().Header.Add("Hx-Redirect", "/")
-	return c.JSON(fiber.Map{"hello": "world"})
+	return c.SendStatus(fiber.StatusOK)
 }

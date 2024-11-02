@@ -10,7 +10,8 @@ ifeq (,$(wildcard .env))
     POSTGRES_USER := cisco
     POSTGRES_PASSWORD := cisco
     POSTGRES_DB := inno-dev
-    POSTGRES_HOST := 10.0.1.80
+    # POSTGRES_HOST := 10.0.1.80
+    POSTGRES_HOST := localhost
     POSTGRES_PORT := 5432
 else
     # Иначе, подключаем переменные из файла .env
@@ -33,9 +34,9 @@ migration-down:
 	goose -dir "$(MIGRATION_FOLDER)" postgres "$(POSTGRES_SETUP_TEST)" down
 
 
-.PHONY: infra
-infra:
-    docker compose -f infra/compose.yaml up -d
+# .PHONY: infra
+# infra:
+#     docker compose -f infra/compose.yaml up -d
 
 .PHONY: sql
 sql:

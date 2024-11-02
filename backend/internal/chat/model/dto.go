@@ -2,13 +2,19 @@ package model
 
 import "time"
 
+type Query struct {
+	Prompt string
+}
+
 type Response struct {
 	SessionID   int64
+	QueryID     int64
 	Source      string // s3 link
 	Filename    string
 	Charts      []Chart
 	Description string // llm response
 	Multipliers Multipliers
+	Err         error
 	CreatedAt   time.Time
 }
 
