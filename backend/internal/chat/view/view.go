@@ -15,6 +15,8 @@ type chatService interface {
 	InsertSession(ctx context.Context, cookie string) (int64, error)
 	InsertQuery(ctx context.Context, sessionID int64, query model.QueryDto) (int64, error)
 	InsertResponse(ctx context.Context, sessionID int64, resp model.ResponseDto) error
+	ListSessions(ctx context.Context, userID int64) ([]*model.SessionDto, error)
+	UpdateSessionTitle(ctx context.Context, sessionID int64, title string) error
 }
 
 type View struct {
