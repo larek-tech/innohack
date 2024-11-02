@@ -9,4 +9,6 @@ var (
 	ErrEmailAlreadyTaken  = errors.New("email is already taken")
 	ErrUnprocessable      = errors.New("can't process request")
 	ErrStorageInternal    = errors.New("internal storage error")
+	// ErrDuplicateKey is an error for postgres unique key violation.
+	ErrDuplicateKey = errors.New("duplicate key")
 )

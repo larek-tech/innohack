@@ -7,45 +7,44 @@ import (
 	"github.com/larek-tech/innohack/backend/internal/auth/model"
 	"github.com/larek-tech/innohack/backend/internal/shared"
 	"github.com/larek-tech/innohack/backend/pkg"
+	"github.com/rs/zerolog/log"
 )
 
 func (v *View) LoginPage(c *fiber.Ctx) error {
-	inp := model.LoginReq{}
-
 	return adaptor.HTTPHandler(
 		templ.Handler(
-			LoginPage(inp),
+			LoginPage(model.LoginReq{}),
 		),
 	)(c)
 }
 
 func (v *View) Login(c *fiber.Ctx) error {
-	var input model.LoginReq
+	var req model.LoginReq
 
-	if err := c.BodyParser(&input); err != nil {
+	// invalid data
+	if err := c.BodyParser(&req); err != nil {
 		v.log.Err(pkg.WrapErr(err)).Msg("parsing login input")
 		return adaptor.HTTPHandler(
 			templ.Handler(
-				LoginForm(input.Email, input.Password, shared.ErrInvalidCredentials),
+				LoginForm(req.Email, req.Password, shared.ErrInvalidCredentials),
 				templ.WithStatus(fiber.StatusUnprocessableEntity),
 			),
 		)(c)
 	}
 
-	token, err := v.service.LoginWithEmail(c.Context(), &model.EmailLoginData{
-		Email:    input.Email,
-		Password: input.Password,
-	}, string(c.Request().Header.UserAgent()))
-
+	token, err := v.service.Login(c.Context(), req)
 	if err != nil {
+		log.Err(err).Msg(req.Password)
 		return adaptor.HTTPHandler(
 			templ.Handler(
-				LoginForm(input.Email, input.Password, shared.ErrInvalidCredentials),
+				LoginForm(req.Email, req.Password, shared.ErrInvalidCredentials),
 				templ.WithStatus(fiber.StatusUnauthorized),
 			),
 		)(c)
 	}
-	c.Cookie(v.service.CreateAuthCookie(token))
+
+	c.Cookie(v.authCookie(token))
+
 	c.Response().Header.Add("Hx-Redirect", "/")
 	return c.SendStatus(fiber.StatusOK)
 }

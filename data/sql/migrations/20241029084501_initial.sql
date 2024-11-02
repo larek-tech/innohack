@@ -1,48 +1,40 @@
 -- +goose Up
 -- +goose StatementBegin
-SELECT 'up SQL query';
-CREATE TABLE IF NOT EXISTS user_profiles(
-    id BIGSERIAL PRIMARY KEY,
-    email text NOT NULL,
-    first_name text NOT NULL,
-    last_name text NOT NULL,
-    otp_secret text NOT NULL,
-    verified BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    deleted_at TIMESTAMP DEFAULT NULL
+create table users(
+    id bigserial primary key,
+    email text not null unique,
+    password text not null,
+    created_at timestamp default current_timestamp not null
 );
-CREATE TABLE IF NOT EXISTS email_account(
-    user_id BIGINT PRIMARY KEY,
-    password text NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
-    deleted_at TIMESTAMP DEFAULT NULL,
-    FOREIGN KEY(user_id) REFERENCES user_profiles(id) ON DELETE CASCADE
+create table session(
+    id bigserial primary key,
+    user_id bigint not null,
+    created_at timestamp default current_timestamp not null,
+    updated_at timestamp default current_timestamp not null,
+    is_deleted boolean default false not null
 );
-CREATE TABLE IF NOT EXISTS yandex_oauth(
-    user_id BIGINT PRIMARY KEY,
-    access_token TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW() NOT NULL,
-    updated_at TIMESTAMP DEFAULT NOW() NOT NULL,
-    deleted_at TIMESTAMP DEFAULT NULL,
-    FOREIGN KEY(user_id) REFERENCES user_profiles(id) ON DELETE CASCADE
+create table query(
+    id bigserial primary key,
+    session_id bigint not null,
+    prompt text not null,
+    created_at timestamp default current_timestamp not null
 );
-CREATE TABLE IF NOT EXISTS user_sessions(
-    id BIGSERIAL PRIMARY KEY,
-    session_id TEXT NOT NULL,
-    user_agent TEXT NOT NULL,
-    is_valid BOOLEAN DEFAULT TRUE NOT NULL,
-    user_id BIGINT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    FOREIGN KEY(user_id) REFERENCES user_profiles(id) ON DELETE CASCADE
+create table response(
+    id bigserial primary key,
+    session_id bigint not null,
+    query_id bigint not null,
+    sources text [] not null,
+    filenames text [] not null,
+    charts jsonb not null,
+    description text not null,
+    multipliers jsonb not null,
+    created_at timestamp default current_timestamp not null
 );
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin
-SELECT 'down SQL query';
-DROP TABLE IF EXISTS user_sessions;
-DROP TABLE IF EXISTS email_account;
-DROP TABLE IF EXISTS yandex_oauth;
-DROP TABLE IF EXISTS user_profiles;
+drop table users;
+drop table session;
+drop table query;
+drop table response;
 -- +goose StatementEnd

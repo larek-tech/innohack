@@ -5,26 +5,24 @@ import (
 
 	"github.com/larek-tech/innohack/backend/internal/auth/model"
 	"github.com/larek-tech/innohack/backend/internal/shared"
+	"github.com/larek-tech/innohack/backend/pkg"
+	"github.com/larek-tech/innohack/backend/pkg/jwt"
 )
 
-func (s *Service) LoginWithEmail(ctx context.Context, payload *model.EmailLoginData, userAgent string) (string, error) {
-	err := s.validate.Struct(payload)
+func (s *Service) Login(ctx context.Context, req model.LoginReq) (string, error) {
+	user, err := s.repo.FindUserByEmail(ctx, req.Email)
 	if err != nil {
-		return "", shared.ErrInvalidCredentials
-	}
-	userData, err := s.users.GetByEmail(ctx, payload.Email)
-	if err != nil {
-		return "", shared.ErrStorageInternal
-	}
-	if err = compareHashAndPassword(userData.Password, payload.Password); err != nil {
-		return "", shared.ErrInvalidCredentials
+		return "", pkg.WrapErr(err, "find user by email")
 	}
 
-	sessionToken := createSessionToken(userData.UserID, payload.Email)
-
-	_, err = s.tokens.Save(ctx, sessionToken, userAgent, userData.UserID)
-	if err != nil {
-		return "", shared.ErrStorageInternal
+	if !compareHashAndPassword(user.Password, req.Password) {
+		return "", pkg.WrapErr(shared.ErrInvalidCredentials)
 	}
-	return sessionToken, nil
+
+	token, err := jwt.CreateAccessToken(user.ID, req.Email, s.jwtSecret)
+	if err != nil {
+		return "", pkg.WrapErr(err, "create access token")
+	}
+
+	return token, nil
 }

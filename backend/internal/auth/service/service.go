@@ -4,31 +4,26 @@ import (
 	"context"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/larek-tech/innohack/backend/internal/auth/config"
 	"github.com/larek-tech/innohack/backend/internal/auth/model"
+	"github.com/larek-tech/innohack/backend/internal/auth/repo"
+	"github.com/larek-tech/innohack/backend/pkg/storage/postgres"
 )
 
-type userStore interface {
-	CreateWithEmail(context.Context, *model.EmailRegisterData) (int64, error)
-	GetByEmail(context.Context, string) (*model.EmailUserData, error)
-}
-
-type tokenStore interface {
-	Save(context.Context, string, string, int64) (int64, error)
+type authRepo interface {
+	InsertUser(ctx context.Context, user model.User) (int64, error)
+	FindUserByEmail(ctx context.Context, email string) (model.User, error)
 }
 
 type Service struct {
-	users    userStore
-	tokens   tokenStore
-	oauth    *OauthProvider
-	validate *validator.Validate
+	repo      authRepo
+	jwtSecret string
+	validate  *validator.Validate
 }
 
-func New(us userStore, ts tokenStore, gitCfg *config.OauthProvider) *Service {
+func New(pg *postgres.Postgres, jwtSecret string) *Service {
 	return &Service{
-		users:    us,
-		tokens:   ts,
-		oauth:    NewOauthProvider(gitCfg),
-		validate: validator.New(validator.WithRequiredStructEnabled()),
+		repo:      repo.New(pg),
+		jwtSecret: jwtSecret,
+		validate:  validator.New(validator.WithRequiredStructEnabled()),
 	}
 }

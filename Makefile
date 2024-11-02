@@ -10,7 +10,8 @@ ifeq (,$(wildcard .env))
     POSTGRES_USER := cisco
     POSTGRES_PASSWORD := cisco
     POSTGRES_DB := inno-dev
-    POSTGRES_HOST := 10.0.1.80
+    # POSTGRES_HOST := 10.0.1.80
+    POSTGRES_HOST := localhost
     POSTGRES_PORT := 5432
 else
     # Иначе, подключаем переменные из файла .env
@@ -33,9 +34,9 @@ migration-down:
 	goose -dir "$(MIGRATION_FOLDER)" postgres "$(POSTGRES_SETUP_TEST)" down
 
 
-.PHONY: infra
-infra:
-    docker compose -f infra/compose.yaml up -d
+# .PHONY: infra
+# infra:
+#     docker compose -f infra/compose.yaml up -d
 
 .PHONY: sql
 sql:
@@ -54,3 +55,11 @@ run:
 	@echo "Staring app"
 	cd $(BACKEND_DIR) && air
 
+.PHONY: proto
+proto:
+	@for dir in $(shell find . -type f -name go.mod -exec dirname {} \;); do \
+		protoc --proto_path=./proto --go_out=$$dir --go-grpc_out=$$dir \
+				proto/analytics/analytics.proto; \
+	done
+	@python -m grpc_tools.protoc -Iproto --python_out=analytics --pyi_out=analytics --grpc_python_out=analytics \
+ 					proto/analytics/analytics.proto
