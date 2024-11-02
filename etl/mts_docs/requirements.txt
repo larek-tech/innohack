@@ -1,0 +1,6 @@
+# 'img2table[easyocr]'
+opencv-python
+pandas
+pillow
+httpx
+bs4
