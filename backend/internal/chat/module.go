@@ -5,11 +5,13 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
+	"github.com/larek-tech/innohack/backend/internal/analytics/pb"
 	"github.com/larek-tech/innohack/backend/internal/chat/service"
 	"github.com/larek-tech/innohack/backend/internal/chat/view"
 	"github.com/larek-tech/innohack/backend/pkg/storage/postgres"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"google.golang.org/grpc"
 )
 
 type chatView interface {
@@ -23,9 +25,10 @@ type ChatModule struct {
 	views chatView
 }
 
-func New(pg *postgres.Postgres, jwtSecret string) *ChatModule {
+func New(pg *postgres.Postgres, jwtSecret string, grpcConn *grpc.ClientConn) *ChatModule {
 	logger := log.With().Str("module", "auth").Logger()
-	chatService := service.New(&logger, jwtSecret, pg)
+	analytics := pb.NewAnalyticsClient(grpcConn)
+	chatService := service.New(&logger, jwtSecret, pg, analytics)
 	return &ChatModule{
 		s:     chatService,
 		log:   &logger,

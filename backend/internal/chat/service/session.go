@@ -45,8 +45,8 @@ func (s *Service) GetSessionContent(ctx context.Context, sessionID int64) ([]*mo
 	}
 
 	res := make([]*model.SessionContentDto, len(content))
-	for idx, c := range content {
-		contentDto, err := c.ToDto()
+	for idx := range len(content) {
+		contentDto, err := content[idx].ToDto()
 		if err != nil {
 			return nil, pkg.WrapErr(err, "dto session content")
 		}

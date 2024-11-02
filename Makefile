@@ -55,3 +55,11 @@ run:
 	@echo "Staring app"
 	cd $(BACKEND_DIR) && air
 
+.PHONY: proto
+proto:
+	@for dir in $(shell find . -type f -name go.mod -exec dirname {} \;); do \
+		protoc --proto_path=./proto --go_out=$$dir --go-grpc_out=$$dir \
+				proto/analytics/analytics.proto; \
+	done
+	@python -m grpc_tools.protoc -Iproto --python_out=analytics --pyi_out=analytics --grpc_python_out=analytics \
+ 					proto/analytics/analytics.proto

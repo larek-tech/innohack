@@ -18,6 +18,7 @@ import (
 
 	"github.com/larek-tech/innohack/backend/config"
 	"github.com/larek-tech/innohack/backend/pkg"
+	"github.com/larek-tech/innohack/backend/pkg/grpc_client"
 	"github.com/larek-tech/innohack/backend/pkg/storage/postgres"
 	"github.com/larek-tech/innohack/backend/pkg/tracing"
 	"github.com/rs/zerolog/log"
@@ -35,6 +36,7 @@ type Server struct {
 	pg       *postgres.Postgres
 	tracer   trace.Tracer
 	exporter sdktrace.SpanExporter
+	grpcConn grpc_client.GrpcClient
 }
 
 func New(cfg config.Config) Server {
@@ -71,6 +73,7 @@ func New(cfg config.Config) Server {
 		pg:       postgres.MustNew(cfg.Postgres, tracer),
 		tracer:   tracer,
 		exporter: exporter,
+		grpcConn: grpc_client.MustNewGrpcClientWithInsecure(cfg.Analytics),
 	}
 
 	return s
