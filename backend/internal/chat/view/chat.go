@@ -168,7 +168,7 @@ func (v *View) ProcessConn(c *websocket.Conn) {
 		}
 		req.ID = queryID
 
-		go v.service.ProcessMessage(ctx, req, out, cancel)
+		go v.service.GetDescription(ctx, req, out, cancel)
 
 	chunks:
 		for {

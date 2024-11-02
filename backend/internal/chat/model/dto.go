@@ -99,6 +99,12 @@ func MultipliersFromPb(multipliers []*pb.Multiplier) []Multiplier {
 	return res
 }
 
+type SessionDto struct {
+	ID        int64     `json:"id"`
+	Title     string    `json:"title"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
 type SessionContentDto struct {
 	Query    QueryDto    `json:"query"`
 	Response ResponseDto `json:"response"`
