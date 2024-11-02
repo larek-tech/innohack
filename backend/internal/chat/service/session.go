@@ -12,6 +12,8 @@ import (
 type sessionRepo interface {
 	InsertSession(ctx context.Context, userID int64) (int64, error)
 	GetSessionContent(ctx context.Context, sessionID int64) ([]model.SessionContent, error)
+	ListSessions(ctx context.Context, userID int64) ([]model.Session, error)
+	UpdateSessionTitle(ctx context.Context, sessionID int64, title string) error
 }
 
 func (s *Service) InsertSession(ctx context.Context, cookie string) (int64, error) {
@@ -53,4 +55,24 @@ func (s *Service) GetSessionContent(ctx context.Context, sessionID int64) ([]*mo
 		res[idx] = contentDto
 	}
 	return res, nil
+}
+
+func (s *Service) ListSessions(ctx context.Context, userID int64) ([]*model.SessionDto, error) {
+	sessions, err := s.sr.ListSessions(ctx, userID)
+	if err != nil {
+		return nil, pkg.WrapErr(err, "list sessions")
+	}
+
+	res := make([]*model.SessionDto, len(sessions))
+	for idx := range len(sessions) {
+		res[idx] = sessions[idx].ToDto()
+	}
+	return res, nil
+}
+
+func (s *Service) UpdateSessionTitle(ctx context.Context, sessionID int64, title string) error {
+	if err := s.sr.UpdateSessionTitle(ctx, sessionID, title); err != nil {
+		return pkg.WrapErr(err, "update session title")
+	}
+	return nil
 }

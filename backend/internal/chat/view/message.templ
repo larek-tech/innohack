@@ -11,7 +11,7 @@ templ Message(response model.ResponseDto, err error) {
 	</div>
 }
 
-templ Graph(response model.Response) {
+templ Graph(response model.ResponseDto) {
 	<div>
 		<canvas id="graphID"></canvas>
 		{ response.Description }

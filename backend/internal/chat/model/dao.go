@@ -15,6 +15,14 @@ type Session struct {
 	IsDeleted bool      `db:"is_deleted"`
 }
 
+func (s *Session) ToDto() *SessionDto {
+	return &SessionDto{
+		ID:        s.ID,
+		Title:     "Новый чат", // TODO: поменять
+		CreatedAt: s.CreatedAt,
+	}
+}
+
 type Query struct {
 	ID        int64     `db:"id"`
 	SessionID int64     `db:"session_id"`

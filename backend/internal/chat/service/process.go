@@ -11,31 +11,7 @@ import (
 	"github.com/larek-tech/innohack/backend/pkg"
 )
 
-func (s *Service) ProcessMessage(ctx context.Context, req model.QueryDto, out chan<- model.ResponseDto, cancel <-chan int64) {
-	s.getCharts(ctx, req, out)
-	s.getDescription(ctx, req, out, cancel)
-
-	// ticker := time.NewTicker(time.Second)
-	// cnt := int64(0)
-
-	// for {
-	// 	select {
-	// 	case sessionID := <-cancel:
-	// 		s.log.Info().Int64("session id", sessionID).Msg("canceled")
-	// 		return
-	// 	case <-ticker.C:
-	// 		// TODO: grpc stream
-	// 		out <- model.ResponseDto{Description: strconv.FormatInt(cnt, 64)}
-	// 		cnt++
-	// 		if cnt > 10 {
-	// 			close(out)
-	// 			return
-	// 		}
-	// 	}
-	// }
-}
-
-func (s *Service) getCharts(ctx context.Context, req model.QueryDto, out chan<- model.ResponseDto) {
+func (s *Service) GetCharts(ctx context.Context, req model.QueryDto, out chan<- model.ResponseDto) {
 	// TODO: поменять на выбор дат
 	startDate := time.Now().AddDate(-2, 0, 0).String()
 	endDate := time.Now().AddDate(-1, 0, 0).String()
@@ -64,7 +40,7 @@ func (s *Service) getCharts(ctx context.Context, req model.QueryDto, out chan<- 
 	out <- chartsResponse
 }
 
-func (s *Service) getDescription(ctx context.Context, req model.QueryDto, out chan<- model.ResponseDto, cancel <-chan int64) {
+func (s *Service) GetDescription(ctx context.Context, req model.QueryDto, out chan<- model.ResponseDto, cancel <-chan int64) {
 	// TODO: поменять на выбор дат
 	startDate := time.Now().AddDate(-2, 0, 0).String()
 	endDate := time.Now().AddDate(-1, 0, 0).String()

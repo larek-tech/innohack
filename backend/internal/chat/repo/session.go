@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"errors"
 
 	"github.com/larek-tech/innohack/backend/internal/chat/model"
 	"github.com/larek-tech/innohack/backend/pkg"
@@ -54,4 +55,34 @@ func (r *SessionRepo) GetSessionContent(ctx context.Context, sessionID int64) ([
 		return nil, pkg.WrapErr(err)
 	}
 	return content, nil
+}
+
+const listSessions = `
+	select id, user_id, created_at, updated_at from session
+	where is_deleted = false and user_id = $1;
+`
+
+func (r *SessionRepo) ListSessions(ctx context.Context, userID int64) ([]model.Session, error) {
+	var sessions []model.Session
+	if err := r.pg.QuerySlice(ctx, &sessions, listSessions, userID); err != nil {
+		return nil, pkg.WrapErr(err)
+	}
+	return sessions, nil
+}
+
+const updateSessionTitle = `
+	update session set
+		title = $2
+	where id = $1 and is_deleted = false;
+`
+
+func (r *SessionRepo) UpdateSessionTitle(ctx context.Context, sessionID int64, title string) error {
+	tag, err := r.pg.Exec(ctx, updateSessionTitle, sessionID, title)
+	if err != nil {
+		return pkg.WrapErr(err)
+	}
+	if tag.RowsAffected() == 0 {
+		return pkg.WrapErr(errors.New("no rows updated"))
+	}
+	return nil
 }
