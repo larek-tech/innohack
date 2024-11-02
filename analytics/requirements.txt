@@ -2,3 +2,5 @@ grpcio
 grpcio-tools
 minio
 pandas
+qdrant-client
+pymongo

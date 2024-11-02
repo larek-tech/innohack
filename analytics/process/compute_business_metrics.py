@@ -350,7 +350,3 @@ def main():
         )
 
         print(metrics_for_chart)
-
-
-if __name__ == "__main__":
-    main()

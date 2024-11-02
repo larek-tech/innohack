@@ -1,12 +1,14 @@
 from minio import Minio
 import typing as tp
 import pandas as pd
-import os
-import json
+import numpy as np
+import bson
+from pymongo import MongoClient
 
 from compute_business_metrics import read_excel, code_column, get_liquidity, profitability_of_sales, profitability_of_assets, coefficients, coefficients_3years
 from const import CODE_NAME, MULTYPLIER_NAME
 
+import json
 s3 = Minio(
     "s3.larek.tech",
     access_key="I3gAX8ygZF1pnXuSSo00",
@@ -33,18 +35,18 @@ def get_value_by_code(df: pd.DataFrame, code: int, period: str):
         return None
 
 def add_one_param_records(records: dict, df: pd.DataFrame, code: int, year: int) -> dict:
-    if code not in records:
-        records[code] = {}
+    if str(code) not in records:
+        records[str(code)] = {}
 
     for period in PERIODS:
         value = get_value_by_code(df, code, period)
         substraction_value = int(period) - 1
-        year_key = year - substraction_value
-        if value:
-            if year_key not in records[code]:
-                records[code][year_key] = float(value)
+        year_key = str(year - substraction_value)
+        if value and value != np.nan and value is not None:
+            if year_key not in records[str(code)]:
+                records[str(code)][year_key] = float(value)
             else:
-                records[code][year_key] = float(value)
+                records[str(code)][year_key] = float(value)
     return records
 
 def parse_df_to_dict(records: dict, df: pd.DataFrame, year: str):
@@ -65,8 +67,8 @@ def parse_multy_to_dict(records: dict, df: pd.DataFrame) -> dict:
             
             if abbrev not in records:
                 records[abbrev] = {}
-            
-            records[abbrev][year] = value
+            if value and value != np.nan and value is not None:
+                records[abbrev][str(year)] = value
     
     return records
 
@@ -74,7 +76,7 @@ def parse_multy_to_dict(records: dict, df: pd.DataFrame) -> dict:
 def preprocess_xlsx():
     excel_paths = list_files()
     records = {}
-    multypliers = {}
+    multipliers = {}
     for file in excel_paths:
         dfs, year = read_excel(file)
         for df in dfs:
@@ -89,8 +91,17 @@ def preprocess_xlsx():
             coefficients_3years(dfs, year),
         ]
     )
-    multypliers = parse_multy_to_dict(multypliers, metrics_for_chart)
+    multipliers = parse_multy_to_dict(multipliers, metrics_for_chart)
 
+    return records, multipliers
 
+mongo = MongoClient("mongodb://46.138.243.191:27017/data", timeoutMS=30000**2)
+col = mongo.get_database("data").get_collection("excel")
 
-preprocess_xlsx()
+def save_data():
+    records, multipliers = preprocess_xlsx()
+    print(records, multipliers)
+
+    col.insert_many([records, multipliers])
+
+save_data()
