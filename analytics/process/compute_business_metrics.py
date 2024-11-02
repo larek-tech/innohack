@@ -134,20 +134,16 @@ def profitability_of_sales(df: List[pd.DataFrame], year: int) -> pd.DataFrame:
     def compute(year: str) -> List[float]:
         return [
             data_2[data_2[code_column] == 2100][year].values[0]
-            / data_2[data_2[code_column] == 2110][year].values[0]
-            * 100,
+            / data_2[data_2[code_column] == 2110][year].values[0],
             (
                 data_2[data_2[code_column] == 2300][year].values[0]
                 + data_2[data_2[code_column] == 2330][year].values[0]
             )
-            / data_2[data_2[code_column] == 2110][year].values[0]
-            * 100,
+            / data_2[data_2[code_column] == 2110][year].values[0],
             data_2[data_2[code_column] == 2400][year].values[0]
-            / data_2[data_2[code_column] == 2110][year].values[0]
-            * 100,
+            / data_2[data_2[code_column] == 2110][year].values[0],
             data_2[data_2[code_column] == 2400][year].values[0]
-            / data_1[data_1[code_column] == 1300][year].values[0]
-            * 100,
+            / data_1[data_1[code_column] == 1300][year].values[0],
         ]
 
     chart_df = pd.DataFrame(
@@ -170,7 +166,7 @@ def profitability_of_sales(df: List[pd.DataFrame], year: int) -> pd.DataFrame:
 # ROE (Рентабельность активов), Рентабельность оборотных активов, Рентабельность внеоборотных активов, Рентабельность собственного капитала
 def profitability_of_assets(
     df: List[pd.DataFrame], year: int, profit_type="sales"
-) -> List[float]:
+) -> pd.DataFrame:
     """
     Рентабельности активов (ROE) = прибыль за период / средняя величина активов за период х 100%
     Показатели прибыли для числителя формулы рентабельности активов нужно взять из отчета о финансовых результатах:
@@ -209,8 +205,7 @@ def profitability_of_assets(
                     + data_1[data_1[code_column] == 1600][year_prev].values[0]
                 )
                 / 2
-            )
-            * 100,
+            ),
             data_2[data_2[code_column] == profit_code][year].values[0]
             / (
                 (
@@ -218,8 +213,7 @@ def profitability_of_assets(
                     + data_1[data_1[code_column] == 1200][year_prev].values[0]
                 )
                 / 2
-            )
-            * 100,
+            ),
             data_2[data_2[code_column] == profit_code][year].values[0]
             / (
                 (
@@ -227,8 +221,7 @@ def profitability_of_assets(
                     + data_1[data_1[code_column] == 1100][year_prev].values[0]
                 )
                 / 2
-            )
-            * 100,
+            ),
         ]
 
     chart_df = pd.DataFrame(
@@ -247,6 +240,102 @@ def profitability_of_assets(
     return chart_df
 
 
+def coefficients(df: List[pd.DataFrame], year: int) -> pd.DataFrame:
+    """
+    Коэффициент автономии = Собственный капитал / Активы = 2400 / (1100 + 1200)
+
+    Коэффициент капитализации = Долгосрочные обязательства / (Долгосрочные обязательства + Собственный капитал)
+    = 1400 / (1400 + 2400)
+
+    Коэффициент покрытия инвестиций = (Собственный капитал+F1[1400])/F1[1600], где
+    Собственный капитал = сумме раздела Баланса "Капитал и резервы" плюс задолженность учредителей по взносам в уставный капитал;
+    F1[1400] – строка баланса "Итого долгосрочные обязательства";
+    F1[1600] – итого Баланс (т.е. общая сумма активов организации).
+    = (2400 + 1400) / 1600
+
+    """
+
+    data_1, data_2 = df[0], df[1]
+
+    def compute(year: str) -> List[float]:
+        return [
+            data_2[data_2[code_column] == 2400][year].values[0]
+            / (
+                data_1[data_1[code_column] == 1100][year].values[0]
+                + data_1[data_1[code_column] == 1200][year].values[0]
+            ),
+            data_1[data_1[code_column] == 1400][year].values[0]
+            / (
+                data_1[data_1[code_column] == 1400][year].values[0]
+                + data_2[data_2[code_column] == 2400][year].values[0]
+            ),
+            (
+                data_1[data_1[code_column] == 1400][year].values[0]
+                + data_2[data_2[code_column] == 2400][year].values[0]
+            )
+            / data_1[data_1[code_column] == 1600][year].values[0],
+        ]
+
+    chart_df = pd.DataFrame(
+        {
+            "metric_name": [
+                "коэффициент автономии",
+                "коэффициент капитализации",
+                "коэффициент покрытия инвестиций",
+            ]
+            * 2,
+            "matric_value": compute("1") + compute("2"),
+            "year": [year] * 3 + [year - 1] * 3,
+        }
+    )
+
+    return chart_df
+
+
+def coefficients_3years(df: List[pd.DataFrame], year: int) -> pd.DataFrame:
+    """
+    Коэффициент обеспеченности материальных запасов = (стр. 1300 – стр. 1100 ) / стр. 1210
+
+    Коэффициент финансовой зависимости = Обязательства / Активы = 1400 / 1600
+
+    Коэффициент финансового левериджа = Обязательства / Собственный капитал = (1400 + 1500) / 1300
+
+    """
+
+    data_1 = df[0]
+
+    def compute(year: str) -> List[float]:
+        return [
+            (
+                data_1[data_1[code_column] == 1300][year].values[0]
+                - data_1[data_1[code_column] == 1100][year].values[0]
+            )
+            / data_1[data_1[code_column] == 1210][year].values[0],
+            data_1[data_1[code_column] == 1400][year].values[0]
+            / data_1[data_1[code_column] == 1600][year].values[0],
+            (
+                data_1[data_1[code_column] == 1400][year].values[0]
+                - data_1[data_1[code_column] == 1500][year].values[0]
+            )
+            / data_1[data_1[code_column] == 1300][year].values[0],
+        ]
+
+    chart_df = pd.DataFrame(
+        {
+            "metric_name": [
+                "коэффициент обеспеченности материальных запасов",
+                "коэффициент финансовой зависимости",
+                "коэффициент финансового левериджа",
+            ]
+            * 3,
+            "matric_value": compute("1") + compute("2") + compute("3"),
+            "year": [year] * 3 + [year - 1] * 3 + [year - 2] * 3,
+        }
+    )
+
+    return chart_df
+
+
 def main():
     for file in os.listdir("excel_data"):
         df, year = read_excel("excel_data/" + file)
@@ -255,6 +344,8 @@ def main():
                 get_liquidity(df, year),
                 profitability_of_sales(df, year),
                 profitability_of_assets(df, year),
+                coefficients(df, year),
+                coefficients_3years(df, year),
             ]
         )
 
