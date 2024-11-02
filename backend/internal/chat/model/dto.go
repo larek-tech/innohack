@@ -3,9 +3,9 @@ package model
 import "time"
 
 type QueryDto struct {
-	ID        int64
-	SessionID int64
-	Prompt    string
+	ID        int64     `json:"id"`
+	Prompt    string    `json:"prompt"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type ResponseDto struct {
@@ -15,7 +15,6 @@ type ResponseDto struct {
 	Charts      []Chart
 	Description string // llm response
 	Multipliers []Multiplier
-	Err         error
 	CreatedAt   time.Time
 }
 
@@ -34,4 +33,9 @@ type Record struct {
 type Multiplier struct {
 	Key   string
 	Value float64
+}
+
+type SessionContentDto struct {
+	Query    QueryDto    `json:"query"`
+	Response ResponseDto `json:"response"`
 }

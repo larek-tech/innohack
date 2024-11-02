@@ -30,19 +30,24 @@ func (v *View) closeHandler(code int, text string) error {
 	return nil
 }
 
-func (v *View) respondError(c *websocket.Conn, err error) {
+func (v *View) respondError(c *websocket.Conn, ctx context.Context, err error) {
 	var resp model.ResponseDto
-	if err != nil {
-		resp.Err = err
+
+	msg, e := v.newHTMLMessage(ctx, resp, err)
+	if e != nil {
+		v.log.Err(e).Msg("failed to create html msg")
+		return
 	}
-	if err := c.WriteJSON(resp); err != nil {
+
+	if err := c.WriteMessage(websocket.TextMessage, msg); err != nil {
 		v.log.Err(err).Msg("failed to send error message on ws")
+		return
 	}
 }
 
-func (v *View) newHTMLMessage(ctx context.Context, resp model.ResponseDto) ([]byte, error) {
+func (v *View) newHTMLMessage(ctx context.Context, resp model.ResponseDto, err error) ([]byte, error) {
 	b := bytes.NewBuffer(nil)
-	msgComponent := Message(resp)
+	msgComponent := Message(resp, err)
 	wb := bufio.NewWriter(b)
 	if err := msgComponent.Render(ctx, wb); err != nil {
 		return nil, err
@@ -63,25 +68,25 @@ func (v *View) ProcessConn(c *websocket.Conn) {
 		v.log.Info().Msg("conn closed")
 	}()
 
+	ctx := context.Background()
 	authCookie := c.Cookies(shared.AuthCookieName, unauthorizedCookie)
 	if authCookie == unauthorizedCookie {
 		// TODO: add check for cookie on front
 		log.Error().Msg("chat error")
-		v.respondError(c, shared.ErrInvalidCredentials)
+		v.respondError(c, ctx, shared.ErrInvalidCredentials)
 		return
 	}
 
-	ctx := context.Background()
 	sessionID, err := v.service.InsertSession(ctx, authCookie)
 	if err != nil {
 		log.Err(err).Msg("chat error")
-		v.respondError(c, err)
+		v.respondError(c, ctx, err)
 		return
 	}
 
 	var (
 		resp   model.ResponseDto
-		req    = model.QueryDto{SessionID: sessionID}
+		req    model.QueryDto
 		desc   = strings.Builder{}
 		cancel = make(chan int64, 1)
 		out    = make(chan model.ResponseDto)
@@ -90,14 +95,14 @@ func (v *View) ProcessConn(c *websocket.Conn) {
 	for {
 		if err := c.ReadJSON(&req); err != nil {
 			log.Err(err).Msg("chat error")
-			v.respondError(c, err)
+			v.respondError(c, ctx, err)
 			return
 		}
 
-		queryID, err := v.service.InsertQuery(ctx, req)
+		queryID, err := v.service.InsertQuery(ctx, sessionID, req)
 		if err != nil {
 			log.Err(err).Msg("chat error")
-			v.respondError(c, err)
+			v.respondError(c, ctx, err)
 			return
 		}
 		req.ID = queryID
@@ -123,21 +128,24 @@ func (v *View) ProcessConn(c *websocket.Conn) {
 					desc.WriteString(chunk.Description)
 				}
 
-				msg, err := v.newHTMLMessage(ctx, chunk)
+				msg, err := v.newHTMLMessage(ctx, chunk, nil)
 				if err != nil {
 					log.Err(err).Msg("chat error")
-					v.respondError(c, err)
+					v.respondError(c, ctx, err)
 					continue
 				}
 
 				if err := c.WriteMessage(websocket.TextMessage, msg); err != nil {
 					v.log.Err(err).Msg("write message chunk")
-					v.respondError(c, err)
+					v.respondError(c, ctx, err)
 					continue
 				}
 			}
 		}
 
-		// TODO: save resp to db
+		if err := v.service.InsertResponse(ctx, sessionID, resp); err != nil {
+			v.respondError(c, ctx, err)
+			return
+		}
 	}
 }

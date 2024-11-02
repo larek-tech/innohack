@@ -11,7 +11,6 @@ import (
 func (s *Service) ProcessMessage(ctx context.Context, req model.QueryDto, out chan<- model.ResponseDto, cancel <-chan int64) {
 	ticker := time.NewTicker(time.Second)
 	cnt := int64(0)
-	desc := ""
 
 	for {
 		select {
@@ -20,8 +19,7 @@ func (s *Service) ProcessMessage(ctx context.Context, req model.QueryDto, out ch
 			return
 		case <-ticker.C:
 			// TODO: grpc stream
-			desc += strconv.FormatInt(cnt, 10)
-			out <- model.ResponseDto{Description: desc}
+			out <- model.ResponseDto{Description: strconv.FormatInt(cnt, 64)}
 			cnt++
 			if cnt > 10 {
 				close(out)
