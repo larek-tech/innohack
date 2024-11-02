@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/websocket/v2"
 	"github.com/larek-tech/innohack/backend/internal/chat/model"
 	"github.com/larek-tech/innohack/backend/internal/shared"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -30,7 +31,7 @@ func (v *View) closeHandler(code int, text string) error {
 }
 
 func (v *View) respondError(c *websocket.Conn, err error) {
-	var resp model.Response
+	var resp model.ResponseDto
 	if err != nil {
 		resp.Err = err
 	}
@@ -39,7 +40,7 @@ func (v *View) respondError(c *websocket.Conn, err error) {
 	}
 }
 
-func (v *View) newHTMLMessage(ctx context.Context, resp model.Response) ([]byte, error) {
+func (v *View) newHTMLMessage(ctx context.Context, resp model.ResponseDto) ([]byte, error) {
 	b := bytes.NewBuffer(nil)
 	msgComponent := Message(resp)
 	wb := bufio.NewWriter(b)
@@ -64,25 +65,42 @@ func (v *View) ProcessConn(c *websocket.Conn) {
 
 	authCookie := c.Cookies(shared.AuthCookieName, unauthorizedCookie)
 	if authCookie == unauthorizedCookie {
-		// TODO: add check for cookie
+		// TODO: add check for cookie on front
+		log.Error().Msg("chat error")
 		v.respondError(c, shared.ErrInvalidCredentials)
 		return
 	}
 
+	ctx := context.Background()
+	sessionID, err := v.service.InsertSession(ctx, authCookie)
+	if err != nil {
+		log.Err(err).Msg("chat error")
+		v.respondError(c, err)
+		return
+	}
+
 	var (
-		req    model.Query
-		resp   model.Response
+		resp   model.ResponseDto
+		req    = model.QueryDto{SessionID: sessionID}
 		desc   = strings.Builder{}
-		ctx    = context.Background()
 		cancel = make(chan int64, 1)
-		out    = make(chan model.Response)
+		out    = make(chan model.ResponseDto)
 	)
 
 	for {
 		if err := c.ReadJSON(&req); err != nil {
+			log.Err(err).Msg("chat error")
 			v.respondError(c, err)
 			return
 		}
+
+		queryID, err := v.service.InsertQuery(ctx, req)
+		if err != nil {
+			log.Err(err).Msg("chat error")
+			v.respondError(c, err)
+			return
+		}
+		req.ID = queryID
 
 		go v.service.ProcessMessage(ctx, req, out, cancel)
 
@@ -107,13 +125,14 @@ func (v *View) ProcessConn(c *websocket.Conn) {
 
 				msg, err := v.newHTMLMessage(ctx, chunk)
 				if err != nil {
+					log.Err(err).Msg("chat error")
 					v.respondError(c, err)
 					continue
 				}
 
 				if err := c.WriteMessage(websocket.TextMessage, msg); err != nil {
-					v.respondError(c, err)
 					v.log.Err(err).Msg("write message chunk")
+					v.respondError(c, err)
 					continue
 				}
 			}

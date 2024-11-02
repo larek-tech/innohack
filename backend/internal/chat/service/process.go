@@ -8,7 +8,7 @@ import (
 	"github.com/larek-tech/innohack/backend/internal/chat/model"
 )
 
-func (s *Service) ProcessMessage(ctx context.Context, req model.Query, out chan<- model.Response, cancel <-chan int64) {
+func (s *Service) ProcessMessage(ctx context.Context, req model.QueryDto, out chan<- model.ResponseDto, cancel <-chan int64) {
 	ticker := time.NewTicker(time.Second)
 	cnt := int64(0)
 	desc := ""
@@ -21,7 +21,7 @@ func (s *Service) ProcessMessage(ctx context.Context, req model.Query, out chan<
 		case <-ticker.C:
 			// TODO: grpc stream
 			desc += strconv.FormatInt(cnt, 10)
-			out <- model.Response{Description: desc}
+			out <- model.ResponseDto{Description: desc}
 			cnt++
 			if cnt > 10 {
 				close(out)

@@ -10,7 +10,7 @@ import (
 )
 
 type chatService interface {
-	ProcessMessage(ctx context.Context, req model.Query, out chan<- model.Response, cancel <-chan int64)
+	ProcessMessage(ctx context.Context, req model.QueryDto, out chan<- model.ResponseDto, cancel <-chan int64)
 }
 
 type View struct {

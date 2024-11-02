@@ -19,7 +19,7 @@ func (s *Service) Login(ctx context.Context, req model.LoginReq) (string, error)
 		return "", pkg.WrapErr(shared.ErrInvalidCredentials)
 	}
 
-	token, err := jwt.CreateAccessToken(req.Email, s.jwtSecret)
+	token, err := jwt.CreateAccessToken(user.ID, req.Email, s.jwtSecret)
 	if err != nil {
 		return "", pkg.WrapErr(err, "create access token")
 	}

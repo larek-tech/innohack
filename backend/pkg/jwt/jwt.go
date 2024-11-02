@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -13,14 +14,14 @@ type jwtClaims struct {
 	RegisteredClaims jwt.RegisteredClaims
 }
 
-func CreateAccessToken(email, secret string) (string, error) {
+func CreateAccessToken(userID int64, email, secret string) (string, error) {
 	key := []byte(secret)
 
 	jwtClaims := jwtClaims{
 		Email: email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)), // TODO: вынести в конфиг
-			Subject:   email,
+			Subject:   strconv.FormatInt(userID, 10),
 		},
 	}
 
@@ -46,12 +47,12 @@ func VerifyPassword(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-func AuthenticateUser(email, hashedPassword, password, secret string) (string, error) {
+func AuthenticateUser(userID int64, email, hashedPassword, password, secret string) (string, error) {
 	if err := VerifyPassword(hashedPassword, password); err != nil {
 		return "", err
 	}
 
-	accessToken, err := CreateAccessToken(email, secret)
+	accessToken, err := CreateAccessToken(userID, email, secret)
 	if err != nil {
 		return "", err
 	}

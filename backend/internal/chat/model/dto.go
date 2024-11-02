@@ -2,18 +2,19 @@ package model
 
 import "time"
 
-type Query struct {
-	Prompt string
+type QueryDto struct {
+	ID        int64
+	SessionID int64
+	Prompt    string
 }
 
-type Response struct {
-	SessionID   int64
+type ResponseDto struct {
 	QueryID     int64
 	Source      string // s3 link
 	Filename    string
 	Charts      []Chart
 	Description string // llm response
-	Multipliers Multipliers
+	Multipliers []Multiplier
 	Err         error
 	CreatedAt   time.Time
 }
@@ -30,7 +31,7 @@ type Record struct {
 	Y float64
 }
 
-type Multipliers struct {
+type Multiplier struct {
 	Key   string
 	Value float64
 }

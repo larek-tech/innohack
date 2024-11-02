@@ -15,7 +15,7 @@ func (s *Server) initModules() {
 
 	modules := []module{
 		auth.New(s.pg, s.cfg.Server.JwtSecret),
-		chat.New(),
+		chat.New(s.pg, s.cfg.Server.JwtSecret),
 	}
 	for _, m := range modules {
 		m.InitRoutes(views)

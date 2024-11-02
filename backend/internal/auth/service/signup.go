@@ -15,7 +15,7 @@ func (s *Service) SignUp(ctx context.Context, req model.SignUpReq) (string, erro
 		return "", pkg.WrapErr(err)
 	}
 
-	_, err = s.repo.InsertUser(ctx, model.User{
+	userID, err := s.repo.InsertUser(ctx, model.User{
 		Email:    req.Email,
 		Password: hashedPass,
 	})
@@ -26,7 +26,7 @@ func (s *Service) SignUp(ctx context.Context, req model.SignUpReq) (string, erro
 		return "", pkg.WrapErr(shared.ErrStorageInternal, err.Error())
 	}
 
-	token, err := jwt.CreateAccessToken(req.Email, s.jwtSecret)
+	token, err := jwt.CreateAccessToken(userID, req.Email, s.jwtSecret)
 	if err != nil {
 		return "", pkg.WrapErr(err, "create access token")
 	}

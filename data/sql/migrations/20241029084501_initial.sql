@@ -23,8 +23,11 @@ create table response(
     id bigserial primary key,
     session_id bigint not null,
     query_id bigint not null,
-    records jsonb not null,
+    source text not null,
+    filename text not null,
+    charts jsonb not null,
     description text not null,
+    multipliers jsonb not null,
     created_at timestamp default current_timestamp not null
 );
 -- +goose StatementEnd

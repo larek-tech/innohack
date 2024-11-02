@@ -10,6 +10,9 @@ import (
 
 // WrapErr обертка для ошибок и передачи к ним контекста.
 func WrapErr(e error, desc ...string) error {
+	if e == nil {
+		return nil
+	}
 	var d string
 	if len(desc) > 0 {
 		d = desc[0]
