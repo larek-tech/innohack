@@ -10,38 +10,44 @@ code_column = "Код стр."
 Рентабельность продаж done
 Рентабельность активов done
 Рентабельность собственного капитала done
-P/E
-P/BV
+P/E нужна мосбиржа (цена акции)
+P/BV 
 EV/S
 EV/EBITDA  
 Долг/EBITDA
-ROE
+ROE done
 Рентабельность продаж done
 """
 
 
-def read_excel(path_to_excel: str) -> List[pd.DataFrame]:
+def read_excel(path_to_excel: str) -> Tuple[List[pd.DataFrame], int]:
+
     sheets = pd.ExcelFile(path_to_excel).sheet_names
     xls = []
     n_start_row = pd.read_excel(path_to_excel)
-    year = n_start_row["Unnamed: 3"][4]
+    year = int(n_start_row["Unnamed: 3"][4])
     n_start_row = n_start_row[
         (n_start_row["Unnamed: 0"] == "АКТИВ")
         | (n_start_row["Unnamed: 0"] == "Наименование показателя")
     ].index[0]
+
     for sheet in sheets:
         df = pd.read_excel(
             path_to_excel, sheet_name=sheet, skiprows=n_start_row + 1
         )  # skiprows=9
-        df = df.rename(
-            columns={
-                "На отчетную дату": "1",
-                "На конец предыдущего отчетного периода": "2",
-                "На конец предшествующего предыдущему отчетному периоду": "3",
-                "За отчетный период": "1",
-                "За предыдущий период": "2",
-            }
-        )
+
+        # Переименование колонок
+        new_column_names = df.columns.tolist()
+
+        if len(new_column_names) > 2:
+            new_column_names[2] = "1"
+        if len(new_column_names) > 3:
+            new_column_names[3] = "2"
+        if len(new_column_names) > 4:
+            new_column_names[4] = "3"
+
+        df.columns = new_column_names
+
         df.replace("-", np.nan, inplace=True)
         df.iloc[:, 1:] = df.iloc[:, 1:].astype(float)
         xls += [df]
