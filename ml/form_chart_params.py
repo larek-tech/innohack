@@ -38,6 +38,24 @@ def get_one_param_records(df: pd.DataFrame, code: int, year: int) -> list[Record
             )
     return records
 
+def count_records_percentage(records: list[Record]) -> list[Record]:
+    percent_records = []
+    whole_sum = 0
+    for record in records:
+        whole_sum += record.y
+
+    for record in records:
+        percent_records.append(
+            Record(
+                x=record.x,
+                y=(record.y/whole_sum)*100
+            )
+        )
+    return percent_records
+
+def form_pie_chart(df: pd.DataFrame, title: str, codes: list[int]) -> Chart:
+    pass
+
 def form_graphs_for_one_xlsx(xlsx_path: str) -> list[Chart]:
     graphs: list[Chart] = []
     dfs, year = read_excel(xlsx_path)
@@ -48,6 +66,32 @@ def form_graphs_for_one_xlsx(xlsx_path: str) -> list[Chart]:
         title="Выручка",
         records=get_one_param_records(dfs[1], 2110, year),
         type="bar chart",
+        description=""
+    ))
+    graphs.append(Chart(
+        title="Себестоимость",
+        records=get_one_param_records(dfs[1], 2120, year),
+        type="bar chart",
+        description=""
+    ))
+    graphs.append(Chart(
+        title="Прибыль",
+        records=get_one_param_records(dfs[1], 2200, year),
+        type="bar chart",
+        description=""
+    ))
+    # graphs.append(Chart(
+    #     title="EBITDA",
+    #     records=get_one_param_records(dfs[1], 2200, year),
+    #     type="bar chart",
+    #     description=""
+    # ))
+
+    # single pie chart
+    graphs.append(Chart(
+        title="Прибыль",
+        records=get_one_param_records(dfs[1], 2200, year),
+        type="pie chart",
         description=""
     ))
     return graphs
