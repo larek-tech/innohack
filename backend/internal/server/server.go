@@ -16,8 +16,8 @@ import (
 
 	"github.com/larek-tech/innohack/backend/config"
 	"github.com/larek-tech/innohack/backend/internal/auth"
-	"github.com/larek-tech/innohack/backend/internal/chat"
 	authService "github.com/larek-tech/innohack/backend/internal/auth/service"
+	"github.com/larek-tech/innohack/backend/internal/chat"
 	chatService "github.com/larek-tech/innohack/backend/internal/chat/service"
 	"github.com/larek-tech/innohack/backend/internal/shared/database"
 	"github.com/larek-tech/innohack/backend/pkg"
@@ -63,7 +63,7 @@ func New(cfg config.Config) Server {
 
 	pg := database.InitPostgres(context.Background(), cfg.Postgres.DSN)
 
-	as := authService.New(pg, pg, &cfg.Auth.Oauth)
+	as := authService.New(pg, pg)
 	cs := chatService.New()
 	s.initModules(
 		auth.New(as),

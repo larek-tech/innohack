@@ -12,7 +12,6 @@ import (
 type authHandler interface {
 	SignUp(c *fiber.Ctx) error
 	Login(c *fiber.Ctx) error
-	OAuth(c *fiber.Ctx) error
 }
 
 type authView interface {
@@ -51,7 +50,6 @@ func (m *AuthModule) InitRoutes(apiRouter, viewRouter fiber.Router) {
 func (m *AuthModule) initAPI(api fiber.Router) {
 	api.Post("/signup", m.api.SignUp)
 	api.Post("/login", m.api.Login)
-	api.Get("/oauth", m.api.OAuth)
 }
 
 func (m *AuthModule) initViews(views fiber.Router) {

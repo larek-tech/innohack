@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/larek-tech/innohack/backend/internal/auth/config"
 	"github.com/larek-tech/innohack/backend/internal/auth/model"
 )
 
@@ -20,15 +19,13 @@ type tokenStore interface {
 type Service struct {
 	users    userStore
 	tokens   tokenStore
-	oauth    *OauthProvider
 	validate *validator.Validate
 }
 
-func New(us userStore, ts tokenStore, gitCfg *config.OauthProvider) *Service {
+func New(us userStore, ts tokenStore) *Service {
 	return &Service{
 		users:    us,
 		tokens:   ts,
-		oauth:    NewOauthProvider(gitCfg),
 		validate: validator.New(validator.WithRequiredStructEnabled()),
 	}
 }
