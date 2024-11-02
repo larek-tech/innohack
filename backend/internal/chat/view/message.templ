@@ -7,5 +7,36 @@ templ Message(response model.Response) {
 		<div>
 			New message received: { response.Description }
 		</div>
+		@Graph(response)
 	</div>
+}
+
+templ Graph(response model.Response) {
+	<div>
+		<canvas id="graphID"></canvas>
+		{ response.Description }
+	</div>
+	<script>
+	  const ctx = document.getElementById("graphID");
+
+	new Chart(ctx, {
+		type: 'bar',
+		data: {
+		labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+		datasets: [{
+			label: '# of Votes',
+			data: [12, 19, 3, 5, 2, 3],
+			borderWidth: 1
+		}]
+		},
+		options: {
+		scales: {
+			y: {
+			beginAtZero: true
+			}
+		}
+		}
+	});
+
+	</script>
 }
