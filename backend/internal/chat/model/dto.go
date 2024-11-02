@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/larek-tech/innohack/backend/internal/analytics/pb"
@@ -24,10 +25,25 @@ type ResponseDto struct {
 }
 
 type Chart struct {
+	GID         string    `json:"gid"`
+	DataGID     string    `json:"data-gid"`
 	Title       string    `json:"title"`
 	Records     []Record  `json:"records"`     // для отрисовки графа
 	Type        ChartType `json:"type"`        // пока что bar chart
 	Description string    `json:"description"` // llm response TODO: возможно, не получится
+}
+
+func (c Chart) GetType() string {
+	switch c.Type {
+	case BarChart:
+		return "bar"
+	case PieChart:
+		return "pie"
+	case UndefinedChart:
+		panic(fmt.Sprintf("unexpected model.ChartType: %#v", c.Type))
+	default:
+		panic(fmt.Sprintf("unexpected model.ChartType: %#v", c.Type))
+	}
 }
 
 func ChartsFromPb(charts []*pb.Chart) []Chart {

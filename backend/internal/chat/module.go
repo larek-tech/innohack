@@ -17,6 +17,7 @@ import (
 type chatView interface {
 	ChatPage(c *fiber.Ctx) error
 	ProcessConn(c *websocket.Conn)
+	TestChat(c *fiber.Ctx) error
 }
 
 type ChatModule struct {
@@ -42,6 +43,7 @@ func (m *ChatModule) InitRoutes(viewRouter fiber.Router) {
 }
 
 func (m *ChatModule) initViews(views fiber.Router) {
+	views.Get("/test", m.views.TestChat)
 	views.Get("/", m.views.ChatPage)
 	views.Get("/ws", websocket.New(m.views.ProcessConn, websocket.Config{
 		HandshakeTimeout: 20 * time.Second,

@@ -8,7 +8,10 @@ package view
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/larek-tech/innohack/backend/templ/layout"
+import (
+	"github.com/larek-tech/innohack/backend/internal/chat/model"
+	"github.com/larek-tech/innohack/backend/templ/layout"
+)
 
 func ChatPage() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -43,13 +46,84 @@ func ChatPage() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body class=\"flex flex-col items-center bg-gray-100 min-h-screen p-4 sm:p-6\"><h1 class=\"text-lg sm:text-2xl font-semibold text-gray-700 mb-2 sm:mb-4\">Chat Room</h1><div class=\"flex flex-col w-full max-w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-4xl bg-white border border-gray-300 rounded-lg shadow-md h-3/4 min-h-[500px]\" hx-ext=\"ws\" ws-connect=\"/chat/ws\"><!-- Chat messages container with flex-grow to take available space --><div id=\"notifications\" class=\"flex-1 p-3 sm:p-4 overflow-y-auto space-y-4\" hx-swap-oob=\"beforeend\"><!-- Plain text messages will appear here --></div><!-- Chat input form sticks to the bottom of the page --><form id=\"chatForm\" class=\"flex items-center border-t border-gray-300 p-3 sm:p-4\" ws-send=\"submit\" hx-trigger=\"submit\"><input type=\"text\" name=\"content\" class=\"flex-1 p-2 border border-gray-300 rounded-full focus:outline-none focus:border-blue-500\" placeholder=\"Type your message here\" required> <button type=\"submit\" class=\"ml-2 sm:ml-3 px-3 sm:px-4 py-1 sm:py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none\">Send</button></form></div></body>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body class=\"flex flex-col items-center bg-gray-100 min-h-screen p-4 sm:p-6 h-full\"><h1 class=\"text-lg sm:text-2xl font-semibold text-gray-700 mb-2 sm:mb-4\">Chat Room</h1>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = Chat().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</body>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			return templ_7745c5c3_Err
 		})
 		templ_7745c5c3_Err = layout.Layout("chat").Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return templ_7745c5c3_Err
+	})
+}
+
+func TestChat(response model.ResponseDto) templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Var4 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+			if !templ_7745c5c3_IsBuffer {
+				defer func() {
+					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err == nil {
+						templ_7745c5c3_Err = templ_7745c5c3_BufErr
+					}
+				}()
+			}
+			ctx = templ.InitializeContext(ctx)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex h-screen\"><div id=\"leftPane\" class=\"bg-blue-100 flex-grow p-4 overflow-auto resize-x\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = Dashboard(response).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div id=\"divider\" class=\"bg-gray-400 w-2 cursor-col-resize relative\"><button id=\"expandRightPane\" class=\"hidden bg-green-500 text-white p-2 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2\"><svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M15 19l-7-7 7-7\"></path></svg></button></div><div id=\"rightPane\" class=\"flex-grow p-4 overflow-auto resize-x\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = Chat().Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div><script>\n\t\t\t// JavaScript for resizing panes\n\t\t\tconst divider = document.getElementById(\"divider\");\n\t\t\tconst leftPane = document.getElementById(\"leftPane\");\n\t\t\tconst rightPane = document.getElementById(\"rightPane\");\n\t\t\tconst expandRightPane = document.getElementById(\"expandRightPane\");\n\n\t\t\tdivider.addEventListener(\"mousedown\", (e) => {\n\t\t\t\te.preventDefault();\n\t\t\t\tdocument.addEventListener(\"mousemove\", resize);\n\t\t\t\tdocument.addEventListener(\"mouseup\", stopResize);\n\t\t\t});\n\n\t\t\tfunction resize(e) {\n\t\t\t\tconst totalWidth = leftPane.offsetWidth + rightPane.offsetWidth + divider.offsetWidth;\n\t\t\t\tconst leftWidth = (e.clientX / window.innerWidth) * 100;\n\t\t\t\tleftPane.style.width = `${leftWidth}%`;\n\t\t\t\trightPane.style.width = `${100 - leftWidth}%`;\n\n\t\t\t\tif (rightPane.offsetWidth < 400) {\n\t\t\t\t\trightPane.style.display = \"none\";\n\t\t\t\t\texpandRightPane.classList.remove(\"hidden\");\n\t\t\t\t} else {\n\t\t\t\t\trightPane.style.display = \"block\";\n\t\t\t\t\texpandRightPane.classList.add(\"hidden\");\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tfunction stopResize() {\n\t\t\t\tdocument.removeEventListener(\"mousemove\", resize);\n\t\t\t\tdocument.removeEventListener(\"mouseup\", stopResize);\n\t\t\t}\n\n\t\t\texpandRightPane.addEventListener(\"click\", () => {\n\t\t\t\trightPane.style.display = \"block\";\n\t\t\t\trightPane.style.width = \"400px\";\n\t\t\t\tleftPane.style.width = `calc(100% - 400px)`;\n\t\t\t\texpandRightPane.classList.add(\"hidden\");\n\t\t\t});\n\t\t</script>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			return templ_7745c5c3_Err
+		})
+		templ_7745c5c3_Err = layout.Layout("Test Chat").Render(templ.WithChildren(ctx, templ_7745c5c3_Var4), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

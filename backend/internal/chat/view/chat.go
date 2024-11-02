@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
@@ -22,6 +24,65 @@ const (
 func (v *View) ChatPage(c *fiber.Ctx) error {
 	return adaptor.HTTPHandler(
 		templ.Handler(ChatPage()),
+	)(c)
+}
+
+func (v *View) TestChat(c *fiber.Ctx) error {
+	return adaptor.HTTPHandler(
+		templ.Handler(TestChat(model.ResponseDto{
+			QueryID: 1,
+			Sources: []string{
+				"https://s3.larek.tech/innohack/mts%2Fmoskva_mts_ru%2F1_MTS_annual_report_2010_annex_1_rus.pdf",
+			},
+			Filenames: []string{
+				"2F1 Ежегодный экспорт МТС 2010 г., приложение 1",
+			},
+			Charts: []model.Chart{
+				{
+					GID:     strconv.FormatInt(time.Now().UnixNano(), 10),
+					DataGID: "data" + strconv.FormatInt(time.Now().UnixNano(), 10),
+					Title:   "Выручка",
+					Records: []model.Record{
+						{
+							X: "1 к.в",
+							Y: 1,
+						},
+						{
+							X: "2 к.в",
+							Y: 10,
+						},
+					},
+					Type:        1,
+					Description: "",
+				},
+				{
+					GID:     strconv.FormatInt(time.Now().UnixNano(), 10),
+					DataGID: "data" + strconv.FormatInt(time.Now().UnixNano(), 10),
+					Title:   "Убыток",
+					Records: []model.Record{
+						{
+							X: "1 к.в",
+							Y: -10,
+						},
+						{
+							X: "2 к.в",
+							Y: -30,
+						},
+					},
+					Type:        1,
+					Description: "",
+				},
+			},
+			Description: "Описание чего либо",
+			Multipliers: []model.Multiplier{
+				{
+					Key:   "мультипликатор",
+					Value: 19,
+				},
+			},
+			CreatedAt: time.Date(2010, 6, 1, 10, 35, 12, 0, time.Local),
+			IsLast:    false,
+		})),
 	)(c)
 }
 

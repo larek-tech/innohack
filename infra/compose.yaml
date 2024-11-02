@@ -2,6 +2,13 @@ volumes:
   pg_admin:
 
 services:
+  mongo:
+    image: mongo:5.0
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/mongo_data:/data/db
   qdrant:
     image: qdrant/qdrant:latest
     restart: always

@@ -2,41 +2,65 @@ package view
 
 import "github.com/larek-tech/innohack/backend/internal/chat/model"
 
+var helloHandle = templ.NewOnceHandle()
+
 templ Message(response model.ResponseDto, err error) {
 	<div id="notifications" hx-swap-oob="beforeend">
 		<div>
 			New message received: { response.Description }
 		</div>
-		@Graph(response)
+		if len(response.Charts) > 0 {
+			@Graph(response.Charts[0], 0)
+		}
 	</div>
 }
 
-templ Graph(response model.Response) {
+templ Graph(chart model.Chart, index int) {
 	<div>
-		<canvas id="graphID"></canvas>
-		{ response.Description }
+		<h3>{ chart.Title }</h3>
+		<canvas id={ chart.GID } width="400" height="200"></canvas>
+		<script>
+			const data = JSON.parse(document.getElementById("json-1").textContent);
+			const name = JSON.parse(document.getElementById("name").textContent)
+			const ctx = document.getElementById(data.gid).getContext("2d");
+			new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: data.records.map((v) => v.x),
+					datasets: [{
+						label: data.title,
+						data: data.records.map((v) => v.y),
+						backgroundColor: 'rgba(54, 162, 235, 0.2)',
+						borderColor: 'rgba(54, 162, 235, 1)',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: { y: { beginAtZero: true } }
+				}
+			});
+		</script>
 	</div>
-	<script>
-	  const ctx = document.getElementById("graphID");
+}
 
-	new Chart(ctx, {
-		type: 'bar',
-		data: {
-		labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-		datasets: [{
-			label: '# of Votes',
-			data: [12, 19, 3, 5, 2, 3],
-			borderWidth: 1
-		}]
-		},
-		options: {
-		scales: {
-			y: {
-			beginAtZero: true
+templ Sources(sources []string, filenames []string) {
+	<div>
+		<h2>Sources:</h2>
+		<ul>
+			for idx, s := range sources {
+				<li><a href={ templ.SafeURL(s) } target="_blank">{ filenames[idx] }</a></li>
 			}
-		}
-		}
-	});
+		</ul>
+	</div>
+}
 
-	</script>
+templ Multipliers(multipliers []model.Multiplier) {
+	<div>
+		<h2>Multipliers:</h2>
+		// <ul>
+		// 	for key, m :=  range multipliers {
+		// 		<li>{ Key + 1 } : { m }</li>
+		// 	}
+		// </ul>
+	</div>
 }

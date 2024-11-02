@@ -1,46 +1,75 @@
 package view
 
-import "github.com/larek-tech/innohack/backend/templ/layout"
+import (
+	"github.com/larek-tech/innohack/backend/internal/chat/model"
+	"github.com/larek-tech/innohack/backend/templ/layout"
+)
 
 templ ChatPage() {
 	@layout.Layout("chat") {
-		<body class="flex flex-col items-center bg-gray-100 min-h-screen p-4 sm:p-6">
+		<body class="flex flex-col items-center bg-gray-100 min-h-screen p-4 sm:p-6 h-full">
 			<h1 class="text-lg sm:text-2xl font-semibold text-gray-700 mb-2 sm:mb-4">Chat Room</h1>
-			<div
-				class="flex flex-col w-full max-w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl xl:max-w-4xl bg-white border border-gray-300 rounded-lg shadow-md h-3/4 min-h-[500px]"
-				hx-ext="ws"
-				ws-connect="/chat/ws"
-			>
-				<!-- Chat messages container with flex-grow to take available space -->
-				<div
-					id="notifications"
-					class="flex-1 p-3 sm:p-4 overflow-y-auto space-y-4"
-					hx-swap-oob="beforeend"
-				>
-					<!-- Plain text messages will appear here -->
-				</div>
-				<!-- Chat input form sticks to the bottom of the page -->
-				<form
-					id="chatForm"
-					class="flex items-center border-t border-gray-300 p-3 sm:p-4"
-					ws-send="submit"
-					hx-trigger="submit"
-				>
-					<input
-						type="text"
-						name="content"
-						class="flex-1 p-2 border border-gray-300 rounded-full focus:outline-none focus:border-blue-500"
-						placeholder="Type your message here"
-						required
-					/>
-					<button
-						type="submit"
-						class="ml-2 sm:ml-3 px-3 sm:px-4 py-1 sm:py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none"
-					>
-						Send
-					</button>
-				</form>
-			</div>
+			@Chat()
 		</body>
+	}
+}
+
+templ TestChat(response model.ResponseDto) {
+	@layout.Layout("Test Chat") {
+		<div class="flex h-screen">
+			<div id="leftPane" class="bg-blue-100 flex-grow p-4 overflow-auto resize-x">
+				@Dashboard(response)
+			</div>
+			<div id="divider" class="bg-gray-400 w-2 cursor-col-resize relative">
+				<button id="expandRightPane" class="hidden bg-green-500 text-white p-2 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+					</svg>
+				</button>
+			</div>
+			<div id="rightPane" class="flex-grow p-4 overflow-auto resize-x">
+				@Chat()
+			</div>
+		</div>
+		<script>
+			// JavaScript for resizing panes
+			const divider = document.getElementById("divider");
+			const leftPane = document.getElementById("leftPane");
+			const rightPane = document.getElementById("rightPane");
+			const expandRightPane = document.getElementById("expandRightPane");
+
+			divider.addEventListener("mousedown", (e) => {
+				e.preventDefault();
+				document.addEventListener("mousemove", resize);
+				document.addEventListener("mouseup", stopResize);
+			});
+
+			function resize(e) {
+				const totalWidth = leftPane.offsetWidth + rightPane.offsetWidth + divider.offsetWidth;
+				const leftWidth = (e.clientX / window.innerWidth) * 100;
+				leftPane.style.width = `${leftWidth}%`;
+				rightPane.style.width = `${100 - leftWidth}%`;
+
+				if (rightPane.offsetWidth < 400) {
+					rightPane.style.display = "none";
+					expandRightPane.classList.remove("hidden");
+				} else {
+					rightPane.style.display = "block";
+					expandRightPane.classList.add("hidden");
+				}
+			}
+
+			function stopResize() {
+				document.removeEventListener("mousemove", resize);
+				document.removeEventListener("mouseup", stopResize);
+			}
+
+			expandRightPane.addEventListener("click", () => {
+				rightPane.style.display = "block";
+				rightPane.style.width = "400px";
+				leftPane.style.width = `calc(100% - 400px)`;
+				expandRightPane.classList.add("hidden");
+			});
+		</script>
 	}
 }
