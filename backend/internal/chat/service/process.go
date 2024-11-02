@@ -94,7 +94,7 @@ func (s *Service) getDescription(ctx context.Context, req model.QueryDto, out ch
 		select {
 		case queryID := <-cancel:
 			s.log.Debug().Int64("query id", queryID).Msg("canceled")
-			close(out)
+			return
 		default:
 			resp, err := stream.Recv()
 			if err == io.EOF {
@@ -105,6 +105,7 @@ func (s *Service) getDescription(ctx context.Context, req model.QueryDto, out ch
 					Charts:      charts,
 					Description: buff.String(),
 					Multipliers: multipliers,
+					IsLast:      true,
 				}
 				return
 			}

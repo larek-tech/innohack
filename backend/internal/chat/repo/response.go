@@ -20,8 +20,8 @@ const insertResponse = `
 	insert into response(
 		session_id, 
 		query_id, 
-		source, 
-		filename, 
+		sources, 
+		filenames, 
 		charts, 
 		description,
 		multipliers

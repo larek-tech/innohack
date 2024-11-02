@@ -115,8 +115,13 @@ func (v *View) ProcessConn(c *websocket.Conn) {
 			case chunk, ok := <-out:
 				// если закончили читать
 				if !ok {
-					resp.Description = desc.String()
-					desc.Reset()
+					v.log.Error().Msg("error while processing")
+					return
+				}
+
+				if chunk.IsLast {
+					resp = chunk
+					v.log.Debug().Int64("query id", queryID).Msg("finished processing")
 					break chunks
 				}
 
@@ -144,6 +149,7 @@ func (v *View) ProcessConn(c *websocket.Conn) {
 		}
 
 		if err := v.service.InsertResponse(ctx, sessionID, resp); err != nil {
+			v.log.Err(err).Msg("save response")
 			v.respondError(c, ctx, err)
 			return
 		}
