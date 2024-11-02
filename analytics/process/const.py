@@ -77,6 +77,13 @@ MULTYPLIER_NAME = {
     "NP_Margin": "Рентабельность продаж по чистой прибыли",  # Net Profit Margin
     "ROA": "Рентабельность всех активов",  # Return on Assets
     "ROCA": "Рентабельность оборотных активов",  # Return on Current Assets
-    "RONCA": "Рентабельность внеоборотных активов"  # Return on Non-Current Assets
+    "RONCA": "Рентабельность внеоборотных активов",  # Return on Non-Current Assets
+    "Autonomy_Ratio": "Коэффициент автономии",  # Autonomy Ratio
+    "Capitalization_Ratio": "Коэффициент капитализации",  # Capitalization Ratio
+    "Investment_Coverage_Ratio": "Коэффициент покрытия инвестиций",  # Investment Coverage Ratio
+    "Inventory_Security_Ratio": "Коэффициент обеспеченности материальных запасов",  # Inventory Security Ratio
+    "Financial_Dependency_Ratio": "Коэффициент финансовой зависимости",  # Financial Dependency Ratio
+    "Financial_Leverage_Ratio": "Коэффициент финансового левериджа"  # Financial Leverage Ratio
 }
+
 

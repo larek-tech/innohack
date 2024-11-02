@@ -2,8 +2,9 @@ from minio import Minio
 import typing as tp
 import pandas as pd
 import os
+import json
 
-from compute_business_metrics import read_excel, code_column, get_liquidity, profitability_of_sales, profitability_of_assets
+from compute_business_metrics import read_excel, code_column, get_liquidity, profitability_of_sales, profitability_of_assets, coefficients, coefficients_3years
 from const import CODE_NAME, MULTYPLIER_NAME
 
 s3 = Minio(
@@ -71,12 +72,11 @@ def parse_multy_to_dict(records: dict, df: pd.DataFrame) -> dict:
 
 
 def preprocess_xlsx():
-    # excel_paths = list_files()
-    excel_paths = os.listdir("/home/hope/Hope/Innohack/excel_data")
+    excel_paths = list_files()
     records = {}
     multypliers = {}
     for file in excel_paths:
-        dfs, year = read_excel("/home/hope/Hope/Innohack/excel_data/" + file)
+        dfs, year = read_excel(file)
         for df in dfs:
             records = parse_df_to_dict(records, df, year)
 
@@ -85,9 +85,12 @@ def preprocess_xlsx():
             get_liquidity(dfs, year),
             profitability_of_sales(dfs, year),
             profitability_of_assets(dfs, year),
+            coefficients(dfs, year),
+            coefficients_3years(dfs, year),
         ]
     )
     multypliers = parse_multy_to_dict(multypliers, metrics_for_chart)
-    print(multypliers)
+
+
 
 preprocess_xlsx()
