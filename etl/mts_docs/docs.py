@@ -2,9 +2,21 @@ import httpx
 import asyncio
 from bs4 import BeautifulSoup
 import re
+import pathlib
+import os
+from tqdm import tqdm
 
 BASE_URL = "https://moskva.mts.ru/about/investoram-i-akcioneram/korporativnoe-upravlenie/raskritie-informacii/godovaya-otchetnost"
-FILE_NAME = "page.html"
+# FILE_NAME = "page.html"
+# FILE_NAME = "vipusk-cennih-bumag.html"
+# FILE_NAME = "vipush-cfa.html"
+# FILE_NAME = "soobcheniya.html"
+# FILE_NAME = "sushhestvennie-fakti.html"
+# FILE_NAME = "ezhekvartalnie-otcheti.html"
+# FILE_NAME = "otchety-emitenta-emissionnyh-cennyh-bumag.html"
+# FILE_NAME = "spiski-affilirovannih-lic.html"
+FILE_NAME = "insajderskaya-informacii-pao-mts.html"
+DATA_PATH = pathlib.Path(__file__).parents[2] / "data" / "mts" / "docs"
 
 
 async def get_page(client: httpx.AsyncClient, url: str) -> str:
@@ -89,5 +101,49 @@ async def main():
             file.write(f["data"])
 
 
+async def download_docs():
+    client = httpx.AsyncClient()
+    with open(FILE_NAME, "r", encoding="utf-8") as file:
+        html_page = file.read()
+    soup = BeautifulSoup(html_page, "html.parser")
+    urls = soup.find("section", class_="section-box").find_all("a")
+    tasks = []
+
+    def get_filename(url: str) -> str:
+        return url.split("/")[-1]
+
+    async def download(url: str, filename: str):
+        try:
+            resp = await client.get(url)
+            if resp.status_code != 200:
+                print(resp.status_code)
+        except Exception as e:
+            print(f"retry for {filename} {url}")
+            await asyncio.sleep(0.3)
+            await download(url, filename)
+            return
+        print(f"saved {filename} {url}")
+        with open(DATA_PATH / filename, "wb") as file:
+            file.write(resp.content)
+
+    skipped = 0
+    for doc in tqdm(urls):
+        url = doc.get("href")
+        filename = get_filename(url)
+        if os.path.exists(DATA_PATH / filename):
+            skipped += 1
+            continue
+        if url.endswith(".pdf"):
+            tasks.append(
+                download(
+                    url,
+                    filename,
+                )
+            )
+    print(f"skipped: {skipped} documents")
+
+    await asyncio.gather(*tasks)
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(download_docs())
