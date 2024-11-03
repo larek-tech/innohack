@@ -8,6 +8,7 @@ from loguru import logger
 
 def main():
     dir_path = Path(__file__).parent / "data"
+    logger.info(dir_path)
 
     file_paths = list(dir_path.glob("*"))
     logger.info(dir_path)

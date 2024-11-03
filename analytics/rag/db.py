@@ -9,6 +9,8 @@ from qdrant_client.http.models import Distance, VectorParams, PointStruct
 from utils.bi_encode import str_to_vec
 from utils.chunks import file_to_chunks
 
+from loguru import logger
+
 # Создаем подключение к векторной БД
 qdrant_client = QdrantClient("https://qdrant.larek.tech", port=443)
 
@@ -23,10 +25,11 @@ def get_questions_for_chunk(chunk_text: str) -> str:
         "prompt": chunk_text,
         "apply_chat_template": True,
         "system_prompt": "Представь, что ты финансовый аналитик. Тебе подаётся чанк текста из финансового документа. \
-              Напиши 10 вопросов, связанных с финансами и бухгалтерией на которые можно было бы найти ответ, исходя из информации в чанке.",
-        "max_tokens": 1024,
+              Напиши 7 вопросов, связанных с финансами и бухгалтерией на которые можно было бы найти ответ, исходя из информации в чанке. \
+                Вопросы про количественные значения (показатели) приветствуются. Формулируй вопросы на русском языке",
+        "max_tokens": 512,
         "n": 1,
-        "temperature": 1,
+        "temperature": 0.7,
     }
 
     headers = {"Content-Type": "application/json"}
@@ -34,6 +37,7 @@ def get_questions_for_chunk(chunk_text: str) -> str:
     response = requests.post(url, data=json.dumps(data), headers=headers)
 
     if response.status_code == 200:
+        logger.info(response.json())
         return response.json()
     else:
         return f"Error: {response.status_code} - {response.text}"
@@ -65,7 +69,7 @@ def save_chunks(
         point = PointStruct(
             id=chunk_uuid,
             vector=questions_for_chunk_embeddings[i],
-            payload={"file": file_name, "chunk": questions_for_chunk[i]},
+            payload={"file": file_name, "chunk": chunks[i]},
         )
         points_question.append(point)
 
@@ -94,22 +98,26 @@ def files_to_vecdb(files, bi_encoder, vec_size, sep, chunk_size, chunk_overlap):
         vectors_config=VectorParams(size=vec_size, distance=Distance.COSINE),
     )
 
+    logger.info("Collections created successfully")
+
     for file_name in files:
         chunks = file_to_chunks(file_name, sep, chunk_size, chunk_overlap)
 
         questions_for_chunk = []
         for chunk in chunks:
             questions_for_chunk += [get_questions_for_chunk(chunk)]
+            logger.info("Questions was created successfully")
 
         # помещаем чанки в векторную БД
         save_chunks(bi_encoder, chunks, file_name, questions_for_chunk)
+        logger.info("chunks saved successfully")
 
 
-def vec_search(bi_encoder, query, n_top_cos):
+def vec_search(bi_encoder, query, n_top_cos, n_top_cos_question):
     # Кодируем запрос в вектор
     query_emb = str_to_vec(bi_encoder, query)
 
-    # Поиск в БД
+    # Поиск в БД по документам
     search_result = qdrant_client.search(
         collection_name=COLL_NAME,
         query_vector=query_emb,
@@ -117,7 +125,17 @@ def vec_search(bi_encoder, query, n_top_cos):
         with_vectors=False,
     )
 
-    top_chunks = [x.payload["chunk"] for x in search_result]
-    top_files = list(set([x.payload["file"] for x in search_result]))
+    # Поиск в БД по вопросам и мэтчинг соотвествующих чанков
+    search_questions_result = qdrant_client.search(
+        collection_name=COLL_QUESTION_NAME,
+        query_vector=query_emb,
+        limit=n_top_cos_question,
+        with_vectors=False,
+    )
 
-    return top_chunks, top_files
+    top_chunks = [x.payload["chunk"] for x in search_result]
+    top_question_chunks = [x.payload["chunk"] for x in search_questions_result]
+    top_files = list(set([x.payload["file"] for x in search_result]))
+    top_question_files = list(set([x.payload["file"] for x in search_questions_result]))
+
+    return top_chunks + top_question_chunks, top_files + top_question_files

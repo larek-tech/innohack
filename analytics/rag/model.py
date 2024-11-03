@@ -15,11 +15,14 @@ class LLMClient:
         )
         self.bi_encoder, self.vect_dim = get_bi_encoder("cointegrated/LaBSE-en-ru")
 
-        self.n_top_cos = 7
+        self.n_top_cos = 2
+        self.n_top_cos_question = 7
 
     def get_response(self, prompt):
 
-        top_chunks, top_files = vec_search(self.bi_encoder, prompt, self.n_top_cos)
+        top_chunks, top_files = vec_search(
+            self.bi_encoder, prompt, self.n_top_cos, self.n_top_cos_question
+        )
         top_chunks_join = "\n".join(top_chunks)
         logger.info(top_chunks)
 
