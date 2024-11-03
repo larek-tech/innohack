@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/websocket/v2"
+	"github.com/google/uuid"
 	"github.com/larek-tech/innohack/backend/internal/chat/model"
 	"github.com/larek-tech/innohack/backend/pkg/jwt"
 	"github.com/rs/zerolog/log"
@@ -50,16 +51,35 @@ func (h *Handler) ProcessConn(c *websocket.Conn) {
 		h.respondError(c, err)
 		return
 	}
-	if _, err := jwt.VerifyAccessToken(authQuery.Prompt, h.jwtSecret); err != nil {
-		h.respondError(c, err)
-		return
-	}
 
-	sessionID, err := strconv.ParseInt(c.Params("session_id"), 10, 64)
+	token, err := jwt.VerifyAccessToken(authQuery.Prompt, h.jwtSecret)
 	if err != nil {
 		h.respondError(c, err)
 		return
 	}
+
+	subject, err := token.Claims.GetSubject()
+	if err != nil {
+		h.respondError(c, err)
+		return
+	}
+	userID, err := strconv.ParseInt(subject, 10, 64)
+	if err != nil {
+		h.respondError(c, err)
+		return
+	}
+
+	sessionID, err := uuid.Parse(c.Params("session_id"))
+	if err != nil {
+		h.respondError(c, err)
+		return
+	}
+
+	defer func() {
+		if err := h.sc.Cleanup(ctx, sessionID, userID); err != nil {
+			log.Warn().Err(err).Msg("cleanup session")
+		}
+	}()
 
 	var (
 		resp   model.ResponseDto
@@ -75,14 +95,14 @@ func (h *Handler) ProcessConn(c *websocket.Conn) {
 			return
 		}
 
-		queryID, err := h.ctrl.InsertQuery(ctx, sessionID, req)
+		queryID, err := h.cc.InsertQuery(ctx, sessionID, req)
 		if err != nil {
 			h.respondError(c, err)
 			return
 		}
 		req.ID = queryID
 
-		go h.ctrl.GetDescription(ctx, req, out, cancel)
+		go h.cc.GetDescription(ctx, req, out, cancel)
 
 	chunks:
 		for {
@@ -108,7 +128,7 @@ func (h *Handler) ProcessConn(c *websocket.Conn) {
 			}
 		}
 
-		if err := h.ctrl.InsertResponse(ctx, sessionID, resp); err != nil {
+		if err := h.cc.InsertResponse(ctx, sessionID, resp); err != nil {
 			h.respondError(c, err)
 			return
 		}
