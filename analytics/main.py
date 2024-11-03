@@ -7,6 +7,10 @@ from analytics import analytics_pb2, analytics_pb2_grpc
 from process.process import preprocess_xlsx
 from process.form_graphs import get_analitics_report
 
+from rag.rag_model import RagClient
+
+
+rag = RagClient()
 
 class Analytics(analytics_pb2_grpc.AnalyticsServicer):
     def __init__(self):
@@ -22,8 +26,10 @@ class Analytics(analytics_pb2_grpc.AnalyticsServicer):
     ):
         res = analytics_pb2.Report()
 
-        for i in range(10):
-            res.description += f"{i} "
+        response = rag.generate(res) 
+
+        for token in response:
+            res.description += f"{token} "
             yield res
 
 
