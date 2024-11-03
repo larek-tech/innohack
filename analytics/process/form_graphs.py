@@ -2,19 +2,8 @@ import json
 from analytics import analytics_pb2, analytics_pb2_grpc
 from process.const import CODE_NAME, MULTYPLIER_NAME
 import math
-from pymongo import MongoClient
-
-
-mongo = MongoClient("mongodb://46.138.243.191:27017/data", timeoutMS=30000**2)
-records_col = mongo.get_database("data").get_collection("records")
-multipliers_col = mongo.get_database("data").get_collection("multipliers")
-
-
-def load_json():
-    records = [r for r in records_col.find({})][0]
-    multipliers = [m for m in multipliers_col.find({})][0]
-    
-    return records, multipliers
+from process.get_report_summary import form_report_description
+from process.load_json import load_json
 
 
 def get_one_param_records(records: dict, code: int, start_date: str, end_date: str, return_year = True) -> list[analytics_pb2.Record]:
@@ -504,6 +493,7 @@ def get_analitics_report(request: analytics_pb2.Params) -> analytics_pb2.Report:
                         value=value
                     )
                 )
+
     report = analytics_pb2.Report(
         sources=None,
         filenames=None,
@@ -512,13 +502,3 @@ def get_analitics_report(request: analytics_pb2.Params) -> analytics_pb2.Report:
         multipliers=return_multy if len(return_multy) > 0 else None
     )
     return report
-
-def main():
-    request = analytics_pb2.Params(
-        query_id=1,
-        start_date="2014",
-        end_date="2024",
-        prompt=""
-    )
-    
-    print(get_analitics_report(request))

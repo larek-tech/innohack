@@ -6,6 +6,7 @@ import grpc
 from analytics import analytics_pb2, analytics_pb2_grpc
 from process.process import preprocess_xlsx
 from process.form_graphs import get_analitics_report
+from process.get_report_summary import form_report_description
 
 from rag.rag_model import RagClient
 

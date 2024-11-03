@@ -77,8 +77,6 @@ def parse_multy_to_dict(records: dict, df: pd.DataFrame) -> dict:
     return records
 
 def save_data(records: dict, multipliers: dict):
-    records, multipliers = preprocess_xlsx()
-
     has_records = len([r for r in records_col.find({})]) > 0
     has_multipliers = len([m for m in multipliers_col.find({})]) > 0
     
