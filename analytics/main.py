@@ -5,6 +5,10 @@ import grpc
 
 from analytics import analytics_pb2, analytics_pb2_grpc
 
+from rag.rag_model import RagClient
+
+
+rag = RagClient()
 
 class Analytics(analytics_pb2_grpc.AnalyticsServicer):
     def GetCharts(self, request: analytics_pb2.Params, context: grpc.ServicerContext):
@@ -15,8 +19,10 @@ class Analytics(analytics_pb2_grpc.AnalyticsServicer):
     ):
         res = analytics_pb2.Report()
 
-        for i in range(10):
-            res.description += f"{i} "
+        response = rag.generate(res) 
+
+        for token in response:
+            res.description += f"{token} "
             yield res
 
 
