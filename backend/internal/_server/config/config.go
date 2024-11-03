@@ -4,8 +4,6 @@ import (
 	"errors"
 	"net/url"
 	"strings"
-
-	"github.com/larek-tech/innohack/backend/pkg"
 )
 
 var (
@@ -21,17 +19,17 @@ type Config struct {
 
 func (c *Config) Validate() error {
 	if c.Port < 1000 || c.Port > 65000 {
-		return pkg.WrapErr(ErrInvalidPort)
+		return ErrInvalidPort
 	}
 
 	if len(c.AllowOrigins) == 0 {
-		return pkg.WrapErr(ErrMissingOrigins)
+		return ErrMissingOrigins
 	}
 
 	for _, origin := range c.AllowOrigins {
 		_, err := url.ParseRequestURI(origin)
 		if err != nil {
-			return pkg.WrapErr(err)
+			return err
 		}
 	}
 	return nil

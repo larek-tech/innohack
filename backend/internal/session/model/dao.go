@@ -3,11 +3,12 @@ package model
 import (
 	"time"
 
+	"github.com/google/uuid"
 	chatmodel "github.com/larek-tech/innohack/backend/internal/chat/model"
 )
 
 type Session struct {
-	ID        int64     `db:"id"`
+	ID        uuid.UUID `db:"id"`
 	UserID    int64     `db:"user_id"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
@@ -23,6 +24,7 @@ func (s *Session) ToDto() *SessionDto {
 }
 
 type SessionContent struct {
+	UserID   int64              `db:"user_id"`
 	Query    chatmodel.Query    `db:"query"`
 	Response chatmodel.Response `db:"response"`
 }

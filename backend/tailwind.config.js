@@ -2,7 +2,11 @@
 export default {
   content: ["./**/*.templ"], // this is where our templates are located
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: colors.lime, 
+      }
+    },
   },
   plugins: [],
 }

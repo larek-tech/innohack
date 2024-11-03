@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/larek-tech/innohack/backend/internal/chat/model"
-	"github.com/larek-tech/innohack/backend/pkg"
 	"github.com/larek-tech/innohack/backend/pkg/storage/postgres"
 )
 
@@ -37,5 +36,5 @@ func (r *ResponseRepo) InsertResponse(ctx context.Context, data model.Response) 
 		data.Filenames,
 		data.Description,
 	)
-	return pkg.WrapErr(err)
+	return err
 }

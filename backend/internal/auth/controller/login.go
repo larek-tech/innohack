@@ -4,14 +4,13 @@ import (
 	"context"
 
 	"github.com/larek-tech/innohack/backend/internal/auth/model"
-	"github.com/larek-tech/innohack/backend/pkg"
 	"github.com/larek-tech/innohack/backend/pkg/jwt"
 )
 
 func (ctrl *Controller) Login(ctx context.Context, req model.LoginReq) (model.TokenResp, error) {
 	user, err := ctrl.repo.FindUserByEmail(ctx, req.Email)
 	if err != nil {
-		return model.TokenResp{}, pkg.WrapErr(err, "find user by email")
+		return model.TokenResp{}, err
 	}
 
 	token, err := jwt.AuthenticateUser(
@@ -22,8 +21,7 @@ func (ctrl *Controller) Login(ctx context.Context, req model.LoginReq) (model.To
 		ctrl.jwtSecret,
 	)
 	if err != nil {
-		return model.TokenResp{}, pkg.WrapErr(err, "jwt auth")
+		return model.TokenResp{}, err
 	}
-
 	return token, nil
 }

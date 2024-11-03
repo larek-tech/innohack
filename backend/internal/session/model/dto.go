@@ -3,16 +3,17 @@ package model
 import (
 	"time"
 
-	chatmodel "github.com/larek-tech/innohack/backend/internal/chat/model"
+	"github.com/google/uuid"
+	"github.com/larek-tech/innohack/backend/internal/chat/model"
 )
 
 type SessionDto struct {
-	ID        int64     `json:"id"`
+	ID        uuid.UUID `json:"id"`
 	Title     string    `json:"title"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 
 type SessionContentDto struct {
-	Query    chatmodel.QueryDto    `json:"query"`
-	Response chatmodel.ResponseDto `json:"response"`
+	Query    model.QueryDto    `json:"query"`
+	Response model.ResponseDto `json:"response"`
 }

@@ -3,14 +3,24 @@ package controller
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/larek-tech/innohack/backend/internal/session/model"
-	"github.com/larek-tech/innohack/backend/pkg"
+	"github.com/larek-tech/innohack/backend/internal/shared"
 )
 
-func (ctrl *Controller) GetSessionContent(ctx context.Context, sessionID int64) ([]*model.SessionContentDto, error) {
+func (ctrl *Controller) GetSessionContent(ctx context.Context, sessionID uuid.UUID, userID int64) ([]*model.SessionContentDto, error) {
+	session, err := ctrl.repo.GetSessionByID(ctx, sessionID)
+	if err != nil {
+		return nil, err
+	}
+
+	if session.UserID != userID {
+		return nil, shared.ErrNoAccessToSession
+	}
+
 	content, err := ctrl.repo.GetSessionContent(ctx, sessionID)
 	if err != nil {
-		return nil, pkg.WrapErr(err, "get session content")
+		return nil, err
 	}
 
 	res := make([]*model.SessionContentDto, len(content))

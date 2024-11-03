@@ -12,7 +12,7 @@ import (
 func (ctrl *Controller) Signup(ctx context.Context, req model.SignupReq) (model.TokenResp, error) {
 	hashedPass, err := hashPassword(req.Password)
 	if err != nil {
-		return model.TokenResp{}, pkg.WrapErr(err, "generate hash")
+		return model.TokenResp{}, err
 	}
 
 	userID, err := ctrl.repo.InsertUser(ctx, model.User{
@@ -21,14 +21,14 @@ func (ctrl *Controller) Signup(ctx context.Context, req model.SignupReq) (model.
 	})
 	if err != nil {
 		if pkg.CheckDuplicateKey(err) {
-			return model.TokenResp{}, pkg.WrapErr(shared.ErrDuplicateKey, err.Error())
+			return model.TokenResp{}, shared.ErrDuplicateKey
 		}
-		return model.TokenResp{}, pkg.WrapErr(shared.ErrStorageInternal, err.Error())
+		return model.TokenResp{}, shared.ErrStorageInternal
 	}
 
 	token, err := jwt.CreateAccessToken(userID, req.Email, ctrl.jwtSecret)
 	if err != nil {
-		return model.TokenResp{}, pkg.WrapErr(err, "create access token")
+		return model.TokenResp{}, err
 	}
 
 	return model.TokenResp{

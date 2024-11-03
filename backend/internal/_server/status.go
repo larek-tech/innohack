@@ -23,5 +23,8 @@ var (
 		shared.ErrInvalidJwt: {
 			Status: fiber.StatusUnauthorized,
 		},
+		shared.ErrNoAccessToSession: {
+			Status: fiber.StatusForbidden,
+		},
 	}
 )
