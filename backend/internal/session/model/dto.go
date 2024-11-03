@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	chatmodel "github.com/larek-tech/innohack/backend/internal/chat/model"
+	"github.com/larek-tech/innohack/backend/internal/chat/model"
 )
 
 type SessionDto struct {
@@ -14,6 +14,6 @@ type SessionDto struct {
 }
 
 type SessionContentDto struct {
-	Query    chatmodel.QueryDto    `json:"query"`
-	Response chatmodel.ResponseDto `json:"response"`
+	Query    model.QueryDto    `json:"query"`
+	Response model.ResponseDto `json:"response"`
 }

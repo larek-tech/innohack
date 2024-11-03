@@ -5,6 +5,16 @@ import (
 	"github.com/larek-tech/innohack/backend/internal/auth/model"
 )
 
+// Signup godoc
+//
+// @Summary		Signup
+// @Description	Регистрация пользователя
+// @Tags			auth
+// @Accept			json
+// @Produce		json
+// @Param			body	body		model.SignupReq	true	"Запрос на регистрацию"
+// @Success		201		{object}	model.TokenResp
+// @Router			/auth/signup [post]
 func (h *Handler) Signup(c *fiber.Ctx) error {
 	var req model.SignupReq
 

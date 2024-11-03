@@ -8,6 +8,16 @@ import (
 	"github.com/larek-tech/innohack/backend/internal/shared"
 )
 
+// GetSessionContent godoc
+//
+//	@Summary		Получение контента сессии
+//	@Description	Получение контента сессии
+//	@Tags			session
+//	@Accept			json
+//	@Produce		json
+//	@Param			session_id	path		string	true	"ID сессии в формате UUID"
+//	@Success		200			{object}	[]model.SessionContentDto
+//	@Router			/api/session/{session_id} [get]
 func (h *Handler) GetSessionContent(c *fiber.Ctx) error {
 	userID, err := strconv.ParseInt(c.Locals(shared.UserIDKey).(string), 10, 64)
 	if err != nil {

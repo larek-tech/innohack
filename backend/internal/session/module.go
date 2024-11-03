@@ -18,5 +18,5 @@ func InitRoutes(api fiber.Router, h sessionHandler, secret string) {
 	session.Post("/", h.InsertSession)
 	session.Get("/list", h.ListSessions)
 	session.Get("/:session_id", h.GetSessionContent)
-	session.Put("/:title", h.UpdateSessionTitle)
+	session.Put("/:session_id/:title", h.UpdateSessionTitle)
 }
