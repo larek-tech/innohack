@@ -6,3 +6,4 @@ infra/data/
 .DS_Store
 __pycache__
 *.xlsx
+*.docx

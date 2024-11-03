@@ -31,7 +31,7 @@ def file_to_chunks(file_name, sep, chunk_size, chunk_overlap):
         for page in document:
             content += page.get_text()
 
-        logger.info(content)
+        logger.info(f"found {len(content)} symbols in {file_name}")
 
         document.close()
 
@@ -49,6 +49,6 @@ def file_to_chunks(file_name, sep, chunk_size, chunk_overlap):
 
     chunks = text_splitter.split_text(content)
 
-    logger.info(chunks)
+    logger.info(f"splitted into {len(chunks)} chunks")
 
     return chunks

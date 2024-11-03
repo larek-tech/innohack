@@ -1,5 +1,6 @@
 import uuid
-import requests
+import time
+import httpx
 import json
 from typing import List
 
@@ -14,12 +15,13 @@ from loguru import logger
 # Создаем подключение к векторной БД
 qdrant_client = QdrantClient("https://qdrant.larek.tech", port=443)
 
+
 COLL_NAME = "test_chuncks"
 COLL_QUESTION_NAME = "test_questions_chuncks"
 
 
 def get_questions_for_chunk(chunk_text: str) -> str:
-
+    start = time.time()
     url = "https://mts-aidocprocessing-case.olymp.innopolis.university/generate"
     data = {
         "prompt": chunk_text,
@@ -34,10 +36,11 @@ def get_questions_for_chunk(chunk_text: str) -> str:
 
     headers = {"Content-Type": "application/json"}
 
-    response = requests.post(url, data=json.dumps(data), headers=headers)
+    response = httpx.post(url, data=json.dumps(data), headers=headers, timeout=600)
 
     if response.status_code == 200:
-        logger.info(response.json())
+        # logger.info(response.json())
+        print(f"completed request in {time.time() - start}")
         return response.json()
     else:
         return f"Error: {response.status_code} - {response.text}"
@@ -83,19 +86,23 @@ def save_chunks(
 
 
 def files_to_vecdb(files, bi_encoder, vec_size, sep, chunk_size, chunk_overlap):
-    # Коллекция для чанков
-    qdrant_client.delete_collection(collection_name=COLL_NAME)
-    qdrant_client.create_collection(
-        collection_name=COLL_NAME,
-        vectors_config=VectorParams(size=vec_size, distance=Distance.COSINE),
-    )
+    if COLL_NAME not in [r.name for r in qdrant_client.get_collections().collections]:
+        # Коллекция для чанков
+        # qdrant_client.delete_collection(collection_name=COLL_NAME)
+        qdrant_client.create_collection(
+            collection_name=COLL_NAME,
+            vectors_config=VectorParams(size=vec_size, distance=Distance.COSINE),
+        )
 
-    # Коллекция для вопросов к чанкам
-    qdrant_client.delete_collection(collection_name=COLL_QUESTION_NAME)
-    qdrant_client.create_collection(
-        collection_name=COLL_QUESTION_NAME,
-        vectors_config=VectorParams(size=vec_size, distance=Distance.COSINE),
-    )
+    if COLL_QUESTION_NAME not in [
+        r.name for r in qdrant_client.get_collections().collections
+    ]:
+        # Коллекция для вопросов к чанкам
+        # qdrant_client.delete_collection(collection_name=COLL_QUESTION_NAME)
+        qdrant_client.create_collection(
+            collection_name=COLL_QUESTION_NAME,
+            vectors_config=VectorParams(size=vec_size, distance=Distance.COSINE),
+        )
 
     logger.info("Collections created successfully")
 
@@ -107,8 +114,10 @@ def files_to_vecdb(files, bi_encoder, vec_size, sep, chunk_size, chunk_overlap):
 
         questions_for_chunk = []
         for chunk in chunks:
-            questions_for_chunk += [get_questions_for_chunk(chunk)]
-            logger.info("Questions was created successfully")
+            new = [get_questions_for_chunk(chunk)]
+            questions_for_chunk += new
+
+            logger.info(f"Questions was created successfully {len(new)}")
 
         # помещаем чанки в векторную БД
         save_chunks(bi_encoder, chunks, file_name, questions_for_chunk)
@@ -158,10 +167,9 @@ def define_question_topic(query: str) -> str:
 
     headers = {"Content-Type": "application/json"}
 
-    response = requests.post(url, data=json.dumps(data), headers=headers)
+    response = httpx.post(url, data=json.dumps(data), headers=headers)
 
     if response.status_code == 200:
-        logger.info(response.json())
         return response.json()
     else:
         return f"Error: {response.status_code} - {response.text}"

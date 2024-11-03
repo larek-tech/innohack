@@ -32,25 +32,26 @@ class RagClient:
         self.qdrant_client = qdrant_client
 
         # Загркзка json из Mongo
-        records, multipliers = load_json()
+        # TODO: time this
+        # records, multipliers = load_json()
 
-        logger.info(records)
+        logger.info(f"parced: {len(records)}")
 
-        new_records = format_data(records)
-        new_multipliers = format_data(multipliers)
-        dir_path = str(Path(__file__).parent / "data")
-        with open(dir_path + "/new_records.txt", "w", encoding="utf-8") as file:
-            file.write(new_records)
+        # new_records = format_data(records)
+        # new_multipliers = format_data(multipliers)
+        # dir_path = str(Path(__file__).parent / "chunk_1")
+        # with open(dir_path + "/new_records.txt", "w", encoding="utf-8") as file:
+        #     file.write(new_records)
 
-        with open(dir_path + "/multipliers.txt", "w", encoding="utf-8") as file:
-            file.write(new_multipliers)
+        # with open(dir_path + "/multipliers.txt", "w", encoding="utf-8") as file:
+        #     file.write(new_multipliers)
 
         bi_encoder, vec_dim = get_bi_encoder(BI_ENCODE_NAME)
 
         # Скачивание данных с S3
         # minio_client.download_all_files("innohack", "data")
 
-        dir_path = Path(__file__).parent / "data"
+        dir_path = Path(__file__).parent / "chunk_1"
         file_paths = list(dir_path.glob("*"))
 
         # Вектаризация данных
