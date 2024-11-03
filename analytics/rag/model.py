@@ -51,6 +51,7 @@ class LLMClient:
             "prompt": f"""
             Используй только следующий контекст, чтобы очень кратко ответить на вопрос в конце.
             Не пытайся выдумывать ответ.
+            Не отвечай на вопросы, не связанные с финансами.
             Контекст:
             ===========
             {top_chunks_join}
@@ -62,11 +63,10 @@ class LLMClient:
             "apply_chat_template": True,
             "system_prompt": """ 
             Ты — помощник по анализу финансовых отчетов. Твоя задача — предоставлять
-              точные и полезные ответы на вопросы, связанные с финансовыми данными, отчетами и анализом.""",
-            "max_tokens": 2048,
+              точные и полезные ответы на вопросы, связанные с финансовыми данными, отчетами и анализом. Не отвечай на вопросы, не связанные с финансами и бухгалтерией.""",
+            "max_tokens": 512,
             "n": 1,
-            "temperature": 0,
-            "stream": True,
+            "temperature": 0.8,
         }
 
         headers = {"Content-Type": "application/json"}
@@ -93,69 +93,23 @@ class LLMClient:
         #     return f"Error: {response.status_code} - {response.text}"
 
 
-# from typing import Iterable, List
+# Пример использования
+if __name__ == "__main__":
+    client = LLMClient()
+
+    # prompt = "Какой был резервный капитал в 2012 и 2013 годах?"
+    # prompt = "Напиши функцию на Python, которая складывает два числа"
+    prompt = "Какие были активы компании в 2023 году?"
+
+    """
+     ̈ КакиепродуктыестьвэкосистемеМТС  ̈ СколькостоитотправкаСМСвсетиМТС  ̈ КакиеестьтарифывМТС?
 
 
-# def post_http_request(
-#     prompt: str, api_url: str, n: int = 1, stream: bool = False
-# ) -> requests.Response:
-#     # headers = {"User-Agent": "Test Client"}
-#     pload = {
-#         "prompt": prompt,
-#         # "n": n,
-#         # "use_beam_search": True,
-#         "temperature": 0.0,
-#         "max_tokens": 16,
-#         "stream": stream,
-#     }
-#     # headers=headers,
-#     response = requests.post(api_url, json=pload, stream=stream)
-#     return response
 
-
-# def get_streaming_response(response: requests.Response) -> Iterable[List[str]]:
-#     for chunk in response.iter_lines(
-#         chunk_size=8192, decode_unicode=False, delimiter=b"\0"
-#     ):
-#         if chunk:
-#             yield chunk.decode("utf-8")
-
-
-# def get_response(response: requests.Response) -> List[str]:
-#     data = json.loads(response.content)
-#     output = data["text"]
-#     return output
-
-
-# if __name__ == "__main__":
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument(
-#         "--host",
-#         type=str,
-#         default="mts-aidocprocessing-case.olymp.innopolis.university",
-#     )
-#     parser.add_argument("--port", type=int, default=443)
-#     parser.add_argument("--n", type=int, default=4)
-#     parser.add_argument("--prompt", type=str, default="San Francisco is a")
-#     parser.add_argument("--stream", action="store_true")
-#     args = parser.parse_args()
-#     prompt = "Привет!"
-#     api_url = f"https://mts-aidocprocessing-case.olymp.innopolis.university/generate"
-#     n = args.n
-#     stream = args.stream
-
-#     print(f"Prompt: {prompt!r}\n", flush=True)
-#     response = post_http_request(prompt, api_url, n, stream)
-#     stream = True
-#     if stream:
-#         num_printed_lines = 0
-#         for h in get_streaming_response(response):
-#             clear_line(num_printed_lines)
-#             num_printed_lines = 0
-#             for i, line in enumerate(h):
-#                 num_printed_lines += 1
-#                 print(f"Beam candidate {i}: {line!r}", flush=True)
-#     else:
-#         output = get_response(response)
-#         for i, line in enumerate(output):
-#             print(f"Beam candidate {i}: {line!r}", flush=True)
+    """
+    try:
+        response = client.get_response(prompt)
+        print()
+        print("Ответ LLM:", response)
+    except Exception as e:
+        print(e)
