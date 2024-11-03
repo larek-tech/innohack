@@ -1,9 +1,5 @@
 import requests
-import json
-
-import httpx
-import asyncio
-
+import ollama
 from loguru import logger
 
 from rag.utils.bi_encode import get_bi_encoder
@@ -29,20 +25,12 @@ def clear_line(n: int = 1) -> None:
 class LLMClient:
     def __init__(self, model="meta-llama/Llama-3.2-11B-Vision-Instruct"):
         self.model = model
-        self.api_url = (
-            "https://mts-aidocprocessing-case.olymp.innopolis.university/generate"
-        )
+        self.ollama = ollama.Client("localhost:11434")
         self.bi_encoder, self.vect_dim = get_bi_encoder(BI_ENCODE_NAME)
         self.qdrant = QdrantBase(QDRANT_HOST, QDRANT_PORT)
         self.n_top_cos = 8
 
-    def clear_line(self, n: int = 1) -> None:
-        LINE_UP = "\033[1A"
-        LINE_CLEAR = "\x1b[2K"
-        for _ in range(n):
-            print(LINE_UP, end=LINE_CLEAR, flush=True)
-
-    async def get_response(self, prompt):
+    def get_response(self, prompt):
 
         top_chunks, top_files = self.qdrant.vec_search(
             self.bi_encoder, prompt, self.n_top_cos
@@ -72,11 +60,11 @@ class LLMClient:
             "stream": True,
         }
 
-        async with httpx.AsyncClient() as client:
-            async with client.stream(
-                "POST",
-                self.api_url,
-                json=data,
-                headers={"Content-Type": "application/json"},
-            ) as response:
-                yield response.aiter_lines()
+        return self.ollama.chat(
+            "llama3.2",
+            messages=[
+                {"role": "system", "content": data["system_prompt"]},
+                {"role": "user", "content": data["prompt"]},
+            ],
+            stream=True,
+        )

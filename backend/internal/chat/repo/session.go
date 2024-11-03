@@ -35,7 +35,7 @@ func (r *SessionRepo) InsertSession(ctx context.Context, userID int64) (int64, e
 const getSessionContent = `
 	select 
 		(q.id, q.session_id, q.prompt, q.created_at) as query,
-		(r.id, r.session_id, r.query_id, r.source, r.filename, r.charts, r.description, r.multipliers r.created_at) as response
+		(r.id, r.session_id, r.query_id, r.sources, r.filenames, r.charts, r.description, r.multipliers, r.created_at) as response
 	from query q
 	join
 	    response r

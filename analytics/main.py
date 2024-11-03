@@ -1,6 +1,7 @@
 import logging
 from concurrent import futures
 
+import ollama
 import grpc
 
 from analytics import analytics_pb2, analytics_pb2_grpc
@@ -28,23 +29,18 @@ class Analytics(analytics_pb2_grpc.AnalyticsServicer):
     def GetDescriptionStream(
         self, request: analytics_pb2.Params, context: grpc.ServicerContext
     ):
-        responser = self.rag.llm_client.get_response(request.prompt)
-
-        # async for msg in responser:
-        #     res = analytics_pb2.Report()
-        #     async for token in msg:
-        #         res.description = token
-        #         yield res
-        # else:
-        #     res = analytics_pb2.Report()
-        #     yield res
+        for chunk in self.rag.llm_client.get_response(request.prompt):
+            res = analytics_pb2.DescriptionReport()
+            res.description = chunk["message"]["content"]
+            print(res.description)
+            yield res
 
 
 logging.basicConfig(level=logging.INFO)
 
 
 def serve():
-    s = grpc.aio.server(futures.ThreadPoolExecutor(max_workers=10))
+    s = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     analytics_pb2_grpc.add_AnalyticsServicer_to_server(Analytics(), s)
     s.add_insecure_port("[::]:9990")
     s.start()
