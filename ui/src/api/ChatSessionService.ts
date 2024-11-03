@@ -1,7 +1,7 @@
 
 
 import { API_URL } from '@/config';
-import { SessionDto } from './models';
+import { SessionContentDto, SessionDto } from './models';
 import { post, get } from "./http"
 
 
@@ -11,7 +11,12 @@ class ChatSessionService {
         return response;
     }
     public async getSessions() {
-        const response = await get<SessionDto[]>(`${API_URL}/api/chat/session/list`);
+        const response = await get<SessionDto[]>(`${API_URL}/api/session/list`);
+        return response
+    }
+
+    public async getSessionContent(sessionId: number) {
+        const response = await get<SessionContentDto[]>(`${API_URL}/api/session/${sessionId}`);
         return response
     }
 

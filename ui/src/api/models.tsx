@@ -26,6 +26,18 @@ export interface SessionDto {
     createdAt: Date | null
 }
 
+export interface QueryDto {
+    id: number
+    prompt: string
+    created_at: Date
+}
+
+export interface SessionContentDto {
+    query: QueryDto
+    response: ResponseDto
+}
+
+
 
 export interface Record {
     x: string
@@ -43,6 +55,8 @@ export interface Multiplier {
     key: string
     value: number
 }
+
+
 
 export interface ResponseDto {
     queryId: number

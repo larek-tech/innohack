@@ -1,102 +1,161 @@
-
-import { useState, useRef, useEffect } from 'react'
-import { Send } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { useState, useRef, useEffect } from 'react';
+import { Send } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { observer } from 'mobx-react-lite';
-import { useStores } from '@/hooks/use-stores'
-import { useToast } from '@/hooks/use-toast'
-import { WS_URL } from '@/config'
-import { useParams, useSearch } from '@tanstack/react-router'
-import { LOCAL_STORAGE_KEY } from '@/auth/AuthProvider'
-import ChatSessionService from '@/api/ChatSessionService'
-import { SessionDto, QueryDto, ResponseDto } from '@/api/models'
+import { useToast } from '@/hooks/use-toast';
+import { WS_URL } from '@/config';
+import { useSearch } from '@tanstack/react-router';
+import { LOCAL_STORAGE_KEY } from '@/auth/AuthProvider';
+import ChatSessionService from '@/api/ChatSessionService';
+import { SessionDto, QueryDto, ResponseDto, SessionContentDto } from '@/api/models';
+import Markdown from 'react-markdown';
 
-type Message = {
-    id: number
-    content: string
-    sender: 'user' | 'bot'
+interface ChatMessage {
+    data: ResponseDto;
+    sender: 'user' | 'chat';
 }
 
+function mapSessionContentDtoToMessages(data: SessionContentDto[]): ChatMessage[] {
+    return data.flatMap(item => [
+        {
+            data: {
+                queryId: item.query.id,
+                sources: [],
+                filenames: [],
+                charts: [],
+                description: item.query.prompt,
+                multipliers: [],
+                createdAt: item.query.created_at,
+                error: "",
+                isLast: false,
+            },
+            sender: "user"
+        },
+        item.response && {
+            data: item.response,
+            sender: "chat"
+        }
+    ].filter(Boolean));
+}
+
+const chatMessage = (msg: ChatMessage, index: number) => (
+    <div
+        key={index}
+        className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+    >
+        <div className={`max-w-[70%] p-3 rounded-lg ${msg.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
+            <Markdown>{msg.data.description}</Markdown>
+        </div>
+    </div>
+);
+
 const ChatInterface = observer(() => {
-    const search = useSearch({
-        strict: false,
-    })
-
-    // const { rootStore } = useStores();
+    const search = useSearch({ strict: false });
     const { toast } = useToast();
-    const [session, setSession] = useState<SessionDto | null>(null)
-    const [socket, setSocket] = useState<WebSocket | null>(null)
-    const [messages, setMessages] = useState<ResponseDto[]>([])
-    const [inputMessage, setInputMessage] = useState('')
-    const scrollAreaRef = useRef<HTMLDivElement>(null)
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [inputMessage, setInputMessage] = useState('');
+    const [socket, setSocket] = useState<WebSocket | null>(null);
+    const scrollAreaRef = useRef<HTMLDivElement>(null);
 
+    // Scroll to the bottom when messages change
     useEffect(() => {
         if (scrollAreaRef.current) {
-            scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
+            scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
         }
-    }, [messages])
+    }, [messages]);
 
+    // Load initial messages from the server
+    useEffect(() => {
+        if (search.chatId) {
+            ChatSessionService.getSessionContent(search.chatId).then((res) => {
+                const initialMessages = mapSessionContentDtoToMessages(res);
+                setMessages(initialMessages);
+            });
+        }
+    }, [search.chatId]);
 
-
+    // Initialize WebSocket and handle incoming messages
     useEffect(() => {
         if (search.chatId) {
             const ws = new WebSocket(`${WS_URL}/${search.chatId}`);
-            setSocket(ws)
+            setSocket(ws);
+
             const req: QueryDto = {
                 id: 0,
                 prompt: `${JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) as string)?.user?.token}`,
                 createdAt: null,
-            }
-            ws.addEventListener("open", (event) => {
-                console.log(event)
-                ws.send(JSON.stringify(req))
+            };
+
+            ws.addEventListener("open", () => {
+                ws.send(JSON.stringify(req));
             });
 
             ws.addEventListener("message", (event) => {
-                const response: ResponseDto = JSON.parse(event.data)
-                if (response.queryId != messages[-1].queryId) {
-                    setMessages([...messages, response])
-                }
-                if (response.queryId == messages[-1].queryId) {
-                    const lastMessage = messages[-1]
-                    lastMessage.description += response.description
-                    setMessages([...messages, lastMessage])
-                }
+                const response: ResponseDto = JSON.parse(event.data);
 
-            })
+                setMessages((prevMessages) => {
+                    const lastMessage = prevMessages[prevMessages.length - 1];
 
+                    if (response.isLast) {
+                        return [...prevMessages.slice(0, -1), { data: response, sender: "chat" }];
+                    }
+                    if (lastMessage && response.queryId === lastMessage.data.queryId && lastMessage.data.description) {
+                        const updatedMessage = {
+                            ...lastMessage,
+                            data: {
+                                ...lastMessage.data,
+                                description: lastMessage.data.description + response.description,
+                            }
+                        };
+                        return [...prevMessages.slice(0, -1), updatedMessage];
+                    } else {
+                        return [...prevMessages, { data: response, sender: "chat" }];
+                    }
+                });
+            });
+
+            return () => {
+                ws.close();
+            };
         }
-    }, [])
+    }, [search.chatId]);
 
     const handleSendMessage = () => {
         const req: QueryDto = {
             id: 0,
             prompt: inputMessage,
             createdAt: null,
-        }
+        };
 
-    }
+        if (socket) {
+            socket.send(JSON.stringify(req));
+            setMessages((prevMessages) => [
+                ...prevMessages,
+                {
+                    data: {
+                        queryId: req.id,
+                        sources: [],
+                        filenames: [],
+                        charts: [],
+                        description: req.prompt,
+                        multipliers: [],
+                        createdAt: new Date(),
+                        error: "",
+                        isLast: false,
+                    },
+                    sender: "user",
+                }
+            ]);
+            setInputMessage('');
+        }
+    };
 
     return (
-        <div className="flex flex-col h-screen max-w-2xl mx-auto">
+        <div className="flex flex-col h-screen max-w-full mx-auto">
             <ScrollArea className="flex-grow p-4 space-y-4" ref={scrollAreaRef}>
-                {messages.map(message => (
-                    <div
-                        key={message.queryId}
-                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                        <div
-                            className={`max - w - [70 %] p - 3 rounded - lg ${message.sender === 'user'
-                                ? 'bg-blue-500 text-white'
-                                : 'bg-gray-200 text-gray-800'
-                                }`}
-                        >
-                            {message.description}
-                        </div>
-                    </div>
-                ))}
+                {messages.map((message, index) => chatMessage(message, index))}
             </ScrollArea>
             <div className="p-4 border-t">
                 <div className="flex space-x-2">
@@ -107,7 +166,7 @@ const ChatInterface = observer(() => {
                         onChange={(e) => setInputMessage(e.target.value)}
                         onKeyPress={(e) => {
                             if (e.key === 'Enter') {
-                                handleSendMessage()
+                                handleSendMessage();
                             }
                         }}
                         className="flex-grow"
@@ -118,7 +177,7 @@ const ChatInterface = observer(() => {
                 </div>
             </div>
         </div>
-    )
-})
+    );
+});
 
 export default ChatInterface;
