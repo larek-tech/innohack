@@ -5,7 +5,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/larek-tech/innohack/backend/internal/shared"
-	"github.com/larek-tech/innohack/backend/pkg"
 	"github.com/larek-tech/innohack/backend/pkg/jwt"
 )
 
@@ -17,23 +16,23 @@ func Jwt(secret string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization", unauthorized)
 		if authHeader == unauthorized {
-			return pkg.WrapErr(shared.ErrMissingJwt)
+			return shared.ErrMissingJwt
 		}
 
 		t := strings.Split(authHeader, " ")
 		if len(t) != 2 {
-			return pkg.WrapErr(shared.ErrMissingJwt)
+			return shared.ErrMissingJwt
 		}
 
 		authToken := t[1]
 		token, err := jwt.VerifyAccessToken(authToken, secret)
 		if err != nil {
-			return pkg.WrapErr(shared.ErrInvalidJwt, err.Error())
+			return shared.ErrInvalidJwt
 		}
 
 		userID, err := token.Claims.GetSubject()
 		if err != nil {
-			return pkg.WrapErr(shared.ErrInvalidJwt, err.Error())
+			return shared.ErrInvalidJwt
 		}
 
 		c.Locals(shared.UserIDKey, userID)

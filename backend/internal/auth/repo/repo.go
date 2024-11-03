@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/larek-tech/innohack/backend/internal/auth/model"
-	"github.com/larek-tech/innohack/backend/pkg"
 	"github.com/larek-tech/innohack/backend/pkg/storage/postgres"
 )
 
@@ -27,7 +26,7 @@ func (r *Repo) InsertUser(ctx context.Context, user model.User) (int64, error) {
 
 	err := r.pg.Query(ctx, &userID, insertUser, user.Email, user.Password)
 	if err != nil {
-		return userID, pkg.WrapErr(err)
+		return userID, err
 	}
 	return userID, nil
 }
@@ -42,7 +41,7 @@ func (r *Repo) FindUserByEmail(ctx context.Context, email string) (model.User, e
 
 	err := r.pg.Query(ctx, &user, findUserByEmail, email)
 	if err != nil {
-		return user, pkg.WrapErr(err)
+		return user, err
 	}
 	return user, nil
 }

@@ -5,3 +5,4 @@ infra/data/
 .venv
 .DS_Store
 __pycache__
+*.xlsx

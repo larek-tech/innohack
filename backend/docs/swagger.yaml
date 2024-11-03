@@ -1,0 +1,289 @@
+basePath: /
+definitions:
+  model.Chart:
+    properties:
+      description:
+        description: 'llm response TODO: возможно, не получится'
+        type: string
+      records:
+        description: для отрисовки графа
+        items:
+          $ref: '#/definitions/model.Record'
+        type: array
+      title:
+        type: string
+      type:
+        description: пока что bar chart
+        type: string
+    type: object
+  model.ChartReport:
+    properties:
+      charts:
+        items:
+          $ref: '#/definitions/model.Chart'
+        type: array
+      description:
+        type: string
+      endDate:
+        type: integer
+      multipliers:
+        items:
+          $ref: '#/definitions/model.Multiplier'
+        type: array
+      startDate:
+        type: integer
+    type: object
+  model.Filter:
+    properties:
+      endDate:
+        type: string
+      startDate:
+        type: string
+    type: object
+  model.LoginReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  model.Multiplier:
+    properties:
+      key:
+        type: string
+      value:
+        type: number
+    type: object
+  model.QueryDto:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      prompt:
+        type: string
+    type: object
+  model.Record:
+    properties:
+      x:
+        description: 'формат: квартал - год'
+        type: string
+      "y":
+        type: number
+    type: object
+  model.ResponseDto:
+    properties:
+      createdAt:
+        type: string
+      description:
+        description: llm response
+        type: string
+      error: {}
+      filenames:
+        items:
+          type: string
+        type: array
+      isLast:
+        type: boolean
+      queryId:
+        type: integer
+      sources:
+        description: s3 link
+        items:
+          type: string
+        type: array
+    type: object
+  model.Session:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      isDeleted:
+        type: boolean
+      updatedAt:
+        type: string
+      userID:
+        type: integer
+    type: object
+  model.SessionContentDto:
+    properties:
+      query:
+        $ref: '#/definitions/model.QueryDto'
+      response:
+        $ref: '#/definitions/model.ResponseDto'
+    type: object
+  model.SignupReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  model.TokenResp:
+    properties:
+      token:
+        type: string
+      type:
+        type: string
+    type: object
+host: localhost:9999
+info:
+  contact: {}
+  description: Документация для сервиса решения команды MISIS Banach Space к задаче
+    MTS AI Docs.
+  title: MTS AI Docs
+  version: "1.0"
+paths:
+  /api/dashboard/charts:
+    post:
+      consumes:
+      - application/json
+      description: Получение графиков
+      parameters:
+      - description: Фильтр
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.Filter'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.ChartReport'
+      summary: Получение графиков
+      tags:
+      - dashboard
+  /api/session:
+    post:
+      consumes:
+      - application/json
+      description: Добавление сессии
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Session'
+      summary: Добавление сессии
+      tags:
+      - session
+  /api/session/{session_id}:
+    get:
+      consumes:
+      - application/json
+      description: Получение контента сессии
+      parameters:
+      - description: ID сессии в формате UUID
+        in: path
+        name: session_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.SessionContentDto'
+            type: array
+      summary: Получение контента сессии
+      tags:
+      - session
+  /api/session/{session_id}/{title}:
+    put:
+      consumes:
+      - application/json
+      description: Обновление названия сессии
+      parameters:
+      - description: ID сессии в формате UUID
+        in: path
+        name: session_id
+        required: true
+        type: string
+      - description: Название сессии
+        in: path
+        name: title
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Обновление названия сессии
+      tags:
+      - session
+  /api/session/list:
+    get:
+      consumes:
+      - application/json
+      description: Получение списка сессий
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Session'
+            type: array
+      summary: Получение списка сессий
+      tags:
+      - session
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Логин пользователя
+      parameters:
+      - description: Запрос на логин
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TokenResp'
+      summary: Login
+      tags:
+      - auth
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация пользователя
+      parameters:
+      - description: Запрос на регистрацию
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.SignupReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.TokenResp'
+      summary: Signup
+      tags:
+      - auth
+swagger: "2.0"

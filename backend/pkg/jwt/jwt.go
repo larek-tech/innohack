@@ -8,7 +8,6 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/larek-tech/innohack/backend/internal/auth/model"
 	"github.com/larek-tech/innohack/backend/internal/shared"
-	"github.com/larek-tech/innohack/backend/pkg"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -52,12 +51,12 @@ func VerifyPassword(hashedPassword, password string) error {
 
 func AuthenticateUser(userID int64, email, hashedPassword, password, secret string) (model.TokenResp, error) {
 	if err := VerifyPassword(hashedPassword, password); err != nil {
-		return model.TokenResp{}, pkg.WrapErr(shared.ErrInvalidCredentials)
+		return model.TokenResp{}, shared.ErrInvalidCredentials
 	}
 
 	accessToken, err := CreateAccessToken(userID, email, secret)
 	if err != nil {
-		return model.TokenResp{}, pkg.WrapErr(err)
+		return model.TokenResp{}, err
 	}
 
 	return model.TokenResp{

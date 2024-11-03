@@ -63,3 +63,7 @@ proto:
 	done
 	@python -m grpc_tools.protoc -Iproto --python_out=analytics --pyi_out=analytics --grpc_python_out=analytics \
  					proto/analytics/analytics.proto
+
+.PHONY: swag
+swag:
+	cd $(BACKEND_DIR) && swag init -g cmd/server/main.go -o docs && swag fmt

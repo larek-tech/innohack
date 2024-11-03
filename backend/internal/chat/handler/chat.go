@@ -6,11 +6,14 @@ import (
 	"strings"
 
 	"github.com/gofiber/websocket/v2"
+	"github.com/google/uuid"
 	"github.com/larek-tech/innohack/backend/internal/chat/model"
+	"github.com/larek-tech/innohack/backend/pkg/jwt"
+	"github.com/rs/zerolog/log"
 )
 
 func (h *Handler) closeHandler(code int, text string) error {
-	h.log.Info().Int("code", code).Str("text", text).Msg("close handler")
+	log.Info().Int("code", code).Str("text", text).Msg("close handler")
 	return nil
 }
 
@@ -20,40 +23,63 @@ func (h *Handler) respondError(c *websocket.Conn, err error) {
 		IsLast: true,
 	}
 
-	h.log.Err(err).Msg("chat error")
+	log.Err(err).Msg("chat error")
 
 	if err := c.WriteJSON(resp); err != nil {
-		h.log.Warn().Err(err).Msg("failed to respond with error")
+		log.Warn().Err(err).Msg("failed to respond with error")
 		return
 	}
 }
 
 func (h *Handler) ProcessConn(c *websocket.Conn) {
-	h.log.Info().Str("addr", c.LocalAddr().String()).Msg("new conn")
+	log.Info().Str("addr", c.LocalAddr().String()).Msg("new conn")
 	c.SetCloseHandler(h.closeHandler)
 
 	defer func() {
 		if err := c.Close(); err != nil {
-			h.log.Warn().Err(err).Msg("failed to close websocket conn")
+			log.Warn().Err(err).Msg("failed to close websocket conn")
 			return
 		}
-		h.log.Info().Msg("conn closed")
+		log.Info().Msg("conn closed")
 	}()
 
 	ctx := context.Background()
 
 	// первое сообщение содержит access token
-	authQuery := model.Query{}
+	authQuery := model.QueryDto{}
 	if err := c.ReadJSON(&authQuery); err != nil {
 		h.respondError(c, err)
 		return
 	}
 
-	sessionID, err := strconv.ParseInt(c.Params("session_id"), 10, 64)
+	token, err := jwt.VerifyAccessToken(authQuery.Prompt, h.jwtSecret)
 	if err != nil {
 		h.respondError(c, err)
 		return
 	}
+
+	subject, err := token.Claims.GetSubject()
+	if err != nil {
+		h.respondError(c, err)
+		return
+	}
+	userID, err := strconv.ParseInt(subject, 10, 64)
+	if err != nil {
+		h.respondError(c, err)
+		return
+	}
+
+	sessionID, err := uuid.Parse(c.Params("session_id"))
+	if err != nil {
+		h.respondError(c, err)
+		return
+	}
+
+	defer func() {
+		if err := h.sc.Cleanup(ctx, sessionID, userID); err != nil {
+			log.Warn().Err(err).Msg("cleanup session")
+		}
+	}()
 
 	var (
 		resp   model.ResponseDto
@@ -69,47 +95,40 @@ func (h *Handler) ProcessConn(c *websocket.Conn) {
 			return
 		}
 
-		queryID, err := h.service.InsertQuery(ctx, sessionID, req)
+		queryID, err := h.cc.InsertQuery(ctx, sessionID, req)
 		if err != nil {
 			h.respondError(c, err)
 			return
 		}
 		req.ID = queryID
 
-		go h.service.GetDescription(ctx, req, out, cancel)
+		go h.cc.GetDescription(ctx, req, out, cancel)
 
 	chunks:
 		for {
 			select {
 			case chunk, ok := <-out:
-				// если закончили читать
 				if !ok {
-					h.log.Error().Msg("error while processing")
+					log.Error().Msg("error while processing")
 					return
 				}
 
-				if chunk.IsLast {
-					resp = chunk
-					h.log.Debug().Int64("query id", queryID).Msg("finished processing")
-					break chunks
-				}
-
-				if chunk.Charts != nil {
-					// если первое сообщение с графиками, которое должно быть цельным
-					copy(resp.Charts, chunk.Charts)
-				} else {
-					// если остальные сообщения с описанием, которые идут по токенам
-					desc.WriteString(chunk.Description)
-				}
+				desc.WriteString(chunk.Description)
 
 				if err := c.WriteJSON(chunk); err != nil {
 					h.respondError(c, err)
 					continue
 				}
+
+				if chunk.IsLast {
+					resp = chunk
+					log.Debug().Int64("query id", queryID).Msg("finished processing")
+					break chunks
+				}
 			}
 		}
 
-		if err := h.service.InsertResponse(ctx, sessionID, resp); err != nil {
+		if err := h.cc.InsertResponse(ctx, sessionID, resp); err != nil {
 			h.respondError(c, err)
 			return
 		}

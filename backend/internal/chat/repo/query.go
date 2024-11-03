@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/larek-tech/innohack/backend/internal/chat/model"
-	"github.com/larek-tech/innohack/backend/pkg"
 	"github.com/larek-tech/innohack/backend/pkg/storage/postgres"
 )
 
@@ -26,7 +25,7 @@ func (r *QueryRepo) InsertQuery(ctx context.Context, query model.Query) (int64, 
 	var queryID int64
 	err := r.pg.Query(ctx, &queryID, insertQuery, query.SessionID, query.Prompt)
 	if err != nil {
-		return queryID, pkg.WrapErr(err)
+		return queryID, err
 	}
 	return queryID, nil
 }
