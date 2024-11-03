@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handler) InsertSession(c *fiber.Ctx) error {
-	userID, err := strconv.ParseInt(c.Locals(shared.UserIDKey, -1).(string), 10, 64)
+	userID, err := strconv.ParseInt(c.Locals(shared.UserIDKey).(string), 10, 64)
 	if err != nil {
 		return pkg.WrapErr(err)
 	}
@@ -35,7 +35,7 @@ func (h *Handler) GetSessionContent(c *fiber.Ctx) error {
 }
 
 func (h *Handler) ListSessions(c *fiber.Ctx) error {
-	userID, err := strconv.ParseInt(c.Locals(shared.UserIDKey, -1).(string), 10, 64)
+	userID, err := strconv.ParseInt(c.Locals(shared.UserIDKey).(string), 10, 64)
 	if err != nil {
 		return pkg.WrapErr(err)
 	}
@@ -48,7 +48,7 @@ func (h *Handler) ListSessions(c *fiber.Ctx) error {
 }
 
 func (h *Handler) UpdateSessionTitle(c *fiber.Ctx) error {
-	userID, err := strconv.ParseInt(c.Locals(shared.UserIDKey, -1).(string), 10, 64)
+	userID, err := strconv.ParseInt(c.Locals(shared.UserIDKey).(string), 10, 64)
 	if err != nil {
 		return pkg.WrapErr(err)
 	}

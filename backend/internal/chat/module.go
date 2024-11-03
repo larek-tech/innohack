@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
 	"github.com/larek-tech/innohack/backend/internal/analytics/pb"
+	authmw "github.com/larek-tech/innohack/backend/internal/auth/middleware"
 	"github.com/larek-tech/innohack/backend/internal/chat/handler"
 	"github.com/larek-tech/innohack/backend/internal/chat/middleware"
 	"github.com/larek-tech/innohack/backend/internal/chat/service"
@@ -30,23 +31,27 @@ type ChatModule struct {
 	handler chatHandler
 }
 
-func New(tracer trace.Tracer, pg *postgres.Postgres, jwtSecret string, grpcConn *grpc.ClientConn) *ChatModule {
+func New(router fiber.Router, tracer trace.Tracer, pg *postgres.Postgres, jwtSecret string, grpcConn *grpc.ClientConn) *ChatModule {
 	logger := log.With().Str("module", "auth").Logger()
 
 	analytics := pb.NewAnalyticsClient(grpcConn)
 	chatService := service.New(&logger, jwtSecret, pg, analytics)
 
-	return &ChatModule{
+	m := &ChatModule{
 		s:       chatService,
 		log:     &logger,
 		handler: handler.New(tracer, &logger, chatService),
 	}
+
+	m.InitRoutes(router, jwtSecret)
+	return m
 }
 
-func (m *ChatModule) InitRoutes(api fiber.Router) {
+func (m *ChatModule) InitRoutes(api fiber.Router, secret string) {
 	chat := api.Group("/chat")
 
 	session := chat.Group("/session")
+	session.Use(authmw.Jwt(secret))
 	session.Post("/", m.handler.InsertSession)
 	session.Get("/:session_id", m.handler.GetSessionContent)
 	session.Get("/list", m.handler.ListSessions)

@@ -10,11 +10,11 @@ import (
 type QueryDto struct {
 	ID        int64     `json:"id"`
 	Prompt    string    `json:"prompt"`
-	CreatedAt time.Time `json:"created_at"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 type ResponseDto struct {
-	QueryID     int64        `json:"query_id"`
+	QueryID     int64        `json:"queryId"`
 	Sources     []string     `json:"sources"` // s3 link
 	Filenames   []string     `json:"filenames"`
 	Charts      []Chart      `json:"charts"`
@@ -26,8 +26,6 @@ type ResponseDto struct {
 }
 
 type Chart struct {
-	GID         string    `json:"gid"`
-	DataGID     string    `json:"data-gid"`
 	Title       string    `json:"title"`
 	Records     []Record  `json:"records"`     // для отрисовки графа
 	Type        ChartType `json:"type"`        // пока что bar chart
@@ -103,7 +101,7 @@ func MultipliersFromPb(multipliers []*pb.Multiplier) []Multiplier {
 type SessionDto struct {
 	ID        int64     `json:"id"`
 	Title     string    `json:"title"`
-	CreatedAt time.Time `json:"created_at"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 type SessionContentDto struct {

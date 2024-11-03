@@ -20,13 +20,17 @@ type AuthModule struct {
 	handler authHandler
 }
 
-func New(tracer trace.Tracer, pg *postgres.Postgres, jwtSecret string) *AuthModule {
+func New(router fiber.Router, tracer trace.Tracer, pg *postgres.Postgres, jwtSecret string) *AuthModule {
 	logger := log.With().Str("module", "auth").Logger()
 	authService := service.New(pg, jwtSecret)
-	return &AuthModule{
+
+	m := &AuthModule{
 		log:     &logger,
 		handler: handler.New(tracer, &logger, authService),
 	}
+
+	m.InitRoutes(router)
+	return m
 }
 
 func (m *AuthModule) InitRoutes(api fiber.Router) {
