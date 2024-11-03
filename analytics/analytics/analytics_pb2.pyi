@@ -28,18 +28,18 @@ class Params(_message.Message):
     def __init__(self, query_id: _Optional[int] = ..., start_date: _Optional[str] = ..., end_date: _Optional[str] = ..., prompt: _Optional[str] = ...) -> None: ...
 
 class Report(_message.Message):
-    __slots__ = ("source", "filename", "description", "charts", "multipliers")
-    SOURCE_FIELD_NUMBER: _ClassVar[int]
-    FILENAME_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ("sources", "filenames", "description", "charts", "multipliers")
+    SOURCES_FIELD_NUMBER: _ClassVar[int]
+    FILENAMES_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     CHARTS_FIELD_NUMBER: _ClassVar[int]
     MULTIPLIERS_FIELD_NUMBER: _ClassVar[int]
-    source: str
-    filename: str
+    sources: _containers.RepeatedScalarFieldContainer[str]
+    filenames: _containers.RepeatedScalarFieldContainer[str]
     description: str
     charts: _containers.RepeatedCompositeFieldContainer[Chart]
     multipliers: _containers.RepeatedCompositeFieldContainer[Multiplier]
-    def __init__(self, source: _Optional[str] = ..., filename: _Optional[str] = ..., description: _Optional[str] = ..., charts: _Optional[_Iterable[_Union[Chart, _Mapping]]] = ..., multipliers: _Optional[_Iterable[_Union[Multiplier, _Mapping]]] = ...) -> None: ...
+    def __init__(self, sources: _Optional[_Iterable[str]] = ..., filenames: _Optional[_Iterable[str]] = ..., description: _Optional[str] = ..., charts: _Optional[_Iterable[_Union[Chart, _Mapping]]] = ..., multipliers: _Optional[_Iterable[_Union[Multiplier, _Mapping]]] = ...) -> None: ...
 
 class Chart(_message.Message):
     __slots__ = ("title", "type", "description", "records")

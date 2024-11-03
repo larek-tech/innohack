@@ -2,44 +2,39 @@ package auth
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/larek-tech/innohack/backend/internal/auth/handler"
 	"github.com/larek-tech/innohack/backend/internal/auth/service"
-	"github.com/larek-tech/innohack/backend/internal/auth/view"
 	"github.com/larek-tech/innohack/backend/pkg/storage/postgres"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"go.opentelemetry.io/otel/trace"
 )
 
-type authView interface {
-	SignUpPage(c *fiber.Ctx) error
-	SignUp(c *fiber.Ctx) error
-	LoginPage(c *fiber.Ctx) error
+type authHandler interface {
+	Signup(c *fiber.Ctx) error
 	Login(c *fiber.Ctx) error
-	ValidateEmail(c *fiber.Ctx) error
 }
 
 type AuthModule struct {
-	log   *zerolog.Logger
-	views authView
+	log     *zerolog.Logger
+	handler authHandler
 }
 
-func New(pg *postgres.Postgres, jwtSecret string) *AuthModule {
+func New(router fiber.Router, tracer trace.Tracer, pg *postgres.Postgres, jwtSecret string) *AuthModule {
 	logger := log.With().Str("module", "auth").Logger()
 	authService := service.New(pg, jwtSecret)
-	return &AuthModule{
-		log:   &logger,
-		views: view.New(&logger, authService),
+
+	m := &AuthModule{
+		log:     &logger,
+		handler: handler.New(tracer, &logger, authService),
 	}
+
+	m.InitRoutes(router)
+	return m
 }
 
-func (m *AuthModule) InitRoutes(viewRouter fiber.Router) {
-	views := viewRouter.Group("/auth")
-	m.initViews(views)
-}
-
-func (m *AuthModule) initViews(views fiber.Router) {
-	views.Get("/signup", m.views.SignUpPage)
-	views.Post("/signup", m.views.SignUp)
-	views.Post("/signup/validate/email", m.views.ValidateEmail)
-	views.Get("/login", m.views.LoginPage)
-	views.Post("/login", m.views.Login)
+func (m *AuthModule) InitRoutes(api fiber.Router) {
+	auth := api.Group("/")
+	auth.Post("/signup", m.handler.Signup)
+	auth.Post("/login", m.handler.Login)
 }

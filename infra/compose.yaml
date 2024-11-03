@@ -2,6 +2,29 @@ volumes:
   pg_admin:
 
 services:
+  mongo:
+    image: mongo:5.0
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/mongo_data:/data/db
+  qdrant:
+    image: qdrant/qdrant:latest
+    restart: always
+    container_name: vector_store
+    ports:
+      - 6333:6333
+      - 6334:6334
+    expose:
+      - 6333
+      - 6334
+    environment:
+      - QDRANT__SERVICE__API_KEY=z)A(nE5<77mi^4L*V_;F(:-u|Lay&Ho6[jk%Sb6/&s1vK#-v(m
+    volumes:
+      - ./data/qdrant_data:/qdrant/storage
+
+
   backend:
     image: ghcr.io/larek-tech/innohack/control:dev-d1e1d5a
     build:

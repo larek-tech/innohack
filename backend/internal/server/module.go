@@ -7,17 +7,13 @@ import (
 )
 
 type module interface {
-	InitRoutes(views fiber.Router)
+	InitRoutes(api fiber.Router)
 }
 
 func (s *Server) initModules() {
-	views := s.app.Group("/")
+	authRouter := s.app.Group("/auth")
+	apiRouter := s.app.Group("/api")
 
-	modules := []module{
-		auth.New(s.pg, s.cfg.Server.JwtSecret),
-		chat.New(s.pg, s.cfg.Server.JwtSecret, s.grpcConn.GetConn()),
-	}
-	for _, m := range modules {
-		m.InitRoutes(views)
-	}
+	auth.New(authRouter, s.tracer, s.pg, s.cfg.Server.JwtSecret)
+	chat.New(apiRouter, s.tracer, s.pg, s.cfg.Server.JwtSecret, s.grpcConn.GetConn())
 }

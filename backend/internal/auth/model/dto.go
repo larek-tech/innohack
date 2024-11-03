@@ -1,12 +1,16 @@
 package model
 
-type SignUpReq struct {
-	Email           string `validate:"required,email" form:"email"`
-	Password        string `validate:"required" form:"password"`
-	PasswordConfirm string `validate:"required" form:"confirm-password"`
+type SignupReq struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required" `
 }
 
 type LoginReq struct {
-	Email    string `validate:"required,email" form:"email"`
-	Password string `validate:"required" form:"password"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required" `
+}
+
+type TokenResp struct {
+	Token string `json:"token"`
+	Type  string `json:"type"`
 }

@@ -6,8 +6,8 @@ from typing import List
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams, PointStruct
 
-from utils.bi_encode import str_to_vec
-from utils.chunks import file_to_chunks
+from rag.utils.bi_encode import str_to_vec
+from rag.utils.chunks import file_to_chunks
 
 from loguru import logger
 
@@ -83,7 +83,6 @@ def save_chunks(
 
 
 def files_to_vecdb(files, bi_encoder, vec_size, sep, chunk_size, chunk_overlap):
-
     # Коллекция для чанков
     qdrant_client.delete_collection(collection_name=COLL_NAME)
     qdrant_client.create_collection(
@@ -102,6 +101,9 @@ def files_to_vecdb(files, bi_encoder, vec_size, sep, chunk_size, chunk_overlap):
 
     for file_name in files:
         chunks = file_to_chunks(file_name, sep, chunk_size, chunk_overlap)
+
+        if chunks == []:
+            continue
 
         questions_for_chunk = []
         for chunk in chunks:
@@ -139,3 +141,27 @@ def vec_search(bi_encoder, query, n_top_cos, n_top_cos_question):
     top_question_files = list(set([x.payload["file"] for x in search_questions_result]))
 
     return top_chunks + top_question_chunks, top_files + top_question_files
+
+
+def define_question_topic(query: str) -> str:
+
+    url = "https://mts-aidocprocessing-case.olymp.innopolis.university/generate"
+    data = {
+        "prompt": query,
+        "apply_chat_template": True,
+        "system_prompt": "Твоя задача определть, относится ли предложение к теме финансов, бухгалтерии, отчетов, \
+            финансовых данных и анализов. Напиши 'Да' или 'Нет'",
+        "max_tokens": 256,
+        "n": 1,
+        "temperature": 0.5,
+    }
+
+    headers = {"Content-Type": "application/json"}
+
+    response = requests.post(url, data=json.dumps(data), headers=headers)
+
+    if response.status_code == 200:
+        logger.info(response.json())
+        return response.json()
+    else:
+        return f"Error: {response.status_code} - {response.text}"

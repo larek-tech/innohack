@@ -47,7 +47,7 @@ func New(cfg config.Config) Server {
 	app := fiber.New(fiber.Config{
 		ServerHeader: srvHeader,
 		BodyLimit:    bodyLimitMb * 1024 * 1024,
-		ErrorHandler: errorHandler,
+		ErrorHandler: NewErrorHandler(errMap).Handler,
 	})
 
 	app.Use(cors.New(cors.Config{
@@ -57,9 +57,7 @@ func New(cfg config.Config) Server {
 	app.Use(logger.New())
 	app.Use(recovermw.New())
 
-	app.Get("/", indexHanlder)
 	app.Get("/health", healtCheckHandler(uuid.NewString()))
-	app.Static("/static", "./static")
 
 	exporter := tracing.MustNewExporter(context.Background(), cfg.Jaeger.URL())
 	provider := tracing.MustNewTraceProvider(exporter, "chat")

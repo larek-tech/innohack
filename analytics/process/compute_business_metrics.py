@@ -82,7 +82,7 @@ def get_liquidity(df: List[pd.DataFrame], year: int) -> pd.DataFrame:
             (
                 data[data[code_column] == 1230][year].values[0]
                 + data[data[code_column] == 1240][year].values[0]
-                + data[data[code_column] == 1250][year].values[0
+                + data[data[code_column] == 1250][year].values[0]
             )
             / (
                 data[data[code_column] == 1510][year].values[0]

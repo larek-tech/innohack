@@ -4,23 +4,32 @@ from concurrent import futures
 import grpc
 
 from analytics import analytics_pb2, analytics_pb2_grpc
+from process.process import preprocess_xlsx
+from process.form_graphs import get_analitics_report
+
+from rag.rag_model import RagClient
 
 
 class Analytics(analytics_pb2_grpc.AnalyticsServicer):
+    def __init__(self):
+        super().__init__()
+        preprocess_xlsx()
+
+        self.rag = RagClient()
+
     def GetCharts(self, request: analytics_pb2.Params, context: grpc.ServicerContext):
-        return analytics_pb2.Report()
+        return get_analitics_report(request)
 
     def GetDescriptionStream(
         self, request: analytics_pb2.Params, context: grpc.ServicerContext
     ):
-        res = analytics_pb2.Report()
-
-        for i in range(10):
-            res.description += f"{i} "
+        for token in self.rag.llm_client.get_response(request.prompt):
+            res = analytics_pb2.Report()
+            res.description = token
             yield res
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 def serve():

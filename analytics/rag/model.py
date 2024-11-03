@@ -2,10 +2,12 @@ import requests
 import json
 import ollama
 
+import random
+
 from loguru import logger
 
-from utils.bi_encode import get_bi_encoder
-from db import vec_search
+from rag.utils.bi_encode import get_bi_encoder
+from rag.db import vec_search, define_question_topic
 
 
 class LLMClient:
@@ -21,15 +23,21 @@ class LLMClient:
 
     def get_response(self, prompt):
 
+        # classificator_response = define_question_topic(prompt)
+        # if "нет" in classificator_response.lower():
+        #     return random.choice()
+
         top_chunks, top_files = vec_search(
             self.bi_encoder, prompt, self.n_top_cos, self.n_top_cos_question
         )
         top_chunks_join = "\n".join(top_chunks)
+
         logger.info(top_chunks)
 
         content = f"""
             Используй только следующий контекст, чтобы ответить на вопрос.
             Не пытайся выдумывать ответ.
+            Не отвечай на вопросы, не связанные с финансами.
             Не отвечай на вопросы, не связанные с финансами.
             Контекст:
             ===========
@@ -43,35 +51,11 @@ class LLMClient:
         system_prompt = """ 
             Ты — помощник по анализу финансовых отчетов. Твоя задача — предоставлять
             точные и полезные ответы на вопросы, связанные с финансовыми данными, отчетами и анализом.
-            Не отвечай на вопросы, не связанные с финансами и бухгалтерией."""
+            Не отвечай на вопросы, не связанные с финансами и бухгалтерией.
+        """
 
         max_tokens = 512
         temperature = 0.8
-
-        # data = {
-        #     "prompt": f"""
-        #     Используй только следующий контекст, чтобы ответить на вопрос.
-        #     Не пытайся выдумывать ответ.
-        #     Не отвечай на вопросы, не связанные с финансами.
-        #     Контекст:
-        #     ===========
-        #     {top_chunks_join}
-        #     ===========
-        #     Вопрос:
-        #     ===========
-        #     {prompt}
-        #     """,
-        #     "apply_chat_template": True,
-        #     "system_prompt": """
-        #     Ты — помощник по анализу финансовых отчетов. Твоя задача — предоставлять
-        #       точные и полезные ответы на вопросы, связанные с финансовыми данными, отчетами и анализом. Не отвечай на вопросы, не связанные с финансами и бухгалтерией.""",
-        #     "n": 1,
-        #     "temperature": 0.8,
-        # }
-
-        # headers = {"Content-Type": "application/json"}
-
-        # response = requests.post(self.api_url, data=json.dumps(data), headers=headers)
 
         response = ollama.chat(
             model="llama3.1",
@@ -101,8 +85,6 @@ if __name__ == "__main__":
 
     """
      ̈ КакиепродуктыестьвэкосистемеМТС  ̈ СколькостоитотправкаСМСвсетиМТС  ̈ КакиеестьтарифывМТС?
-
-
 
     """
     try:
