@@ -32,7 +32,7 @@ func (r *SessionRepo) InsertSession(ctx context.Context, userID int64) (int64, e
 	return sessionID, nil
 }
 
-const getSessionContext = `
+const getSessionContent = `
 	select 
 		(q.id, q.session_id, q.prompt, q.created_at) as query,
 		(r.id, r.session_id, r.query_id, r.source, r.filename, r.charts, r.description, r.multipliers r.created_at) as response
@@ -51,7 +51,7 @@ const getSessionContext = `
 
 func (r *SessionRepo) GetSessionContent(ctx context.Context, sessionID int64) ([]model.SessionContent, error) {
 	var content []model.SessionContent
-	if err := r.pg.QuerySlice(ctx, &content, getSessionContext, sessionID); err != nil {
+	if err := r.pg.QuerySlice(ctx, &content, getSessionContent, sessionID); err != nil {
 		return nil, pkg.WrapErr(err)
 	}
 	return content, nil
@@ -59,7 +59,8 @@ func (r *SessionRepo) GetSessionContent(ctx context.Context, sessionID int64) ([
 
 const listSessions = `
 	select id, user_id, created_at, updated_at from session
-	where is_deleted = false and user_id = $1;
+	where is_deleted = false and user_id = $1
+	order by created_at;
 `
 
 func (r *SessionRepo) ListSessions(ctx context.Context, userID int64) ([]model.Session, error) {
@@ -72,12 +73,12 @@ func (r *SessionRepo) ListSessions(ctx context.Context, userID int64) ([]model.S
 
 const updateSessionTitle = `
 	update session set
-		title = $2
-	where id = $1 and is_deleted = false;
+		title = $3
+	where id = $1 and user_id = $2 and is_deleted = false;
 `
 
-func (r *SessionRepo) UpdateSessionTitle(ctx context.Context, sessionID int64, title string) error {
-	tag, err := r.pg.Exec(ctx, updateSessionTitle, sessionID, title)
+func (r *SessionRepo) UpdateSessionTitle(ctx context.Context, sessionID, userID int64, title string) error {
+	tag, err := r.pg.Exec(ctx, updateSessionTitle, sessionID, userID, title)
 	if err != nil {
 		return pkg.WrapErr(err)
 	}

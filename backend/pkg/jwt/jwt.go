@@ -6,6 +6,9 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/larek-tech/innohack/backend/internal/auth/model"
+	"github.com/larek-tech/innohack/backend/internal/shared"
+	"github.com/larek-tech/innohack/backend/pkg"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -47,15 +50,18 @@ func VerifyPassword(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-func AuthenticateUser(userID int64, email, hashedPassword, password, secret string) (string, error) {
+func AuthenticateUser(userID int64, email, hashedPassword, password, secret string) (model.TokenResp, error) {
 	if err := VerifyPassword(hashedPassword, password); err != nil {
-		return "", err
+		return model.TokenResp{}, pkg.WrapErr(shared.ErrInvalidCredentials)
 	}
 
 	accessToken, err := CreateAccessToken(userID, email, secret)
 	if err != nil {
-		return "", err
+		return model.TokenResp{}, pkg.WrapErr(err)
 	}
 
-	return accessToken, nil
+	return model.TokenResp{
+		Token: accessToken,
+		Type:  shared.BearerType,
+	}, nil
 }
