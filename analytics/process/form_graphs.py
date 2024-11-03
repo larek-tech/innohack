@@ -528,6 +528,7 @@ def form_graph_info(
             )
         return charts
 
+
 def get_analitics_report(request: analytics_pb2.Filter) -> analytics_pb2.ChartReport:
     records, multipliers, report_summary = load_json()
 
