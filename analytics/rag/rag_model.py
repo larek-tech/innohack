@@ -24,18 +24,18 @@ from process.form_graphs import load_json
 
 class RagClient:
 
-    llm_client = LLMClient()
+    # llm_client = LLMClient()
 
     def __init__(self):
-
+        self.llm_client = LLMClient()
         # minio_client = MinioClient(MINIO_HOST, MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
-        self.qdrant_client = qdrant_client
+        # self.qdrant_client = qdrant_client
 
         # Загркзка json из Mongo
         # TODO: time this
         # records, multipliers = load_json()
 
-        logger.info(f"parced: {len(records)}")
+        # logger.info(records)
 
         # new_records = format_data(records)
         # new_multipliers = format_data(multipliers)
@@ -46,7 +46,7 @@ class RagClient:
         # with open(dir_path + "/multipliers.txt", "w", encoding="utf-8") as file:
         #     file.write(new_multipliers)
 
-        bi_encoder, vec_dim = get_bi_encoder(BI_ENCODE_NAME)
+        # bi_encoder, vec_dim = get_bi_encoder(BI_ENCODE_NAME)
 
         # Скачивание данных с S3
         # minio_client.download_all_files("innohack", "data")
@@ -54,12 +54,12 @@ class RagClient:
         dir_path = Path(__file__).parent / "chunk_1"
         file_paths = list(dir_path.glob("*"))
 
-        # Вектаризация данных
-        files_to_vecdb(
-            files=file_paths,
-            bi_encoder=bi_encoder,
-            vec_size=vec_dim,
-            sep="\n",
-            chunk_size=CHUNK_SIZE,
-            chunk_overlap=CHUNK_OVERLAP,
-        )
+        # # Вектаризация данных
+        # files_to_vecdb(
+        #     files=file_paths,
+        #     bi_encoder=bi_encoder,
+        #     vec_size=vec_dim,
+        #     sep="\n",
+        #     chunk_size=CHUNK_SIZE,
+        #     chunk_overlap=CHUNK_OVERLAP,
+        # )

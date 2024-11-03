@@ -123,8 +123,23 @@ def files_to_vecdb(files, bi_encoder, vec_size, sep, chunk_size, chunk_overlap):
         save_chunks(bi_encoder, chunks, file_name, questions_for_chunk)
         logger.info("chunks saved successfully")
 
+def vec_search_qwery(bi_encoder, query, n_top_cos_question):
 
-def vec_search(bi_encoder, query, n_top_cos, n_top_cos_question):
+    query_emb = str_to_vec(bi_encoder, query)
+
+    # Поиск в БД по вопросам и мэтчинг соотвествующих чанков
+    search_questions_result = qdrant_client.search(
+        collection_name=COLL_QUESTION_NAME,
+        query_vector=query_emb,
+        limit=n_top_cos_question,
+        with_vectors=False,
+    )
+
+    top_question_chunks = [x.payload["chunk"] for x in search_questions_result]
+    
+    return top_question_chunks
+
+def vec_search(bi_encoder, query, n_top_cos):
     # Кодируем запрос в вектор
     query_emb = str_to_vec(bi_encoder, query)
 
@@ -136,20 +151,10 @@ def vec_search(bi_encoder, query, n_top_cos, n_top_cos_question):
         with_vectors=False,
     )
 
-    # Поиск в БД по вопросам и мэтчинг соотвествующих чанков
-    search_questions_result = qdrant_client.search(
-        collection_name=COLL_QUESTION_NAME,
-        query_vector=query_emb,
-        limit=n_top_cos_question,
-        with_vectors=False,
-    )
 
     top_chunks = [x.payload["chunk"] for x in search_result]
-    top_question_chunks = [x.payload["chunk"] for x in search_questions_result]
-    top_files = list(set([x.payload["file"] for x in search_result]))
-    top_question_files = list(set([x.payload["file"] for x in search_questions_result]))
 
-    return top_chunks + top_question_chunks, top_files + top_question_files
+    return top_chunks
 
 
 def define_question_topic(query: str) -> str:
