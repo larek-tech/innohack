@@ -5,6 +5,8 @@ import math
 from process.get_report_summary import form_report_description
 from process.load_json import load_json
 
+valid_min_year = 2009
+valid_max_year = 2023
 
 def get_one_param_records(
     records: dict, code: int, start_date: str, end_date: str, return_year=True
@@ -526,9 +528,16 @@ def form_graph_info(
             )
         return charts
 
-
 def get_analitics_report(request: analytics_pb2.Filter) -> analytics_pb2.ChartReport:
-    records, multipliers = load_json()
+    records, multipliers, report_summary = load_json()
+
+    start_date = int(request.start_date)
+    end_date = int(request.end_date)
+    if start_date < valid_min_year or start_date > valid_max_year:
+        request.start_date = valid_min_year
+    if end_date > valid_max_year or end_date < valid_min_year:
+        request.end_date = valid_max_year
+
     charts: list[analytics_pb2.Chart] = form_graph_info(records, multipliers, request)
     return_multy = []
     if request.start_date == request.end_date:
@@ -541,7 +550,10 @@ def get_analitics_report(request: analytics_pb2.Filter) -> analytics_pb2.ChartRe
                 return_multy.append(
                     analytics_pb2.Multiplier(key=MULTYPLIER_NAME[k], value=value)
                 )
+
+    dates = sorted([request.start_date, request.end_date])
     report = analytics_pb2.ChartReport(
+        description=report_summary[str(dates[0])][str(dates[1])],
         charts=charts,
         multipliers=return_multy if len(return_multy) > 0 else None,
     )

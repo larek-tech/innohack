@@ -3,8 +3,6 @@ import requests
 from analytics import analytics_pb2
 import math
 
-from process.load_json import load_json
-
 from process.const import CODE_NAME, MULTYPLIER_NAME
 
 REPORT_CODES = [1100, 1200, 1300, 1400]

@@ -15,7 +15,8 @@ from rag.rag_model import RagClient
 class Analytics(analytics_pb2_grpc.AnalyticsServicer):
     def __init__(self):
         super().__init__()
-        preprocess_xlsx()
+        # Data preporation - USE ONLY ONCE
+        # preprocess_xlsx()
 
         self.rag = RagClient()
 
