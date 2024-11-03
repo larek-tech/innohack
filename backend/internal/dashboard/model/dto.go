@@ -13,12 +13,16 @@ type Filter struct {
 }
 
 type ChartReport struct {
-	Summary     string             `json:"summary"`
-	Charts      map[string][]Chart `json:"charts"`
-	Multipliers []Multiplier       `json:"multipliers"`
-	Legend      map[string]string  `json:"legend"`
-	StartDate   int                `json:"startDate"`
-	EndDate     int                `json:"endDate"`
+	Summary     string                  `json:"summary"`
+	Info        map[string]ChartsLegend `json:"info"`
+	Multipliers []Multiplier            `json:"multipliers"`
+	StartDate   int                     `json:"startDate"`
+	EndDate     int                     `json:"endDate"`
+}
+
+type ChartsLegend struct {
+	Charts []Chart           `json:"charts"`
+	Legend map[string]string `json:"legend"`
 }
 
 type Chart struct {

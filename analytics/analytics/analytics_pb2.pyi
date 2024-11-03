@@ -44,21 +44,21 @@ class Filter(_message.Message):
     def __init__(self, start_date: _Optional[int] = ..., end_date: _Optional[int] = ...) -> None: ...
 
 class ChartReport(_message.Message):
-    __slots__ = ("charts", "multipliers", "summary")
-    class ChartsEntry(_message.Message):
+    __slots__ = ("info", "multipliers", "summary")
+    class InfoEntry(_message.Message):
         __slots__ = ("key", "value")
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
         key: str
         value: ListChartsLegend
         def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[ListChartsLegend, _Mapping]] = ...) -> None: ...
-    CHARTS_FIELD_NUMBER: _ClassVar[int]
+    INFO_FIELD_NUMBER: _ClassVar[int]
     MULTIPLIERS_FIELD_NUMBER: _ClassVar[int]
     SUMMARY_FIELD_NUMBER: _ClassVar[int]
-    charts: _containers.MessageMap[str, ListChartsLegend]
+    info: _containers.MessageMap[str, ListChartsLegend]
     multipliers: _containers.RepeatedCompositeFieldContainer[Multiplier]
     summary: str
-    def __init__(self, charts: _Optional[_Mapping[str, ListChartsLegend]] = ..., multipliers: _Optional[_Iterable[_Union[Multiplier, _Mapping]]] = ..., summary: _Optional[str] = ...) -> None: ...
+    def __init__(self, info: _Optional[_Mapping[str, ListChartsLegend]] = ..., multipliers: _Optional[_Iterable[_Union[Multiplier, _Mapping]]] = ..., summary: _Optional[str] = ...) -> None: ...
 
 class ListChartsLegend(_message.Message):
     __slots__ = ("charts", "legend")

@@ -16,21 +16,27 @@ func (ctrl *Controller) GetCharts(ctx context.Context, filter model.Filter) (mod
 		return model.ChartReport{}, err
 	}
 
-	titleCharts := report.GetCharts()
+	info := report.GetInfo()
 	multipliers := report.GetMultipliers()
 
 	res := model.ChartReport{
 		Summary:     report.GetSummary(),
-		Charts:      map[string][]model.Chart{},
+		Info:        map[string]model.ChartsLegend{},
 		Multipliers: make([]model.Multiplier, len(multipliers)),
-		Legend:      map[string]string{},
 		StartDate:   filter.StartDate.Year(),
 		EndDate:     filter.EndDate.Year(),
 	}
-	for title, chartList := range titleCharts {
-		res.Charts[title] = make([]model.Chart, len(chartList.Charts))
-		for idx, chart := range chartList.Charts {
-			res.Charts[title][idx] = model.ChartFromPb(chart)
+	for title, chartLegend := range info {
+		res.Info[title] = model.ChartsLegend{
+			Charts: make([]model.Chart, len(chartLegend.Charts)),
+			Legend: map[string]string{},
+		}
+
+		for idx := range len(chartLegend.Charts) {
+			res.Info[title].Charts[idx] = model.ChartFromPb(chartLegend.Charts[idx])
+		}
+		for color, desc := range chartLegend.Legend {
+			res.Info[title].Legend[chartLegend.Legend[color]] = desc
 		}
 	}
 
