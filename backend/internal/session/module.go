@@ -16,7 +16,7 @@ func InitRoutes(api fiber.Router, h sessionHandler, secret string) {
 	session := api.Group("/session")
 	session.Use(middleware.Jwt(secret))
 	session.Post("/", h.InsertSession)
-	session.Get("/:session_id", h.GetSessionContent)
 	session.Get("/list", h.ListSessions)
+	session.Get("/:session_id", h.GetSessionContent)
 	session.Put("/:title", h.UpdateSessionTitle)
 }

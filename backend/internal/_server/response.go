@@ -1,7 +1,6 @@
 package server
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 
@@ -90,8 +89,6 @@ func (h ErrorHandler) getErrorResponse(err error) ErrorResponse {
 			Status: fiber.StatusUnprocessableEntity,
 		}
 	}
-
-	err = errors.Unwrap(err)
 
 	e, ok = h.status[err]
 	if !ok {

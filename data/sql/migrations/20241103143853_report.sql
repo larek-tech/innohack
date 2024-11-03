@@ -1,7 +1,5 @@
 -- +goose Up
 -- +goose StatementBegin
-drop table response;
-
 create table chart (
     id bigserial primary key,
     charts jsonb not null,

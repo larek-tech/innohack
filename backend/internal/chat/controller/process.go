@@ -7,7 +7,6 @@ import (
 
 	"github.com/larek-tech/innohack/backend/internal/analytics/pb"
 	"github.com/larek-tech/innohack/backend/internal/chat/model"
-	"github.com/larek-tech/innohack/backend/pkg"
 	"github.com/rs/zerolog/log"
 )
 
@@ -18,7 +17,7 @@ func (ctrl *Controller) GetDescription(ctx context.Context, req model.QueryDto, 
 	})
 	if err != nil {
 		close(out)
-		log.Err(pkg.WrapErr(err)).Msg("receive stream description")
+		log.Err(err).Msg("receive stream description")
 		return
 	}
 
@@ -46,7 +45,7 @@ func (ctrl *Controller) GetDescription(ctx context.Context, req model.QueryDto, 
 				return
 			}
 			if err != nil {
-				log.Err(pkg.WrapErr(err)).Msg("reading stream")
+				log.Err(err).Msg("reading stream")
 				close(out)
 				return
 			}

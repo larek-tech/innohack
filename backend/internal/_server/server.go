@@ -32,7 +32,6 @@ import (
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/larek-tech/innohack/backend/config"
-	"github.com/larek-tech/innohack/backend/pkg"
 	"github.com/larek-tech/innohack/backend/pkg/grpc_client"
 	"github.com/larek-tech/innohack/backend/pkg/storage/postgres"
 	"github.com/larek-tech/innohack/backend/pkg/tracing"
@@ -56,7 +55,7 @@ type Server struct {
 
 func New(cfg config.Config) Server {
 	if err := cfg.Server.Validate(); err != nil {
-		panic(pkg.WrapErr(err, "config validation"))
+		panic(err)
 	}
 
 	app := fiber.New(fiber.Config{
@@ -129,13 +128,13 @@ func (s *Server) Serve() {
 	<-shutdown
 
 	if err := s.app.Shutdown(); err != nil {
-		log.Err(pkg.WrapErr(err)).Msg("graceful shutdown")
+		log.Err(err).Msg("graceful shutdown")
 	}
 }
 
 func (s *Server) listenHTTP(port string) {
 	addr := net.JoinHostPort("0.0.0.0", port)
 	if err := s.app.Listen(addr); err != nil {
-		log.Err(pkg.WrapErr(err)).Msg("application interrupted")
+		log.Err(err).Msg("application interrupted")
 	}
 }

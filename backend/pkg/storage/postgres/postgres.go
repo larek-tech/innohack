@@ -9,7 +9,6 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/larek-tech/innohack/backend/pkg"
 	"github.com/rs/zerolog/log"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -75,7 +74,7 @@ func (pg Postgres) BeginSerializable(ctx context.Context) (context.Context, erro
 		AccessMode: pgx.ReadWrite,
 	})
 	if err != nil {
-		return nil, pkg.WrapErr(err)
+		return nil, err
 	}
 
 	ctx = context.WithValue(ctx, txKey, tx)

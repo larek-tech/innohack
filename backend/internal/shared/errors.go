@@ -14,6 +14,11 @@ var (
 	ErrMissingJwt         = errors.New("missing jwt")
 )
 
+// 403
+var (
+	ErrNoAccessToSession = errors.New("no access to session")
+)
+
 // 500
 var (
 	ErrStorageInternal = errors.New("internal storage error")
@@ -23,8 +28,4 @@ var (
 var (
 	// ErrDuplicateKey is an error for postgres unique key violation.
 	ErrDuplicateKey = errors.New("duplicate key")
-	// ErrPageNotFound for page not found handlers.
-	ErrPageNotFound = errors.New("page not found")
-	// ErrValidation for handling validation errors.
-	ErrValidation = errors.New("validation error")
 )

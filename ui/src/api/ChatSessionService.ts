@@ -7,7 +7,7 @@ import { post, get } from "./http"
 
 class ChatSessionService {
     public async createSession() {
-        const response = await post<SessionDto>(`${API_URL}/api/chat/session`, null);
+        const response = await post<SessionDto>(`${API_URL}/api/session`, null);
         return response;
     }
     public async getSessions() {

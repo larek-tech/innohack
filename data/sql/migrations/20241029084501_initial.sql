@@ -7,7 +7,7 @@ create table users(
     created_at timestamp default current_timestamp not null
 );
 create table session(
-    id bigserial primary key,
+    id uuid primary key,
     user_id bigint not null,
     created_at timestamp default current_timestamp not null,
     updated_at timestamp default current_timestamp not null,

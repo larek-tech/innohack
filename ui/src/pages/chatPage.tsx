@@ -6,11 +6,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { observer } from 'mobx-react-lite';
 import { useToast } from '@/hooks/use-toast';
 import { WS_URL } from '@/config';
-import { useSearch } from '@tanstack/react-router';
+import { Route, useNavigate, useParams } from '@tanstack/react-router';
 import { LOCAL_STORAGE_KEY } from '@/auth/AuthProvider';
 import ChatSessionService from '@/api/ChatSessionService';
 import { SessionDto, QueryDto, ResponseDto, SessionContentDto } from '@/api/models';
 import Markdown from 'react-markdown';
+
+import { AppSidebar } from '@/components/app-sidebar';
 
 interface ChatMessage {
     data: ResponseDto;
@@ -52,7 +54,10 @@ const chatMessage = (msg: ChatMessage, index: number) => (
 );
 
 const ChatInterface = observer(() => {
-    const search = useSearch({ strict: false });
+    const navigate = useNavigate();
+    const { sessionId } = useParams({ strict: false });
+    const sessionIdNumber = Number(sessionId);
+    console.log(sessionIdNumber);
     const { toast } = useToast();
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputMessage, setInputMessage] = useState('');
@@ -68,18 +73,53 @@ const ChatInterface = observer(() => {
 
     // Load initial messages from the server
     useEffect(() => {
-        if (search.chatId) {
-            ChatSessionService.getSessionContent(search.chatId).then((res) => {
+        if (sessionIdNumber) {
+            const session = 
+            ChatSessionService.getSessionContent(sessionIdNumber).then((res) => {
+                console.log(res);
                 const initialMessages = mapSessionContentDtoToMessages(res);
                 setMessages(initialMessages);
+            }).catch((err) => {
+
+                toast({
+                    title: 'Error',
+                    description: err.message,
+                });
+                ChatSessionService.createSession().then((res) => {
+                    const newChatId = res.id;
+                    toast({
+                        title: 'Chat Created',
+                        description: `Chat with ID ${newChatId} created.`,
+
+                    });
+                    ChatSessionService.getSessionContent(sessionIdNumber).then((res) => {
+                        console.log(res);
+                        const initialMessages = mapSessionContentDtoToMessages(res);
+                        setMessages(initialMessages);
+                    }
+                );
+                    // navigate({to:`/chat/${newChatId}`});
+                    
+            }).catch((err) => {
+                toast({
+                    title: 'Error',
+                    description: err.message,
+                });
+                navigate({to:'/'});
             });
-        }
-    }, [search.chatId]);
+        }).catch((err) => {
+            toast({
+                title: 'Error',
+                description: err.message,
+            });
+        });
+    }
+    }, [sessionIdNumber]);
 
     // Initialize WebSocket and handle incoming messages
     useEffect(() => {
-        if (search.chatId) {
-            const ws = new WebSocket(`${WS_URL}/${search.chatId}`);
+        if (sessionIdNumber) {
+            const ws = new WebSocket(`${WS_URL}/${sessionIdNumber}`);
             setSocket(ws);
 
             const req: QueryDto = {
@@ -120,7 +160,7 @@ const ChatInterface = observer(() => {
                 ws.close();
             };
         }
-    }, [search.chatId]);
+    }, [sessionIdNumber]);
 
     const handleSendMessage = () => {
         const req: QueryDto = {
@@ -153,31 +193,34 @@ const ChatInterface = observer(() => {
     };
 
     return (
-        <div className="flex flex-col h-screen max-w-full mx-auto">
+        <div className="flex h-screen">
+          <AppSidebar />
+          <div className="flex flex-col flex-grow">
             <ScrollArea className="flex-grow p-4 space-y-4" ref={scrollAreaRef}>
-                {messages.map((message, index) => chatMessage(message, index))}
+              {messages.map((message, index) => chatMessage(message, index))}
             </ScrollArea>
             <div className="p-4 border-t">
-                <div className="flex space-x-2">
-                    <Input
-                        type="text"
-                        placeholder="Type your message..."
-                        value={inputMessage}
-                        onChange={(e) => setInputMessage(e.target.value)}
-                        onKeyPress={(e) => {
-                            if (e.key === 'Enter') {
-                                handleSendMessage();
-                            }
-                        }}
-                        className="flex-grow"
-                    />
-                    <Button onClick={handleSendMessage}>
-                        <Send className="w-4 h-4" />
-                    </Button>
-                </div>
+              <div className="flex space-x-2">
+                <Input
+                  type="text"
+                  placeholder="Type your message..."
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSendMessage();
+                    }
+                  }}
+                  className="flex-grow"
+                />
+                <Button onClick={handleSendMessage}>
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
+          </div>
         </div>
-    );
+      );
 });
 
 export default ChatInterface;

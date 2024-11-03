@@ -5,7 +5,6 @@ import (
 
 	"github.com/larek-tech/innohack/backend/internal/analytics/pb"
 	"github.com/larek-tech/innohack/backend/internal/dashboard/model"
-	"github.com/larek-tech/innohack/backend/pkg"
 )
 
 func (ctrl *Controller) GetCharts(ctx context.Context, filter model.Filter) (model.ChartReport, error) {
@@ -14,7 +13,7 @@ func (ctrl *Controller) GetCharts(ctx context.Context, filter model.Filter) (mod
 		EndDate:   filter.EndDate.String(),
 	})
 	if err != nil {
-		return model.ChartReport{}, pkg.WrapErr(err)
+		return model.ChartReport{}, err
 	}
 
 	charts := report.GetCharts()

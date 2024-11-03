@@ -3,7 +3,6 @@ package grpc_client
 import (
 	"net"
 
-	"github.com/larek-tech/innohack/backend/pkg"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -26,7 +25,7 @@ func NewGrpcClient(cfg *Config, opts ...grpc.DialOption) (GrpcClient, error) {
 	addr := net.JoinHostPort(cfg.Host, cfg.Port)
 	conn, err := grpc.NewClient(addr, grpcOpts...)
 	if err != nil {
-		return nil, pkg.WrapErr(err, "open grpc conn")
+		return nil, err
 	}
 
 	return &grpcClient{conn: conn}, nil
@@ -36,7 +35,7 @@ func NewGrpcClient(cfg *Config, opts ...grpc.DialOption) (GrpcClient, error) {
 func MustNewGrpcClientWithInsecure(cfg *Config) GrpcClient {
 	conn, err := NewGrpcClient(cfg, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		panic(pkg.WrapErr(err))
+		panic(err)
 	}
 	return conn
 }

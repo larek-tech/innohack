@@ -2,30 +2,12 @@ package pkg
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
-	"runtime"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jackc/pgx/v5/pgconn"
 )
-
-// WrapErr обертка для ошибок и передачи к ним контекста.
-func WrapErr(e error, desc ...string) error {
-	if e == nil {
-		return nil
-	}
-	var d string
-	if len(desc) > 0 {
-		d = desc[0]
-	}
-	_, file, line, ok := runtime.Caller(1)
-	if !ok {
-		return fmt.Errorf("undefined call %s -> %w", d, e)
-	}
-	return fmt.Errorf("%s:%d %s -> %w", file, line, d, e)
-}
 
 // CheckDuplicateKey checks if the error is a postgres duplicate key violation.
 func CheckDuplicateKey(err error) bool {

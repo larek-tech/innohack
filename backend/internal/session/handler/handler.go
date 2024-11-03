@@ -9,7 +9,7 @@ import (
 
 type sessionController interface {
 	InsertSession(ctx context.Context, userID int64) (model.SessionDto, error)
-	GetSessionContent(ctx context.Context, sessionID int64) ([]*model.SessionContentDto, error)
+	GetSessionContent(ctx context.Context, sessionID, userID int64) ([]*model.SessionContentDto, error)
 	ListSessions(ctx context.Context, userID int64) ([]*model.SessionDto, error)
 	UpdateSessionTitle(ctx context.Context, sessionID, userID int64, title string) error
 }
