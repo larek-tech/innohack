@@ -22,7 +22,7 @@ type ResponseDto struct {
 	Multipliers []Multiplier `json:"multipliers"`
 	CreatedAt   time.Time    `json:"createdAt"`
 	Err         error        `json:"error,omitempty"`
-	IsLast      bool         `json:"-"`
+	IsLast      bool         `json:"isLast"`
 }
 
 type Chart struct {

@@ -20,24 +20,35 @@ class Analytics(analytics_pb2_grpc.AnalyticsServicer):
     def GetCharts(self, request: analytics_pb2.Params, context: grpc.ServicerContext):
         return get_analitics_report(request)
 
+    def GetChartSummary(
+        self, request: analytics_pb2.Params, context: grpc.ServicerContext
+    ):
+        return analytics_pb2.ChartReport()
+
     def GetDescriptionStream(
         self, request: analytics_pb2.Params, context: grpc.ServicerContext
     ):
-        for token in self.rag.llm_client.get_response(request.prompt):
-            res = analytics_pb2.Report()
-            res.description = token
-            yield res
+        responser = self.rag.llm_client.get_response(request.prompt)
+
+        # async for msg in responser:
+        #     res = analytics_pb2.Report()
+        #     async for token in msg:
+        #         res.description = token
+        #         yield res
+        # else:
+        #     res = analytics_pb2.Report()
+        #     yield res
 
 
 logging.basicConfig(level=logging.INFO)
 
 
 def serve():
-    s = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    s = grpc.aio.server(futures.ThreadPoolExecutor(max_workers=10))
     analytics_pb2_grpc.add_AnalyticsServicer_to_server(Analytics(), s)
     s.add_insecure_port("[::]:9990")
-    print("starting server")
     s.start()
+    print("starting server")
     s.wait_for_termination()
 
 

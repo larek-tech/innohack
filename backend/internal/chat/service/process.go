@@ -30,10 +30,7 @@ func (s *Service) GetCharts(ctx context.Context, req model.QueryDto, out chan<- 
 
 	chartsResponse := model.ResponseDto{
 		QueryID:     req.ID,
-		Sources:     charts.GetSources(),
-		Filenames:   charts.GetFilenames(),
 		Charts:      model.ChartsFromPb(charts.GetCharts()),
-		Description: charts.Description,
 		Multipliers: model.MultipliersFromPb(charts.GetMultipliers()),
 	}
 
@@ -58,12 +55,9 @@ func (s *Service) GetDescription(ctx context.Context, req model.QueryDto, out ch
 	}
 
 	var (
-		sources     = make([]string, 0)
-		filenames   = make([]string, 0)
-		charts      = make([]model.Chart, 0)
-		multipliers = make([]model.Multiplier, 0)
-		buff        = strings.Builder{}
-		idx         uint
+		sources   = make([]string, 0)
+		filenames = make([]string, 0)
+		buff      = strings.Builder{}
 	)
 
 	for {
@@ -78,9 +72,7 @@ func (s *Service) GetDescription(ctx context.Context, req model.QueryDto, out ch
 					QueryID:     req.ID,
 					Sources:     sources,
 					Filenames:   filenames,
-					Charts:      charts,
 					Description: buff.String(),
-					Multipliers: multipliers,
 					IsLast:      true,
 				}
 				return
@@ -99,28 +91,11 @@ func (s *Service) GetDescription(ctx context.Context, req model.QueryDto, out ch
 
 			curDescription := resp.GetDescription()
 
-			if idx == 0 {
-				curCharts := model.ChartsFromPb(resp.GetCharts())
-				charts = append(charts, curCharts...)
-
-				curMultipliers := model.MultipliersFromPb(resp.GetMultipliers())
-				multipliers = append(multipliers, curMultipliers...)
-
-				out <- model.ResponseDto{
-					QueryID:     req.ID,
-					Sources:     curSources,
-					Filenames:   curFilenames,
-					Charts:      curCharts,
-					Description: curDescription,
-					Multipliers: curMultipliers,
-				}
-			} else {
-				out <- model.ResponseDto{
-					QueryID:     req.ID,
-					Sources:     curSources,
-					Filenames:   curFilenames,
-					Description: curDescription,
-				}
+			out <- model.ResponseDto{
+				QueryID:     req.ID,
+				Sources:     curSources,
+				Filenames:   curFilenames,
+				Description: curDescription,
 			}
 
 			buff.WriteString(curDescription)

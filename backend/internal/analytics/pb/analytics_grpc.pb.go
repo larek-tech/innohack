@@ -21,14 +21,16 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	Analytics_GetCharts_FullMethodName            = "/analytics.Analytics/GetCharts"
 	Analytics_GetDescriptionStream_FullMethodName = "/analytics.Analytics/GetDescriptionStream"
+	Analytics_GetChartSummary_FullMethodName      = "/analytics.Analytics/GetChartSummary"
 )
 
 // AnalyticsClient is the client API for Analytics service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AnalyticsClient interface {
-	GetCharts(ctx context.Context, in *Params, opts ...grpc.CallOption) (*Report, error)
+	GetCharts(ctx context.Context, in *Params, opts ...grpc.CallOption) (*ChartReport, error)
 	GetDescriptionStream(ctx context.Context, in *Params, opts ...grpc.CallOption) (Analytics_GetDescriptionStreamClient, error)
+	GetChartSummary(ctx context.Context, in *Params, opts ...grpc.CallOption) (*ChartReport, error)
 }
 
 type analyticsClient struct {
@@ -39,8 +41,8 @@ func NewAnalyticsClient(cc grpc.ClientConnInterface) AnalyticsClient {
 	return &analyticsClient{cc}
 }
 
-func (c *analyticsClient) GetCharts(ctx context.Context, in *Params, opts ...grpc.CallOption) (*Report, error) {
-	out := new(Report)
+func (c *analyticsClient) GetCharts(ctx context.Context, in *Params, opts ...grpc.CallOption) (*ChartReport, error) {
+	out := new(ChartReport)
 	err := c.cc.Invoke(ctx, Analytics_GetCharts_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -64,7 +66,7 @@ func (c *analyticsClient) GetDescriptionStream(ctx context.Context, in *Params, 
 }
 
 type Analytics_GetDescriptionStreamClient interface {
-	Recv() (*Report, error)
+	Recv() (*DescriptionReport, error)
 	grpc.ClientStream
 }
 
@@ -72,20 +74,30 @@ type analyticsGetDescriptionStreamClient struct {
 	grpc.ClientStream
 }
 
-func (x *analyticsGetDescriptionStreamClient) Recv() (*Report, error) {
-	m := new(Report)
+func (x *analyticsGetDescriptionStreamClient) Recv() (*DescriptionReport, error) {
+	m := new(DescriptionReport)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
+func (c *analyticsClient) GetChartSummary(ctx context.Context, in *Params, opts ...grpc.CallOption) (*ChartReport, error) {
+	out := new(ChartReport)
+	err := c.cc.Invoke(ctx, Analytics_GetChartSummary_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AnalyticsServer is the server API for Analytics service.
 // All implementations must embed UnimplementedAnalyticsServer
 // for forward compatibility
 type AnalyticsServer interface {
-	GetCharts(context.Context, *Params) (*Report, error)
+	GetCharts(context.Context, *Params) (*ChartReport, error)
 	GetDescriptionStream(*Params, Analytics_GetDescriptionStreamServer) error
+	GetChartSummary(context.Context, *Params) (*ChartReport, error)
 	mustEmbedUnimplementedAnalyticsServer()
 }
 
@@ -93,11 +105,14 @@ type AnalyticsServer interface {
 type UnimplementedAnalyticsServer struct {
 }
 
-func (UnimplementedAnalyticsServer) GetCharts(context.Context, *Params) (*Report, error) {
+func (UnimplementedAnalyticsServer) GetCharts(context.Context, *Params) (*ChartReport, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCharts not implemented")
 }
 func (UnimplementedAnalyticsServer) GetDescriptionStream(*Params, Analytics_GetDescriptionStreamServer) error {
 	return status.Errorf(codes.Unimplemented, "method GetDescriptionStream not implemented")
+}
+func (UnimplementedAnalyticsServer) GetChartSummary(context.Context, *Params) (*ChartReport, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetChartSummary not implemented")
 }
 func (UnimplementedAnalyticsServer) mustEmbedUnimplementedAnalyticsServer() {}
 
@@ -139,7 +154,7 @@ func _Analytics_GetDescriptionStream_Handler(srv interface{}, stream grpc.Server
 }
 
 type Analytics_GetDescriptionStreamServer interface {
-	Send(*Report) error
+	Send(*DescriptionReport) error
 	grpc.ServerStream
 }
 
@@ -147,8 +162,26 @@ type analyticsGetDescriptionStreamServer struct {
 	grpc.ServerStream
 }
 
-func (x *analyticsGetDescriptionStreamServer) Send(m *Report) error {
+func (x *analyticsGetDescriptionStreamServer) Send(m *DescriptionReport) error {
 	return x.ServerStream.SendMsg(m)
+}
+
+func _Analytics_GetChartSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Params)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AnalyticsServer).GetChartSummary(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Analytics_GetChartSummary_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AnalyticsServer).GetChartSummary(ctx, req.(*Params))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 // Analytics_ServiceDesc is the grpc.ServiceDesc for Analytics service.
@@ -161,6 +194,10 @@ var Analytics_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCharts",
 			Handler:    _Analytics_GetCharts_Handler,
+		},
+		{
+			MethodName: "GetChartSummary",
+			Handler:    _Analytics_GetChartSummary_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

@@ -5,8 +5,9 @@ package analytics;
 option go_package="internal/analytics/pb";
 
 service Analytics {
-    rpc GetCharts(Params) returns (Report) {};
-    rpc GetDescriptionStream(Params) returns (stream Report) {};
+    rpc GetCharts(Params) returns (ChartReport) {};
+    rpc GetDescriptionStream(Params) returns (stream DescriptionReport) {};
+    rpc GetChartSummary(Params) returns (ChartReport) {};
 };
 
 message Params {
@@ -16,12 +17,16 @@ message Params {
     string prompt = 4;
 };
 
-message Report {
+message DescriptionReport {
     repeated string sources = 1;
     repeated string filenames = 2;
     string description = 3;
-    repeated Chart charts = 4;
-    repeated Multiplier multipliers = 5;
+};
+
+message ChartReport {
+    repeated Chart charts = 1;
+    repeated Multiplier multipliers = 2;
+    string description = 3;
 };
 
 message Chart {

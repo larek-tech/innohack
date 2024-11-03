@@ -550,10 +550,7 @@ def get_analitics_report(request: analytics_pb2.Params) -> analytics_pb2.Report:
                 return_multy.append(
                     analytics_pb2.Multiplier(key=MULTYPLIER_NAME[k], value=value)
                 )
-    report = analytics_pb2.Report(
-        sources=None,
-        filenames=None,
-        description="",
+    report = analytics_pb2.ChartReport(
         charts=charts,
         multipliers=return_multy if len(return_multy) > 0 else None,
     )

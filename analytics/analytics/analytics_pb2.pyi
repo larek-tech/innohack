@@ -11,9 +11,11 @@ class ChartType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     UNDEFINED: _ClassVar[ChartType]
     BAR_CHART: _ClassVar[ChartType]
     PIE_CHART: _ClassVar[ChartType]
+    LINE_CHART: _ClassVar[ChartType]
 UNDEFINED: ChartType
 BAR_CHART: ChartType
 PIE_CHART: ChartType
+LINE_CHART: ChartType
 
 class Params(_message.Message):
     __slots__ = ("query_id", "start_date", "end_date", "prompt")
@@ -27,19 +29,25 @@ class Params(_message.Message):
     prompt: str
     def __init__(self, query_id: _Optional[int] = ..., start_date: _Optional[str] = ..., end_date: _Optional[str] = ..., prompt: _Optional[str] = ...) -> None: ...
 
-class Report(_message.Message):
-    __slots__ = ("sources", "filenames", "description", "charts", "multipliers")
+class DescriptionReport(_message.Message):
+    __slots__ = ("sources", "filenames", "description")
     SOURCES_FIELD_NUMBER: _ClassVar[int]
     FILENAMES_FIELD_NUMBER: _ClassVar[int]
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
-    CHARTS_FIELD_NUMBER: _ClassVar[int]
-    MULTIPLIERS_FIELD_NUMBER: _ClassVar[int]
     sources: _containers.RepeatedScalarFieldContainer[str]
     filenames: _containers.RepeatedScalarFieldContainer[str]
     description: str
+    def __init__(self, sources: _Optional[_Iterable[str]] = ..., filenames: _Optional[_Iterable[str]] = ..., description: _Optional[str] = ...) -> None: ...
+
+class ChartReport(_message.Message):
+    __slots__ = ("charts", "multipliers", "description")
+    CHARTS_FIELD_NUMBER: _ClassVar[int]
+    MULTIPLIERS_FIELD_NUMBER: _ClassVar[int]
+    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     charts: _containers.RepeatedCompositeFieldContainer[Chart]
     multipliers: _containers.RepeatedCompositeFieldContainer[Multiplier]
-    def __init__(self, sources: _Optional[_Iterable[str]] = ..., filenames: _Optional[_Iterable[str]] = ..., description: _Optional[str] = ..., charts: _Optional[_Iterable[_Union[Chart, _Mapping]]] = ..., multipliers: _Optional[_Iterable[_Union[Multiplier, _Mapping]]] = ...) -> None: ...
+    description: str
+    def __init__(self, charts: _Optional[_Iterable[_Union[Chart, _Mapping]]] = ..., multipliers: _Optional[_Iterable[_Union[Multiplier, _Mapping]]] = ..., description: _Optional[str] = ...) -> None: ...
 
 class Chart(_message.Message):
     __slots__ = ("title", "type", "description", "records")

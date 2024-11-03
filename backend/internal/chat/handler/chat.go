@@ -87,29 +87,22 @@ func (h *Handler) ProcessConn(c *websocket.Conn) {
 		for {
 			select {
 			case chunk, ok := <-out:
-				// если закончили читать
 				if !ok {
 					h.log.Error().Msg("error while processing")
 					return
+				}
+
+				desc.WriteString(chunk.Description)
+
+				if err := c.WriteJSON(chunk); err != nil {
+					h.respondError(c, err)
+					continue
 				}
 
 				if chunk.IsLast {
 					resp = chunk
 					h.log.Debug().Int64("query id", queryID).Msg("finished processing")
 					break chunks
-				}
-
-				if chunk.Charts != nil {
-					// если первое сообщение с графиками, которое должно быть цельным
-					copy(resp.Charts, chunk.Charts)
-				} else {
-					// если остальные сообщения с описанием, которые идут по токенам
-					desc.WriteString(chunk.Description)
-				}
-
-				if err := c.WriteJSON(chunk); err != nil {
-					h.respondError(c, err)
-					continue
 				}
 			}
 		}
