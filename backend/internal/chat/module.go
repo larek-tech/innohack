@@ -45,9 +45,12 @@ func New(tracer trace.Tracer, pg *postgres.Postgres, jwtSecret string, grpcConn 
 
 func (m *ChatModule) InitRoutes(api fiber.Router) {
 	chat := api.Group("/chat")
-	chat.Get("/session/:session_id", m.handler.GetSessionContent)
-	chat.Get("/session/list", m.handler.ListSessions)
-	chat.Put("/session/:title", m.handler.UpdateSessionTitle)
+
+	session := chat.Group("/session")
+	session.Post("/", m.handler.InsertSession)
+	session.Get("/:session_id", m.handler.GetSessionContent)
+	session.Get("/list", m.handler.ListSessions)
+	session.Put("/:title", m.handler.UpdateSessionTitle)
 
 	ws := chat.Group("/ws")
 	ws.Use(middleware.WsProtocolUpgrade())
