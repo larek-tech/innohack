@@ -6,51 +6,45 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/websocket/v2"
 	"github.com/larek-tech/innohack/backend/internal/analytics/pb"
+	"github.com/larek-tech/innohack/backend/internal/chat/handler"
+	"github.com/larek-tech/innohack/backend/internal/chat/middleware"
 	"github.com/larek-tech/innohack/backend/internal/chat/service"
-	"github.com/larek-tech/innohack/backend/internal/chat/view"
 	"github.com/larek-tech/innohack/backend/pkg/storage/postgres"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 )
 
-type chatView interface {
-	ChatPage(c *fiber.Ctx) error
+type chatHandler interface {
 	ProcessConn(c *websocket.Conn)
-	TestChat(c *fiber.Ctx) error
 }
 
 type ChatModule struct {
-	s     *service.Service
-	log   *zerolog.Logger
-	views chatView
+	s       *service.Service
+	log     *zerolog.Logger
+	handler chatHandler
 }
 
-func New(pg *postgres.Postgres, jwtSecret string, grpcConn *grpc.ClientConn) *ChatModule {
+func New(tracer trace.Tracer, pg *postgres.Postgres, jwtSecret string, grpcConn *grpc.ClientConn) *ChatModule {
 	logger := log.With().Str("module", "auth").Logger()
+
 	analytics := pb.NewAnalyticsClient(grpcConn)
 	chatService := service.New(&logger, jwtSecret, pg, analytics)
+
 	return &ChatModule{
-		s:     chatService,
-		log:   &logger,
-		views: view.New(&logger, chatService),
+		s:       chatService,
+		log:     &logger,
+		handler: handler.New(tracer, &logger, chatService),
 	}
 }
 
-func (m *ChatModule) InitRoutes(viewRouter fiber.Router) {
-	views := viewRouter.Group("/chat")
-	m.initViews(views)
-}
+func (m *ChatModule) InitRoutes(api fiber.Router) {
+	chat := api.Group("/chat")
 
-func (m *ChatModule) initViews(views fiber.Router) {
-	views.Get("/test", m.views.TestChat)
-	views.Get("/", m.views.ChatPage)
-	views.Get("/ws", websocket.New(m.views.ProcessConn, websocket.Config{
-		HandshakeTimeout: 20 * time.Second,
-	}), func(c *fiber.Ctx) error {
-		if websocket.IsWebSocketUpgrade(c) {
-			return c.Next()
-		}
-		return fiber.ErrUpgradeRequired
-	})
+	chat.Use(middleware.WsProtocolUpgrade())
+	chat.Get("/ws", websocket.New(
+		m.handler.ProcessConn,
+		websocket.Config{HandshakeTimeout: 20 * time.Second},
+	))
 }

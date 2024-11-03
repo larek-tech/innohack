@@ -44,7 +44,5 @@ func (r *Repo) FindUserByEmail(ctx context.Context, email string) (model.User, e
 	if err != nil {
 		return user, pkg.WrapErr(err)
 	}
-
-	user.Email = email
 	return user, nil
 }

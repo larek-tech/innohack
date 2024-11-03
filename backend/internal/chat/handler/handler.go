@@ -1,12 +1,12 @@
-package view
+package handler
 
 import (
 	"context"
 
 	"github.com/larek-tech/innohack/backend/internal/chat/model"
 	"github.com/larek-tech/innohack/backend/internal/chat/service"
-
 	"github.com/rs/zerolog"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type chatService interface {
@@ -19,14 +19,16 @@ type chatService interface {
 	UpdateSessionTitle(ctx context.Context, sessionID int64, title string) error
 }
 
-type View struct {
+type Handler struct {
 	service chatService
 	log     *zerolog.Logger
+	tracer  trace.Tracer
 }
 
-func New(log *zerolog.Logger, s *service.Service) *View {
-	return &View{
+func New(tracer trace.Tracer, log *zerolog.Logger, s *service.Service) *Handler {
+	return &Handler{
 		service: s,
 		log:     log,
+		tracer:  tracer,
 	}
 }

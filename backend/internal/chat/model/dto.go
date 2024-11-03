@@ -21,7 +21,8 @@ type ResponseDto struct {
 	Description string       `json:"description"` // llm response
 	Multipliers []Multiplier `json:"multipliers"`
 	CreatedAt   time.Time    `json:"created_at"`
-	IsLast      bool
+	Err         error        `json:"error,omitempty"`
+	IsLast      bool         `json:"-"`
 }
 
 type Chart struct {
