@@ -5,23 +5,30 @@ package analytics;
 option go_package="internal/analytics/pb";
 
 service Analytics {
-    rpc GetCharts(Params) returns (Report) {};
-    rpc GetDescriptionStream(Params) returns (stream Report) {};
+    rpc GetCharts(Filter) returns (ChartReport) {};
+    rpc GetDescriptionStream(Params) returns (stream DescriptionReport) {};
 };
 
 message Params {
     int64 query_id = 1;
-    string start_date = 2;
-    string end_date = 3;
-    string prompt = 4;
+    string prompt = 2;
 };
 
-message Report {
+message DescriptionReport {
     repeated string sources = 1;
     repeated string filenames = 2;
     string description = 3;
-    repeated Chart charts = 4;
-    repeated Multiplier multipliers = 5;
+};
+
+message Filter {
+    string start_date = 1;
+    string end_date = 2;
+};
+
+message ChartReport {
+    repeated Chart charts = 1;
+    repeated Multiplier multipliers = 2;
+    string description = 3;
 };
 
 message Chart {
@@ -35,6 +42,7 @@ enum ChartType {
     UNDEFINED = 0;
     BAR_CHART = 1;
     PIE_CHART = 2;
+    LINE_CHART = 3;
 };
 
 message Multiplier {

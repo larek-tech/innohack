@@ -2,8 +2,8 @@ package config
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
+	server "github.com/larek-tech/innohack/backend/internal/_server/config"
 
-	server "github.com/larek-tech/innohack/backend/internal/server/config"
 	"github.com/larek-tech/innohack/backend/pkg"
 	"github.com/larek-tech/innohack/backend/pkg/grpc_client"
 	"github.com/larek-tech/innohack/backend/pkg/storage/postgres"

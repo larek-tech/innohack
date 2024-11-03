@@ -36,13 +36,13 @@ class AnalyticsStub(object):
         """
         self.GetCharts = channel.unary_unary(
                 '/analytics.Analytics/GetCharts',
-                request_serializer=analytics_dot_analytics__pb2.Params.SerializeToString,
-                response_deserializer=analytics_dot_analytics__pb2.Report.FromString,
+                request_serializer=analytics_dot_analytics__pb2.Filter.SerializeToString,
+                response_deserializer=analytics_dot_analytics__pb2.ChartReport.FromString,
                 _registered_method=True)
         self.GetDescriptionStream = channel.unary_stream(
                 '/analytics.Analytics/GetDescriptionStream',
                 request_serializer=analytics_dot_analytics__pb2.Params.SerializeToString,
-                response_deserializer=analytics_dot_analytics__pb2.Report.FromString,
+                response_deserializer=analytics_dot_analytics__pb2.DescriptionReport.FromString,
                 _registered_method=True)
 
 
@@ -66,13 +66,13 @@ def add_AnalyticsServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'GetCharts': grpc.unary_unary_rpc_method_handler(
                     servicer.GetCharts,
-                    request_deserializer=analytics_dot_analytics__pb2.Params.FromString,
-                    response_serializer=analytics_dot_analytics__pb2.Report.SerializeToString,
+                    request_deserializer=analytics_dot_analytics__pb2.Filter.FromString,
+                    response_serializer=analytics_dot_analytics__pb2.ChartReport.SerializeToString,
             ),
             'GetDescriptionStream': grpc.unary_stream_rpc_method_handler(
                     servicer.GetDescriptionStream,
                     request_deserializer=analytics_dot_analytics__pb2.Params.FromString,
-                    response_serializer=analytics_dot_analytics__pb2.Report.SerializeToString,
+                    response_serializer=analytics_dot_analytics__pb2.DescriptionReport.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -100,8 +100,8 @@ class Analytics(object):
             request,
             target,
             '/analytics.Analytics/GetCharts',
-            analytics_dot_analytics__pb2.Params.SerializeToString,
-            analytics_dot_analytics__pb2.Report.FromString,
+            analytics_dot_analytics__pb2.Filter.SerializeToString,
+            analytics_dot_analytics__pb2.ChartReport.FromString,
             options,
             channel_credentials,
             insecure,
@@ -128,7 +128,7 @@ class Analytics(object):
             target,
             '/analytics.Analytics/GetDescriptionStream',
             analytics_dot_analytics__pb2.Params.SerializeToString,
-            analytics_dot_analytics__pb2.Report.FromString,
+            analytics_dot_analytics__pb2.DescriptionReport.FromString,
             options,
             channel_credentials,
             insecure,

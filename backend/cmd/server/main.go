@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/larek-tech/innohack/backend/config"
-	"github.com/larek-tech/innohack/backend/internal/server"
+	server "github.com/larek-tech/innohack/backend/internal/_server"
 )
 
 func main() {
