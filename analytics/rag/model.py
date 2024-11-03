@@ -1,5 +1,6 @@
 import requests
 import json
+import ollama
 
 from loguru import logger
 
@@ -24,11 +25,11 @@ def clear_line(n: int = 1) -> None:
 
 
 class LLMClient:
-    def __init__(self, model="meta-llama/Llama-3.2-11B-Vision-Instruct"):
+    def __init__(self, model="llama3.1"):  # meta-llama/Llama-3.2-11B-Vision-Instruct
         self.model = model
-        self.api_url = (
-            "https://mts-aidocprocessing-case.olymp.innopolis.university/generate"
-        )
+        # self.api_url = (
+        #     "https://mts-aidocprocessing-case.olymp.innopolis.university/generate"
+        # )
         self.bi_encoder, self.vect_dim = get_bi_encoder("cointegrated/LaBSE-en-ru")
 
         self.n_top_cos = 2
@@ -42,9 +43,8 @@ class LLMClient:
         top_chunks_join = "\n".join(top_chunks)
         logger.info(top_chunks)
 
-        data = {
-            "prompt": f"""
-            Используй только следующий контекст, чтобы очень кратко ответить на вопрос в конце.
+        content = f"""
+            Используй только следующий контекст, чтобы ответить на вопрос.
             Не пытайся выдумывать ответ.
             Не отвечай на вопросы, не связанные с финансами.
             Контекст:
@@ -54,38 +54,57 @@ class LLMClient:
             Вопрос:
             ===========
             {prompt}
-            """,
-            "apply_chat_template": True,
-            "system_prompt": """ 
-            Ты — помощник по анализу финансовых отчетов. Твоя задача — предоставлять
-              точные и полезные ответы на вопросы, связанные с финансовыми данными, отчетами и анализом. Не отвечай на вопросы, не связанные с финансами и бухгалтерией.""",
-            "max_tokens": 512,
-            "n": 1,
-            "temperature": 0.8,
-        }
+            """
 
-        headers = {"Content-Type": "application/json"}
+        system_prompt = """ 
+            Ты — помощник по анализу финансовых отчетов. Твоя задача — предоставлять
+            точные и полезные ответы на вопросы, связанные с финансовыми данными, отчетами и анализом.
+            Не отвечай на вопросы, не связанные с финансами и бухгалтерией."""
+
+        max_tokens = 512
+        temperature = 0.8
+
+        # data = {
+        #     "prompt": f"""
+        #     Используй только следующий контекст, чтобы ответить на вопрос.
+        #     Не пытайся выдумывать ответ.
+        #     Не отвечай на вопросы, не связанные с финансами.
+        #     Контекст:
+        #     ===========
+        #     {top_chunks_join}
+        #     ===========
+        #     Вопрос:
+        #     ===========
+        #     {prompt}
+        #     """,
+        #     "apply_chat_template": True,
+        #     "system_prompt": """
+        #     Ты — помощник по анализу финансовых отчетов. Твоя задача — предоставлять
+        #       точные и полезные ответы на вопросы, связанные с финансовыми данными, отчетами и анализом. Не отвечай на вопросы, не связанные с финансами и бухгалтерией.""",
+        #     "n": 1,
+        #     "temperature": 0.8,
+        # }
+
+        # headers = {"Content-Type": "application/json"}
 
         # response = requests.post(self.api_url, data=json.dumps(data), headers=headers)
 
-        session = requests.Session()
-        response = session.post(
-            self.api_url, data=json.dumps(data), headers=headers, stream=True
+        response = ollama.chat(
+            model="llama3.1",
+            messages=[
+                {
+                    "role": "user",
+                    "content": content,
+                },
+            ],
+            options={
+                "system_prompt": system_prompt,
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+            },
         )
 
-        num_printed_lines = 0
-        for h in get_streaming_response(response):
-            clear_line(num_printed_lines)
-            num_printed_lines = 0
-            for i, line in enumerate(h):
-                num_printed_lines += 1
-                yield f"{line!r}"
-                print(f"Beam candidate {i}: {line!r}", flush=True)
-
-        # if response.status_code == 200:
-        #     return response
-        # else:
-        #     return f"Error: {response.status_code} - {response.text}"
+        return response["message"]["content"]
 
 
 # Пример использования
