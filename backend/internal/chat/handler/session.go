@@ -8,6 +8,19 @@ import (
 	"github.com/larek-tech/innohack/backend/pkg"
 )
 
+func (h *Handler) InsertSession(c *fiber.Ctx) error {
+	userID, err := strconv.ParseInt(c.Locals(shared.UserIDKey, -1).(string), 10, 64)
+	if err != nil {
+		return pkg.WrapErr(err)
+	}
+
+	session, err := h.service.InsertSession(c.Context(), userID)
+	if err != nil {
+		return pkg.WrapErr(err)
+	}
+	return c.Status(fiber.StatusCreated).JSON(session)
+}
+
 func (h *Handler) GetSessionContent(c *fiber.Ctx) error {
 	sessionID, err := c.ParamsInt("session_id")
 	if err != nil {

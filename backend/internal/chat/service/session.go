@@ -2,11 +2,10 @@ package service
 
 import (
 	"context"
-	"strconv"
+	"time"
 
 	"github.com/larek-tech/innohack/backend/internal/chat/model"
 	"github.com/larek-tech/innohack/backend/pkg"
-	"github.com/larek-tech/innohack/backend/pkg/jwt"
 )
 
 type sessionRepo interface {
@@ -16,28 +15,16 @@ type sessionRepo interface {
 	UpdateSessionTitle(ctx context.Context, sessionID, userID int64, title string) error
 }
 
-func (s *Service) InsertSession(ctx context.Context, accessToken string) (int64, error) {
-	token, err := jwt.VerifyAccessToken(accessToken, s.jwtSecret)
-	if err != nil {
-		return 0, pkg.WrapErr(err, "verify token")
-	}
-
-	userIDString, err := token.Claims.GetSubject()
-	if err != nil {
-		return 0, pkg.WrapErr(err, "get user claims from token")
-	}
-
-	userID, err := strconv.ParseFloat(userIDString, 64)
-	if err != nil {
-		return 0, pkg.WrapErr(err, "parse user id")
-	}
-
+func (s *Service) InsertSession(ctx context.Context, userID int64) (model.SessionDto, error) {
 	sessionID, err := s.sr.InsertSession(ctx, int64(userID))
 	if err != nil {
-		return 0, pkg.WrapErr(err, "insert session")
+		return model.SessionDto{}, pkg.WrapErr(err, "insert session")
 	}
 
-	return sessionID, nil
+	return model.SessionDto{
+		ID:        sessionID,
+		CreatedAt: time.Now(),
+	}, nil
 }
 
 func (s *Service) GetSessionContent(ctx context.Context, sessionID int64) ([]*model.SessionContentDto, error) {

@@ -12,7 +12,7 @@ import (
 type chatService interface {
 	GetCharts(ctx context.Context, req model.QueryDto, out chan<- model.ResponseDto)
 	GetDescription(ctx context.Context, req model.QueryDto, out chan<- model.ResponseDto, cancel <-chan int64)
-	InsertSession(ctx context.Context, token string) (int64, error)
+	InsertSession(ctx context.Context, userID int64) (model.SessionDto, error)
 	InsertQuery(ctx context.Context, sessionID int64, query model.QueryDto) (int64, error)
 	InsertResponse(ctx context.Context, sessionID int64, resp model.ResponseDto) error
 	GetSessionContent(ctx context.Context, sessionID int64) ([]*model.SessionContentDto, error)
