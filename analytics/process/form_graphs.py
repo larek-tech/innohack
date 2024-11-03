@@ -2,16 +2,18 @@ import json
 from analytics import analytics_pb2, analytics_pb2_grpc
 from process.const import CODE_NAME, MULTYPLIER_NAME
 import math
+from pymongo import MongoClient
+
+
+mongo = MongoClient("mongodb://46.138.243.191:27017/data", timeoutMS=30000**2)
+records_col = mongo.get_database("data").get_collection("records")
+multipliers_col = mongo.get_database("data").get_collection("multipliers")
 
 
 def load_json():
-    records = {}
-    multipliers = {}
-
-    with open('process/records.json', 'r') as file:
-        records = json.load(file)
-    with open('process/multipliers.json', 'r') as file:
-        multipliers = json.load(file)
+    records = [r for r in records_col.find({})][0]
+    multipliers = [m for m in multipliers_col.find({})][0]
+    
     return records, multipliers
 
 

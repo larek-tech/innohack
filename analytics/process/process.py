@@ -5,10 +5,14 @@ import numpy as np
 import bson
 from pymongo import MongoClient
 
-from compute_business_metrics import read_excel, code_column, get_liquidity, profitability_of_sales, profitability_of_assets, coefficients, coefficients_3years
-from const import CODE_NAME, MULTYPLIER_NAME
+from process.compute_business_metrics import read_excel, code_column, get_liquidity, profitability_of_sales, profitability_of_assets, coefficients, coefficients_3years
+from process.const import CODE_NAME, MULTYPLIER_NAME
 
-import json
+
+mongo = MongoClient("mongodb://46.138.243.191:27017/data", timeoutMS=30000**2)
+records_col = mongo.get_database("data").get_collection("records")
+multipliers_col = mongo.get_database("data").get_collection("multipliers")
+
 s3 = Minio(
     "s3.larek.tech",
     access_key="I3gAX8ygZF1pnXuSSo00",
@@ -72,6 +76,16 @@ def parse_multy_to_dict(records: dict, df: pd.DataFrame) -> dict:
     
     return records
 
+def save_data(records: dict, multipliers: dict):
+    records, multipliers = preprocess_xlsx()
+
+    has_records = len([r for r in records_col.find({})]) > 0
+    has_multipliers = len([m for m in multipliers_col.find({})]) > 0
+    
+    if not has_records:
+        records_col.insert_one(records)
+    if not has_multipliers:
+        multipliers_col.insert_one(multipliers)
 
 def preprocess_xlsx():
     excel_paths = list_files()
@@ -93,14 +107,6 @@ def preprocess_xlsx():
         )
         multipliers = parse_multy_to_dict(multipliers, metrics_for_chart)
 
-    return records, multipliers
+    save_data(records, multipliers)
 
-mongo = MongoClient("mongodb://46.138.243.191:27017/data", timeoutMS=30000**2)
-col = mongo.get_database("data").get_collection("excel")
 
-def save_data():
-    records, multipliers = preprocess_xlsx()
-
-    col.insert_many([records, multipliers])
-
-save_data()
