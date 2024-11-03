@@ -26,14 +26,14 @@ message Filter {
 };
 
 message ChartReport {
-    map<string, ListCharts> charts = 1;
+    map<string, ListChartsLegend> charts = 1;
     repeated Multiplier multipliers = 2;
     string summary = 3;
-    map<string, string> legend = 4;
 };
 
-message ListCharts {
+message ListChartsLegend {
     repeated Chart charts = 1;
+    map<string, string> legend = 2;
 }
 
 message Chart {
