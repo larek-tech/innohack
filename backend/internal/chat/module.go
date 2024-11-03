@@ -40,7 +40,7 @@ func New(router fiber.Router, tracer trace.Tracer, pg *postgres.Postgres, jwtSec
 	m := &ChatModule{
 		s:       chatService,
 		log:     &logger,
-		handler: handler.New(tracer, &logger, chatService),
+		handler: handler.New(tracer, jwtSecret, &logger, chatService),
 	}
 
 	m.InitRoutes(router, jwtSecret)
@@ -59,7 +59,7 @@ func (m *ChatModule) InitRoutes(api fiber.Router, secret string) {
 
 	ws := chat.Group("/ws")
 	ws.Use(middleware.WsProtocolUpgrade())
-	ws.Get("/ws/:session_id", websocket.New(
+	ws.Get("/:session_id", websocket.New(
 		m.handler.ProcessConn,
 		websocket.Config{HandshakeTimeout: 20 * time.Second},
 	))

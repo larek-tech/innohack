@@ -43,8 +43,3 @@ class RagClient:
             chunk_size=CHUNK_SIZE,
             chunk_overlap=CHUNK_OVERLAP,
         )
-
-    def generate(self, prompt):
-        yield self.llm_client.get_response(
-            prompt=prompt
-        )

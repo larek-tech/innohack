@@ -20,7 +20,7 @@ type ResponseDto struct {
 	Charts      []Chart      `json:"charts"`
 	Description string       `json:"description"` // llm response
 	Multipliers []Multiplier `json:"multipliers"`
-	CreatedAt   time.Time    `json:"created_at"`
+	CreatedAt   time.Time    `json:"createdAt"`
 	Err         error        `json:"error,omitempty"`
 	IsLast      bool         `json:"-"`
 }
@@ -38,8 +38,6 @@ func (c Chart) GetType() string {
 		return "bar"
 	case PieChart:
 		return "pie"
-	case UndefinedChart:
-		panic(fmt.Sprintf("unexpected model.ChartType: %#v", c.Type))
 	default:
 		panic(fmt.Sprintf("unexpected model.ChartType: %#v", c.Type))
 	}

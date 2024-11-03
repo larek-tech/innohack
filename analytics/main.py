@@ -10,13 +10,12 @@ from process.form_graphs import get_analitics_report
 from rag.rag_model import RagClient
 
 
-rag = RagClient()
-
 class Analytics(analytics_pb2_grpc.AnalyticsServicer):
     def __init__(self):
         super().__init__()
         preprocess_xlsx()
 
+        self.rag = RagClient()
 
     def GetCharts(self, request: analytics_pb2.Params, context: grpc.ServicerContext):
         return get_analitics_report(request)
@@ -24,16 +23,13 @@ class Analytics(analytics_pb2_grpc.AnalyticsServicer):
     def GetDescriptionStream(
         self, request: analytics_pb2.Params, context: grpc.ServicerContext
     ):
-        res = analytics_pb2.Report()
-
-        response = rag.generate(res) 
-
-        for token in response:
-            res.description += f"{token} "
+        for token in self.rag.llm_client.get_response(request.prompt):
+            res = analytics_pb2.Report()
+            res.description = token
             yield res
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 def serve():

@@ -21,15 +21,17 @@ type chatService interface {
 }
 
 type Handler struct {
-	service chatService
-	log     *zerolog.Logger
-	tracer  trace.Tracer
+	service   chatService
+	log       *zerolog.Logger
+	tracer    trace.Tracer
+	jwtSecret string
 }
 
-func New(tracer trace.Tracer, log *zerolog.Logger, s *service.Service) *Handler {
+func New(tracer trace.Tracer, jwtSecret string, log *zerolog.Logger, s *service.Service) *Handler {
 	return &Handler{
-		service: s,
-		log:     log,
-		tracer:  tracer,
+		service:   s,
+		log:       log,
+		tracer:    tracer,
+		jwtSecret: jwtSecret,
 	}
 }

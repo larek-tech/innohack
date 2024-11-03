@@ -7,6 +7,7 @@ import (
 
 	"github.com/gofiber/websocket/v2"
 	"github.com/larek-tech/innohack/backend/internal/chat/model"
+	"github.com/larek-tech/innohack/backend/pkg/jwt"
 )
 
 func (h *Handler) closeHandler(code int, text string) error {
@@ -43,8 +44,12 @@ func (h *Handler) ProcessConn(c *websocket.Conn) {
 	ctx := context.Background()
 
 	// первое сообщение содержит access token
-	authQuery := model.Query{}
+	authQuery := model.QueryDto{}
 	if err := c.ReadJSON(&authQuery); err != nil {
+		h.respondError(c, err)
+		return
+	}
+	if _, err := jwt.VerifyAccessToken(authQuery.Prompt, h.jwtSecret); err != nil {
 		h.respondError(c, err)
 		return
 	}
