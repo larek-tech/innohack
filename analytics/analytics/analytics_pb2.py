@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x19\x61nalytics/analytics.proto\x12\tanalytics\"*\n\x06Params\x12\x10\n\x08query_id\x18\x01 \x01(\x03\x12\x0e\n\x06prompt\x18\x02 \x01(\t\"L\n\x11\x44\x65scriptionReport\x12\x0f\n\x07sources\x18\x01 \x03(\t\x12\x11\n\tfilenames\x18\x02 \x03(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\".\n\x06\x46ilter\x12\x12\n\nstart_date\x18\x01 \x01(\x03\x12\x10\n\x08\x65nd_date\x18\x02 \x01(\x03\"p\n\x0b\x43hartReport\x12 \n\x06\x63harts\x18\x01 \x03(\x0b\x32\x10.analytics.Chart\x12*\n\x0bmultipliers\x18\x02 \x03(\x0b\x32\x15.analytics.Multiplier\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\"s\n\x05\x43hart\x12\r\n\x05title\x18\x01 \x01(\t\x12\"\n\x04type\x18\x02 \x01(\x0e\x32\x14.analytics.ChartType\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\"\n\x07records\x18\x04 \x03(\x0b\x32\x11.analytics.Record\"(\n\nMultiplier\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x01\"\x1e\n\x06Record\x12\t\n\x01x\x18\x01 \x01(\t\x12\t\n\x01y\x18\x02 \x01(\x01*H\n\tChartType\x12\r\n\tUNDEFINED\x10\x00\x12\r\n\tBAR_CHART\x10\x01\x12\r\n\tPIE_CHART\x10\x02\x12\x0e\n\nLINE_CHART\x10\x03\x32\x92\x01\n\tAnalytics\x12\x38\n\tGetCharts\x12\x11.analytics.Filter\x1a\x16.analytics.ChartReport\"\x00\x12K\n\x14GetDescriptionStream\x12\x11.analytics.Params\x1a\x1c.analytics.DescriptionReport\"\x00\x30\x01\x42\x17Z\x15internal/analytics/pbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x19\x61nalytics/analytics.proto\x12\tanalytics\"*\n\x06Params\x12\x10\n\x08query_id\x18\x01 \x01(\x03\x12\x0e\n\x06prompt\x18\x02 \x01(\t\"L\n\x11\x44\x65scriptionReport\x12\x0f\n\x07sources\x18\x01 \x03(\t\x12\x11\n\tfilenames\x18\x02 \x03(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\".\n\x06\x46ilter\x12\x12\n\nstart_date\x18\x01 \x01(\x03\x12\x10\n\x08\x65nd_date\x18\x02 \x01(\x03\"\xa7\x02\n\x0b\x43hartReport\x12\x32\n\x06\x63harts\x18\x01 \x03(\x0b\x32\".analytics.ChartReport.ChartsEntry\x12*\n\x0bmultipliers\x18\x02 \x03(\x0b\x32\x15.analytics.Multiplier\x12\x0f\n\x07summary\x18\x03 \x01(\t\x12\x32\n\x06legend\x18\x04 \x03(\x0b\x32\".analytics.ChartReport.LegendEntry\x1a\x44\n\x0b\x43hartsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12$\n\x05value\x18\x02 \x01(\x0b\x32\x15.analytics.ListCharts:\x02\x38\x01\x1a-\n\x0bLegendEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\".\n\nListCharts\x12 \n\x06\x63harts\x18\x01 \x03(\x0b\x32\x10.analytics.Chart\"^\n\x05\x43hart\x12\r\n\x05\x63olor\x18\x01 \x01(\t\x12\"\n\x04type\x18\x02 \x01(\x0e\x32\x14.analytics.ChartType\x12\"\n\x07records\x18\x03 \x03(\x0b\x32\x11.analytics.Record\"(\n\nMultiplier\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x01\"\x1e\n\x06Record\x12\t\n\x01x\x18\x01 \x01(\t\x12\t\n\x01y\x18\x02 \x01(\x01*H\n\tChartType\x12\r\n\tUNDEFINED\x10\x00\x12\r\n\tBAR_CHART\x10\x01\x12\r\n\tPIE_CHART\x10\x02\x12\x0e\n\nLINE_CHART\x10\x03\x32\x92\x01\n\tAnalytics\x12\x38\n\tGetCharts\x12\x11.analytics.Filter\x1a\x16.analytics.ChartReport\"\x00\x12K\n\x14GetDescriptionStream\x12\x11.analytics.Params\x1a\x1c.analytics.DescriptionReport\"\x00\x30\x01\x42\x17Z\x15internal/analytics/pbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,22 +32,32 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'analytics.analytics_pb2', _
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z\025internal/analytics/pb'
-  _globals['_CHARTTYPE']._serialized_start=515
-  _globals['_CHARTTYPE']._serialized_end=587
+  _globals['_CHARTREPORT_CHARTSENTRY']._loaded_options = None
+  _globals['_CHARTREPORT_CHARTSENTRY']._serialized_options = b'8\001'
+  _globals['_CHARTREPORT_LEGENDENTRY']._loaded_options = None
+  _globals['_CHARTREPORT_LEGENDENTRY']._serialized_options = b'8\001'
+  _globals['_CHARTTYPE']._serialized_start=726
+  _globals['_CHARTTYPE']._serialized_end=798
   _globals['_PARAMS']._serialized_start=40
   _globals['_PARAMS']._serialized_end=82
   _globals['_DESCRIPTIONREPORT']._serialized_start=84
   _globals['_DESCRIPTIONREPORT']._serialized_end=160
   _globals['_FILTER']._serialized_start=162
   _globals['_FILTER']._serialized_end=208
-  _globals['_CHARTREPORT']._serialized_start=210
-  _globals['_CHARTREPORT']._serialized_end=322
-  _globals['_CHART']._serialized_start=324
-  _globals['_CHART']._serialized_end=439
-  _globals['_MULTIPLIER']._serialized_start=441
-  _globals['_MULTIPLIER']._serialized_end=481
-  _globals['_RECORD']._serialized_start=483
-  _globals['_RECORD']._serialized_end=513
-  _globals['_ANALYTICS']._serialized_start=590
-  _globals['_ANALYTICS']._serialized_end=736
+  _globals['_CHARTREPORT']._serialized_start=211
+  _globals['_CHARTREPORT']._serialized_end=506
+  _globals['_CHARTREPORT_CHARTSENTRY']._serialized_start=391
+  _globals['_CHARTREPORT_CHARTSENTRY']._serialized_end=459
+  _globals['_CHARTREPORT_LEGENDENTRY']._serialized_start=461
+  _globals['_CHARTREPORT_LEGENDENTRY']._serialized_end=506
+  _globals['_LISTCHARTS']._serialized_start=508
+  _globals['_LISTCHARTS']._serialized_end=554
+  _globals['_CHART']._serialized_start=556
+  _globals['_CHART']._serialized_end=650
+  _globals['_MULTIPLIER']._serialized_start=652
+  _globals['_MULTIPLIER']._serialized_end=692
+  _globals['_RECORD']._serialized_start=694
+  _globals['_RECORD']._serialized_end=724
+  _globals['_ANALYTICS']._serialized_start=801
+  _globals['_ANALYTICS']._serialized_end=947
 # @@protoc_insertion_point(module_scope)

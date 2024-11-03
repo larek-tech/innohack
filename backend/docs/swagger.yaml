@@ -2,16 +2,13 @@ basePath: /
 definitions:
   model.Chart:
     properties:
-      description:
-        description: 'llm response TODO: возможно, не получится'
+      color:
         type: string
       records:
         description: для отрисовки графа
         items:
           $ref: '#/definitions/model.Record'
         type: array
-      title:
-        type: string
       type:
         description: пока что bar chart
         type: string
@@ -19,19 +16,25 @@ definitions:
   model.ChartReport:
     properties:
       charts:
-        items:
-          $ref: '#/definitions/model.Chart'
-        type: array
-      description:
-        type: string
+        additionalProperties:
+          items:
+            $ref: '#/definitions/model.Chart'
+          type: array
+        type: object
       endDate:
         type: integer
+      legend:
+        additionalProperties:
+          type: string
+        type: object
       multipliers:
         items:
           $ref: '#/definitions/model.Multiplier'
         type: array
       startDate:
         type: integer
+      summary:
+        type: string
     type: object
   model.Filter:
     properties:

@@ -242,8 +242,7 @@ const docTemplate = `{
         "model.Chart": {
             "type": "object",
             "properties": {
-                "description": {
-                    "description": "llm response TODO: возможно, не получится",
+                "color": {
                     "type": "string"
                 },
                 "records": {
@@ -252,9 +251,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/model.Record"
                     }
-                },
-                "title": {
-                    "type": "string"
                 },
                 "type": {
                     "description": "пока что bar chart",
@@ -266,16 +262,22 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "charts": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Chart"
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/model.Chart"
+                        }
                     }
-                },
-                "description": {
-                    "type": "string"
                 },
                 "endDate": {
                     "type": "integer"
+                },
+                "legend": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
                 },
                 "multipliers": {
                     "type": "array",
@@ -285,6 +287,9 @@ const docTemplate = `{
                 },
                 "startDate": {
                     "type": "integer"
+                },
+                "summary": {
+                    "type": "string"
                 }
             }
         },

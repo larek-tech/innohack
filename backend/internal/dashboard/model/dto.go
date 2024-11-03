@@ -13,18 +13,18 @@ type Filter struct {
 }
 
 type ChartReport struct {
-	Charts      []Chart      `json:"charts"`
-	Multipliers []Multiplier `json:"multipliers"`
-	Description string       `json:"description"`
-	StartDate   int          `json:"startDate"`
-	EndDate     int          `json:"endDate"`
+	Summary     string             `json:"summary"`
+	Charts      map[string][]Chart `json:"charts"`
+	Multipliers []Multiplier       `json:"multipliers"`
+	Legend      map[string]string  `json:"legend"`
+	StartDate   int                `json:"startDate"`
+	EndDate     int                `json:"endDate"`
 }
 
 type Chart struct {
-	Title       string   `json:"title"`
-	Records     []Record `json:"records"`     // для отрисовки графа
-	Type        string   `json:"type"`        // пока что bar chart
-	Description string   `json:"description"` // llm response TODO: возможно, не получится
+	Color   string   `json:"color"`
+	Records []Record `json:"records"` // для отрисовки графа
+	Type    string   `json:"type"`    // пока что bar chart
 }
 
 func ChartFromPb(in *pb.Chart) Chart {
@@ -35,10 +35,9 @@ func ChartFromPb(in *pb.Chart) Chart {
 	}
 
 	return Chart{
-		Title:       in.GetTitle(),
-		Records:     records,
-		Type:        ChartType(in.GetType()).ToString(),
-		Description: in.GetDescription(),
+		Color:   in.GetColor(),
+		Records: records,
+		Type:    ChartType(in.GetType()).ToString(),
 	}
 }
 

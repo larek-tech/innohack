@@ -26,16 +26,20 @@ message Filter {
 };
 
 message ChartReport {
-    repeated Chart charts = 1;
+    map<string, ListCharts> charts = 1;
     repeated Multiplier multipliers = 2;
-    string description = 3;
+    string summary = 3;
+    map<string, string> legend = 4;
 };
 
+message ListCharts {
+    repeated Chart charts = 1;
+}
+
 message Chart {
-    string title = 1;
+    string color = 1;
     ChartType type = 2;
-    string description = 3;
-    repeated Record records = 4;
+    repeated Record records = 3;
 };
 
 enum ChartType {

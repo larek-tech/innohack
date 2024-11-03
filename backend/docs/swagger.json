@@ -236,8 +236,7 @@
         "model.Chart": {
             "type": "object",
             "properties": {
-                "description": {
-                    "description": "llm response TODO: возможно, не получится",
+                "color": {
                     "type": "string"
                 },
                 "records": {
@@ -246,9 +245,6 @@
                     "items": {
                         "$ref": "#/definitions/model.Record"
                     }
-                },
-                "title": {
-                    "type": "string"
                 },
                 "type": {
                     "description": "пока что bar chart",
@@ -260,16 +256,22 @@
             "type": "object",
             "properties": {
                 "charts": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Chart"
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/model.Chart"
+                        }
                     }
-                },
-                "description": {
-                    "type": "string"
                 },
                 "endDate": {
                     "type": "integer"
+                },
+                "legend": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
                 },
                 "multipliers": {
                     "type": "array",
@@ -279,6 +281,9 @@
                 },
                 "startDate": {
                     "type": "integer"
+                },
+                "summary": {
+                    "type": "string"
                 }
             }
         },

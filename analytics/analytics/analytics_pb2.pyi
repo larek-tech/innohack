@@ -44,26 +44,46 @@ class Filter(_message.Message):
     def __init__(self, start_date: _Optional[int] = ..., end_date: _Optional[int] = ...) -> None: ...
 
 class ChartReport(_message.Message):
-    __slots__ = ("charts", "multipliers", "description")
+    __slots__ = ("charts", "multipliers", "summary", "legend")
+    class ChartsEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: ListCharts
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[ListCharts, _Mapping]] = ...) -> None: ...
+    class LegendEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     CHARTS_FIELD_NUMBER: _ClassVar[int]
     MULTIPLIERS_FIELD_NUMBER: _ClassVar[int]
-    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
-    charts: _containers.RepeatedCompositeFieldContainer[Chart]
+    SUMMARY_FIELD_NUMBER: _ClassVar[int]
+    LEGEND_FIELD_NUMBER: _ClassVar[int]
+    charts: _containers.MessageMap[str, ListCharts]
     multipliers: _containers.RepeatedCompositeFieldContainer[Multiplier]
-    description: str
-    def __init__(self, charts: _Optional[_Iterable[_Union[Chart, _Mapping]]] = ..., multipliers: _Optional[_Iterable[_Union[Multiplier, _Mapping]]] = ..., description: _Optional[str] = ...) -> None: ...
+    summary: str
+    legend: _containers.ScalarMap[str, str]
+    def __init__(self, charts: _Optional[_Mapping[str, ListCharts]] = ..., multipliers: _Optional[_Iterable[_Union[Multiplier, _Mapping]]] = ..., summary: _Optional[str] = ..., legend: _Optional[_Mapping[str, str]] = ...) -> None: ...
+
+class ListCharts(_message.Message):
+    __slots__ = ("charts",)
+    CHARTS_FIELD_NUMBER: _ClassVar[int]
+    charts: _containers.RepeatedCompositeFieldContainer[Chart]
+    def __init__(self, charts: _Optional[_Iterable[_Union[Chart, _Mapping]]] = ...) -> None: ...
 
 class Chart(_message.Message):
-    __slots__ = ("title", "type", "description", "records")
-    TITLE_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ("color", "type", "records")
+    COLOR_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
-    DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     RECORDS_FIELD_NUMBER: _ClassVar[int]
-    title: str
+    color: str
     type: ChartType
-    description: str
     records: _containers.RepeatedCompositeFieldContainer[Record]
-    def __init__(self, title: _Optional[str] = ..., type: _Optional[_Union[ChartType, str]] = ..., description: _Optional[str] = ..., records: _Optional[_Iterable[_Union[Record, _Mapping]]] = ...) -> None: ...
+    def __init__(self, color: _Optional[str] = ..., type: _Optional[_Union[ChartType, str]] = ..., records: _Optional[_Iterable[_Union[Record, _Mapping]]] = ...) -> None: ...
 
 class Multiplier(_message.Message):
     __slots__ = ("key", "value")
