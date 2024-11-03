@@ -12,12 +12,14 @@ type module interface {
 }
 
 func (s *Server) initModules() {
-	api := s.app.Group("/api")
-	apiWithAuth := api.Use(middleware.Jwt(s.cfg.Server.JwtSecret))
+	authRouter := s.app.Group("/auth")
+
+	apiRouter := s.app.Group("/api")
+	apiRouter.Use(middleware.Jwt(s.cfg.Server.JwtSecret))
 
 	modules := map[fiber.Router]module{
-		api:         auth.New(s.tracer, s.pg, s.cfg.Server.JwtSecret),
-		apiWithAuth: chat.New(s.tracer, s.pg, s.cfg.Server.JwtSecret, s.grpcConn.GetConn()),
+		authRouter: auth.New(s.tracer, s.pg, s.cfg.Server.JwtSecret),
+		apiRouter:  chat.New(s.tracer, s.pg, s.cfg.Server.JwtSecret, s.grpcConn.GetConn()),
 	}
 	for router, module := range modules {
 		module.InitRoutes(router)

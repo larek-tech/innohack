@@ -30,7 +30,7 @@ func New(tracer trace.Tracer, pg *postgres.Postgres, jwtSecret string) *AuthModu
 }
 
 func (m *AuthModule) InitRoutes(api fiber.Router) {
-	auth := api.Group("/auth")
+	auth := api.Group("/")
 	auth.Post("/signup", m.handler.Signup)
 	auth.Post("/login", m.handler.Login)
 }
