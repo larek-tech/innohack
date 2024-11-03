@@ -16,17 +16,19 @@ import (
 //	@Success		200		{object}	model.TokenResp
 //	@Router			/auth/login [post]
 func (h *Handler) Login(c *fiber.Ctx) error {
+	ctx, span := h.tracer.Start(c.Context(), "auth.handler.login")
+	defer span.End()
+
 	var req model.LoginReq
 
 	if err := c.BodyParser(&req); err != nil {
 		return err
 	}
-
 	if err := h.validate.Struct(req); err != nil {
 		return err
 	}
 
-	token, err := h.ctrl.Login(c.Context(), req)
+	token, err := h.ctrl.Login(ctx, req)
 	if err != nil {
 		return err
 	}

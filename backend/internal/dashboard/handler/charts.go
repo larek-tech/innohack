@@ -16,13 +16,16 @@ import (
 // @Success		200		{object}	model.ChartReport
 // @Router			/api/dashboard/charts [post]
 func (h *Handler) GetCharts(c *fiber.Ctx) error {
+	ctx, span := h.tracer.Start(c.Context(), "dashboard.handler.get_charts")
+	defer span.End()
+
 	var filter model.Filter
 
 	if err := c.BodyParser(&filter); err != nil {
 		return err
 	}
 
-	report, err := h.ctrl.GetCharts(c.Context(), filter)
+	report, err := h.ctrl.GetCharts(ctx, filter)
 	if err != nil {
 		return err
 	}

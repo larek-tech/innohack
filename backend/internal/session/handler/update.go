@@ -20,6 +20,9 @@ import (
 // @Success		200
 // @Router			/api/session/{session_id}/{title} [put]
 func (h *Handler) UpdateSessionTitle(c *fiber.Ctx) error {
+	ctx, span := h.tracer.Start(c.Context(), "session.handler.update_title")
+	defer span.End()
+
 	userID, err := strconv.ParseInt(c.Locals(shared.UserIDKey).(string), 10, 64)
 	if err != nil {
 		return err
@@ -31,7 +34,7 @@ func (h *Handler) UpdateSessionTitle(c *fiber.Ctx) error {
 	}
 
 	title := c.Params("title")
-	if err := h.ctrl.UpdateSessionTitle(c.Context(), sessionID, int64(userID), title); err != nil {
+	if err := h.ctrl.UpdateSessionTitle(ctx, sessionID, int64(userID), title); err != nil {
 		return err
 	}
 	return c.SendStatus(fiber.StatusOK)

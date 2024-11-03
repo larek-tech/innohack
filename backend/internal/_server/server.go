@@ -96,7 +96,7 @@ func New(cfg config.Config) Server {
 func (s *Server) Serve() {
 	defer func() {
 		if err := s.exporter.Shutdown(context.Background()); err != nil {
-			log.Err(err).Msg("shutodwn exporter")
+			log.Err(err).Msg("shutdown exporter")
 		}
 	}()
 	defer s.pg.Close()
@@ -117,10 +117,10 @@ func (s *Server) Serve() {
 	sessionRepo := sr.New(s.pg)
 	sessionCtrl := sc.New(sessionRepo)
 	sessionHandler := sh.New(s.tracer, sessionCtrl)
-	session.InitRoutes(api, sessionHandler, s.cfg.Server.JwtSecret)
+	session.InitRoutes(api, sessionHandler, s.cfg.Server.JwtSecret, s.tracer)
 
 	dashboardCtrl := dc.New(s.grpcConn.GetConn())
-	dashboardHandler := dh.New(dashboardCtrl)
+	dashboardHandler := dh.New(s.tracer, dashboardCtrl)
 	dashboard.InitRoutes(api, dashboardHandler)
 
 	go s.listenHTTP(strconv.Itoa(s.cfg.Server.Port))

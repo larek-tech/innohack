@@ -17,12 +17,15 @@ import (
 //	@Success		201	{object}	model.Session
 //	@Router			/api/session [post]
 func (h *Handler) InsertSession(c *fiber.Ctx) error {
+	ctx, span := h.tracer.Start(c.Context(), "session.handler.insert_session")
+	defer span.End()
+
 	userID, err := strconv.ParseInt(c.Locals(shared.UserIDKey).(string), 10, 64)
 	if err != nil {
 		return err
 	}
 
-	session, err := h.ctrl.InsertSession(c.Context(), userID)
+	session, err := h.ctrl.InsertSession(ctx, userID)
 	if err != nil {
 		return err
 	}

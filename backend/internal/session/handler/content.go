@@ -19,6 +19,9 @@ import (
 //	@Success		200			{object}	[]model.SessionContentDto
 //	@Router			/api/session/{session_id} [get]
 func (h *Handler) GetSessionContent(c *fiber.Ctx) error {
+	ctx, span := h.tracer.Start(c.Context(), "session.handler.get_session_content")
+	defer span.End()
+
 	userID, err := strconv.ParseInt(c.Locals(shared.UserIDKey).(string), 10, 64)
 	if err != nil {
 		return err
@@ -29,7 +32,7 @@ func (h *Handler) GetSessionContent(c *fiber.Ctx) error {
 		return err
 	}
 
-	content, err := h.ctrl.GetSessionContent(c.Context(), sessionID, userID)
+	content, err := h.ctrl.GetSessionContent(ctx, sessionID, userID)
 	if err != nil {
 		return err
 	}
