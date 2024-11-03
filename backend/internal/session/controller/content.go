@@ -9,13 +9,18 @@ import (
 )
 
 func (ctrl *Controller) GetSessionContent(ctx context.Context, sessionID uuid.UUID, userID int64) ([]*model.SessionContentDto, error) {
-	content, err := ctrl.repo.GetSessionContent(ctx, sessionID, userID)
+	session, err := ctrl.repo.GetSessionByID(ctx, sessionID)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(content) == 0 {
+	if session.UserID != userID {
 		return nil, shared.ErrNoAccessToSession
+	}
+
+	content, err := ctrl.repo.GetSessionContent(ctx, sessionID)
+	if err != nil {
+		return nil, err
 	}
 
 	res := make([]*model.SessionContentDto, len(content))

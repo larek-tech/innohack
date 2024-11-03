@@ -3,11 +3,12 @@ package model
 import (
 	"time"
 
+	"github.com/google/uuid"
 	chatmodel "github.com/larek-tech/innohack/backend/internal/chat/model"
 )
 
 type SessionDto struct {
-	ID        int64     `json:"id"`
+	ID        uuid.UUID `json:"id"`
 	Title     string    `json:"title"`
 	CreatedAt time.Time `json:"createdAt"`
 }

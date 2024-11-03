@@ -19,22 +19,10 @@ create table query(
     prompt text not null,
     created_at timestamp default current_timestamp not null
 );
-create table response(
-    id bigserial primary key,
-    session_id bigint not null,
-    query_id bigint not null,
-    sources text [] not null,
-    filenames text [] not null,
-    charts jsonb not null,
-    description text not null,
-    multipliers jsonb not null,
-    created_at timestamp default current_timestamp not null
-);
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin
 drop table users;
 drop table session;
 drop table query;
-drop table response;
 -- +goose StatementEnd
