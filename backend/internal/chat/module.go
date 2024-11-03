@@ -18,6 +18,7 @@ import (
 
 type chatHandler interface {
 	ProcessConn(c *websocket.Conn)
+	InsertSession(c *fiber.Ctx) error
 	GetSessionContent(c *fiber.Ctx) error
 	ListSessions(c *fiber.Ctx) error
 	UpdateSessionTitle(c *fiber.Ctx) error
@@ -44,13 +45,13 @@ func New(tracer trace.Tracer, pg *postgres.Postgres, jwtSecret string, grpcConn 
 
 func (m *ChatModule) InitRoutes(api fiber.Router) {
 	chat := api.Group("/chat")
-	chat.Get("/session/{session_id}", m.handler.GetSessionContent)
+	chat.Get("/session/:session_id", m.handler.GetSessionContent)
 	chat.Get("/session/list", m.handler.ListSessions)
-	chat.Put("/session/{title}", m.handler.UpdateSessionTitle)
+	chat.Put("/session/:title", m.handler.UpdateSessionTitle)
 
 	ws := chat.Group("/ws")
 	ws.Use(middleware.WsProtocolUpgrade())
-	ws.Get("/ws", websocket.New(
+	ws.Get("/ws/:session_id", websocket.New(
 		m.handler.ProcessConn,
 		websocket.Config{HandshakeTimeout: 20 * time.Second},
 	))

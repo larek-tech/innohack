@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"strconv"
 	"strings"
 
 	"github.com/gofiber/websocket/v2"
@@ -44,10 +45,11 @@ func (h *Handler) ProcessConn(c *websocket.Conn) {
 	// первое сообщение содержит access token
 	authQuery := model.Query{}
 	if err := c.ReadJSON(&authQuery); err != nil {
+		h.respondError(c, err)
 		return
 	}
 
-	sessionID, err := h.service.InsertSession(ctx, authQuery.Prompt)
+	sessionID, err := strconv.ParseInt(c.Params("session_id"), 10, 64)
 	if err != nil {
 		h.respondError(c, err)
 		return
