@@ -5,22 +5,24 @@ package analytics;
 option go_package="internal/analytics/pb";
 
 service Analytics {
-    rpc GetCharts(Params) returns (ChartReport) {};
+    rpc GetCharts(Filter) returns (ChartReport) {};
     rpc GetDescriptionStream(Params) returns (stream DescriptionReport) {};
-    rpc GetChartSummary(Params) returns (ChartReport) {};
 };
 
 message Params {
     int64 query_id = 1;
-    string start_date = 2;
-    string end_date = 3;
-    string prompt = 4;
+    string prompt = 2;
 };
 
 message DescriptionReport {
     repeated string sources = 1;
     repeated string filenames = 2;
     string description = 3;
+};
+
+message Filter {
+    string start_date = 1;
+    string end_date = 2;
 };
 
 message ChartReport {

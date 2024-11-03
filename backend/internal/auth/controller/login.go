@@ -1,4 +1,4 @@
-package service
+package controller
 
 import (
 	"context"
@@ -8,8 +8,8 @@ import (
 	"github.com/larek-tech/innohack/backend/pkg/jwt"
 )
 
-func (s *Service) Login(ctx context.Context, req model.LoginReq) (model.TokenResp, error) {
-	user, err := s.repo.FindUserByEmail(ctx, req.Email)
+func (ctrl *Controller) Login(ctx context.Context, req model.LoginReq) (model.TokenResp, error) {
+	user, err := ctrl.repo.FindUserByEmail(ctx, req.Email)
 	if err != nil {
 		return model.TokenResp{}, pkg.WrapErr(err, "find user by email")
 	}
@@ -19,7 +19,7 @@ func (s *Service) Login(ctx context.Context, req model.LoginReq) (model.TokenRes
 		user.Email,
 		user.Password,
 		req.Password,
-		s.jwtSecret,
+		ctrl.jwtSecret,
 	)
 	if err != nil {
 		return model.TokenResp{}, pkg.WrapErr(err, "jwt auth")

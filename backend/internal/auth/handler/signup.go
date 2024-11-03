@@ -17,7 +17,7 @@ func (h *Handler) Signup(c *fiber.Ctx) error {
 		return pkg.WrapErr(err, "validation")
 	}
 
-	token, err := h.service.Signup(c.Context(), req)
+	token, err := h.ctrl.Signup(c.Context(), req)
 	if err != nil {
 		return pkg.WrapErr(err, "jwt auth")
 	}

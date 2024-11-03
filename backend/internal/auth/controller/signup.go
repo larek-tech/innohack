@@ -1,4 +1,4 @@
-package service
+package controller
 
 import (
 	"context"
@@ -9,13 +9,13 @@ import (
 	"github.com/larek-tech/innohack/backend/pkg/jwt"
 )
 
-func (s *Service) Signup(ctx context.Context, req model.SignupReq) (model.TokenResp, error) {
+func (ctrl *Controller) Signup(ctx context.Context, req model.SignupReq) (model.TokenResp, error) {
 	hashedPass, err := hashPassword(req.Password)
 	if err != nil {
 		return model.TokenResp{}, pkg.WrapErr(err, "generate hash")
 	}
 
-	userID, err := s.repo.InsertUser(ctx, model.User{
+	userID, err := ctrl.repo.InsertUser(ctx, model.User{
 		Email:    req.Email,
 		Password: hashedPass,
 	})
@@ -26,7 +26,7 @@ func (s *Service) Signup(ctx context.Context, req model.SignupReq) (model.TokenR
 		return model.TokenResp{}, pkg.WrapErr(shared.ErrStorageInternal, err.Error())
 	}
 
-	token, err := jwt.CreateAccessToken(userID, req.Email, s.jwtSecret)
+	token, err := jwt.CreateAccessToken(userID, req.Email, ctrl.jwtSecret)
 	if err != nil {
 		return model.TokenResp{}, pkg.WrapErr(err, "create access token")
 	}

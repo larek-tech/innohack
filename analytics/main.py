@@ -18,13 +18,8 @@ class Analytics(analytics_pb2_grpc.AnalyticsServicer):
 
         self.rag = RagClient()
 
-    def GetCharts(self, request: analytics_pb2.Params, context: grpc.ServicerContext):
+    def GetCharts(self, request: analytics_pb2.Filter, context: grpc.ServicerContext):
         return get_analitics_report(request)
-
-    def GetChartSummary(
-        self, request: analytics_pb2.Params, context: grpc.ServicerContext
-    ):
-        return analytics_pb2.ChartReport()
 
     def GetDescriptionStream(
         self, request: analytics_pb2.Params, context: grpc.ServicerContext

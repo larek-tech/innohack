@@ -4,17 +4,17 @@ import (
 	"context"
 	"errors"
 
-	"github.com/larek-tech/innohack/backend/internal/chat/model"
+	"github.com/larek-tech/innohack/backend/internal/session/model"
 	"github.com/larek-tech/innohack/backend/pkg"
 	"github.com/larek-tech/innohack/backend/pkg/storage/postgres"
 )
 
-type SessionRepo struct {
+type Repo struct {
 	pg *postgres.Postgres
 }
 
-func NewSessionRepo(pg *postgres.Postgres) *SessionRepo {
-	return &SessionRepo{pg: pg}
+func New(pg *postgres.Postgres) *Repo {
+	return &Repo{pg: pg}
 }
 
 const insertSession = `
@@ -23,7 +23,7 @@ const insertSession = `
 	returning id;
 `
 
-func (r *SessionRepo) InsertSession(ctx context.Context, userID int64) (int64, error) {
+func (r *Repo) InsertSession(ctx context.Context, userID int64) (int64, error) {
 	var sessionID int64
 	err := r.pg.Query(ctx, &sessionID, insertSession, userID)
 	if err != nil {
@@ -35,7 +35,7 @@ func (r *SessionRepo) InsertSession(ctx context.Context, userID int64) (int64, e
 const getSessionContent = `
 	select 
 		(q.id, q.session_id, q.prompt, q.created_at) as query,
-		(r.id, r.session_id, r.query_id, r.sources, r.filenames, r.charts, r.description, r.multipliers, r.created_at) as response
+		(r.id, r.session_id, r.query_id, r.sources, r.filenames, r.description, r.created_at) as response
 	from query q
 	join
 	    response r
@@ -49,7 +49,7 @@ const getSessionContent = `
 	order by q.id;
 `
 
-func (r *SessionRepo) GetSessionContent(ctx context.Context, sessionID int64) ([]model.SessionContent, error) {
+func (r *Repo) GetSessionContent(ctx context.Context, sessionID int64) ([]model.SessionContent, error) {
 	var content []model.SessionContent
 	if err := r.pg.QuerySlice(ctx, &content, getSessionContent, sessionID); err != nil {
 		return nil, pkg.WrapErr(err)
@@ -63,7 +63,7 @@ const listSessions = `
 	order by created_at;
 `
 
-func (r *SessionRepo) ListSessions(ctx context.Context, userID int64) ([]model.Session, error) {
+func (r *Repo) ListSessions(ctx context.Context, userID int64) ([]model.Session, error) {
 	var sessions []model.Session
 	if err := r.pg.QuerySlice(ctx, &sessions, listSessions, userID); err != nil {
 		return nil, pkg.WrapErr(err)
@@ -77,7 +77,7 @@ const updateSessionTitle = `
 	where id = $1 and user_id = $2 and is_deleted = false;
 `
 
-func (r *SessionRepo) UpdateSessionTitle(ctx context.Context, sessionID, userID int64, title string) error {
+func (r *Repo) UpdateSessionTitle(ctx context.Context, sessionID, userID int64, title string) error {
 	tag, err := r.pg.Exec(ctx, updateSessionTitle, sessionID, userID, title)
 	if err != nil {
 		return pkg.WrapErr(err)

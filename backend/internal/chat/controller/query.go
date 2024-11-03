@@ -1,4 +1,4 @@
-package service
+package controller
 
 import (
 	"context"
@@ -7,12 +7,8 @@ import (
 	"github.com/larek-tech/innohack/backend/pkg"
 )
 
-type queryRepo interface {
-	InsertQuery(ctx context.Context, data model.Query) (int64, error)
-}
-
-func (s *Service) InsertQuery(ctx context.Context, sessionID int64, query model.QueryDto) (int64, error) {
-	queryID, err := s.qr.InsertQuery(ctx, model.Query{
+func (ctrl *Controller) InsertQuery(ctx context.Context, sessionID int64, query model.QueryDto) (int64, error) {
+	queryID, err := ctrl.qr.InsertQuery(ctx, model.Query{
 		SessionID: sessionID,
 		Prompt:    query.Prompt,
 	})

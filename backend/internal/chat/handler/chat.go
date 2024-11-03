@@ -8,10 +8,11 @@ import (
 	"github.com/gofiber/websocket/v2"
 	"github.com/larek-tech/innohack/backend/internal/chat/model"
 	"github.com/larek-tech/innohack/backend/pkg/jwt"
+	"github.com/rs/zerolog/log"
 )
 
 func (h *Handler) closeHandler(code int, text string) error {
-	h.log.Info().Int("code", code).Str("text", text).Msg("close handler")
+	log.Info().Int("code", code).Str("text", text).Msg("close handler")
 	return nil
 }
 
@@ -21,24 +22,24 @@ func (h *Handler) respondError(c *websocket.Conn, err error) {
 		IsLast: true,
 	}
 
-	h.log.Err(err).Msg("chat error")
+	log.Err(err).Msg("chat error")
 
 	if err := c.WriteJSON(resp); err != nil {
-		h.log.Warn().Err(err).Msg("failed to respond with error")
+		log.Warn().Err(err).Msg("failed to respond with error")
 		return
 	}
 }
 
 func (h *Handler) ProcessConn(c *websocket.Conn) {
-	h.log.Info().Str("addr", c.LocalAddr().String()).Msg("new conn")
+	log.Info().Str("addr", c.LocalAddr().String()).Msg("new conn")
 	c.SetCloseHandler(h.closeHandler)
 
 	defer func() {
 		if err := c.Close(); err != nil {
-			h.log.Warn().Err(err).Msg("failed to close websocket conn")
+			log.Warn().Err(err).Msg("failed to close websocket conn")
 			return
 		}
-		h.log.Info().Msg("conn closed")
+		log.Info().Msg("conn closed")
 	}()
 
 	ctx := context.Background()
@@ -74,21 +75,21 @@ func (h *Handler) ProcessConn(c *websocket.Conn) {
 			return
 		}
 
-		queryID, err := h.service.InsertQuery(ctx, sessionID, req)
+		queryID, err := h.ctrl.InsertQuery(ctx, sessionID, req)
 		if err != nil {
 			h.respondError(c, err)
 			return
 		}
 		req.ID = queryID
 
-		go h.service.GetDescription(ctx, req, out, cancel)
+		go h.ctrl.GetDescription(ctx, req, out, cancel)
 
 	chunks:
 		for {
 			select {
 			case chunk, ok := <-out:
 				if !ok {
-					h.log.Error().Msg("error while processing")
+					log.Error().Msg("error while processing")
 					return
 				}
 
@@ -101,13 +102,13 @@ func (h *Handler) ProcessConn(c *websocket.Conn) {
 
 				if chunk.IsLast {
 					resp = chunk
-					h.log.Debug().Int64("query id", queryID).Msg("finished processing")
+					log.Debug().Int64("query id", queryID).Msg("finished processing")
 					break chunks
 				}
 			}
 		}
 
-		if err := h.service.InsertResponse(ctx, sessionID, resp); err != nil {
+		if err := h.ctrl.InsertResponse(ctx, sessionID, resp); err != nil {
 			h.respondError(c, err)
 			return
 		}

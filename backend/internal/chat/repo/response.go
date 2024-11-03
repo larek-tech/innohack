@@ -22,11 +22,9 @@ const insertResponse = `
 		query_id, 
 		sources, 
 		filenames, 
-		charts, 
-		description,
-		multipliers
+		description
 	)
-	values ($1, $2, $3, $4, $5, $6, $7);
+	values ($1, $2, $3, $4, $5);
 `
 
 func (r *ResponseRepo) InsertResponse(ctx context.Context, data model.Response) error {
@@ -37,9 +35,7 @@ func (r *ResponseRepo) InsertResponse(ctx context.Context, data model.Response) 
 		data.QueryID,
 		data.Sources,
 		data.Filenames,
-		data.Charts,
 		data.Description,
-		data.Multipliers,
 	)
 	return pkg.WrapErr(err)
 }

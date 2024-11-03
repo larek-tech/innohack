@@ -1,4 +1,4 @@
-package service
+package controller
 
 import (
 	"github.com/larek-tech/innohack/backend/pkg"

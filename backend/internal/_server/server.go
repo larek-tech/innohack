@@ -13,6 +13,21 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	recovermw "github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/google/uuid"
+	"github.com/larek-tech/innohack/backend/internal/auth"
+	ac "github.com/larek-tech/innohack/backend/internal/auth/controller"
+	ah "github.com/larek-tech/innohack/backend/internal/auth/handler"
+	ar "github.com/larek-tech/innohack/backend/internal/auth/repo"
+	"github.com/larek-tech/innohack/backend/internal/chat"
+	cc "github.com/larek-tech/innohack/backend/internal/chat/controller"
+	ch "github.com/larek-tech/innohack/backend/internal/chat/handler"
+	cr "github.com/larek-tech/innohack/backend/internal/chat/repo"
+	"github.com/larek-tech/innohack/backend/internal/dashboard"
+	dc "github.com/larek-tech/innohack/backend/internal/dashboard/controller"
+	dh "github.com/larek-tech/innohack/backend/internal/dashboard/handler"
+	"github.com/larek-tech/innohack/backend/internal/session"
+	sc "github.com/larek-tech/innohack/backend/internal/session/controller"
+	sh "github.com/larek-tech/innohack/backend/internal/session/handler"
+	sr "github.com/larek-tech/innohack/backend/internal/session/repo"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 
@@ -85,7 +100,27 @@ func (s *Server) Serve() {
 	}()
 	defer s.pg.Close()
 
-	s.initModules()
+	api := s.app.Group("/api")
+
+	authRepo := ar.New(s.pg)
+	authCtrl := ac.New(authRepo, s.cfg.Server.JwtSecret)
+	authHandler := ah.New(s.tracer, authCtrl)
+	auth.InitRoutes(s.app, authHandler)
+
+	queryRepo := cr.NewQueryRepo(s.pg)
+	respRepo := cr.NewResponseRepo(s.pg)
+	chatCtrl := cc.New(s.cfg.Server.JwtSecret, s.grpcConn.GetConn(), queryRepo, respRepo)
+	chatHandler := ch.New(s.tracer, s.cfg.Server.JwtSecret, chatCtrl)
+	chat.InitRoutes(api, chatHandler, s.cfg.Server.JwtSecret)
+
+	sessionRepo := sr.New(s.pg)
+	sessionCtrl := sc.New(sessionRepo)
+	sessionHandler := sh.New(s.tracer, sessionCtrl)
+	session.InitRoutes(api, sessionHandler, s.cfg.Server.JwtSecret)
+
+	dashboardCtrl := dc.New(s.grpcConn.GetConn())
+	dashboardHandler := dh.New(dashboardCtrl)
+	dashboard.InitRoutes(api, dashboardHandler)
 
 	go s.listenHTTP(strconv.Itoa(s.cfg.Server.Port))
 
