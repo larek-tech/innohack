@@ -8,7 +8,6 @@ export const Route = createFileRoute('/login')({
 })
 
 function RouteComponent() {
-    return <div className="w-full h-screen flex items-center justify-center">
-        <LoginForm />
-    </div>
+    return <LoginForm />
+    
 }

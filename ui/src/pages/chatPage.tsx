@@ -74,46 +74,46 @@ const ChatInterface = observer(() => {
     // Load initial messages from the server
     useEffect(() => {
         if (sessionIdNumber) {
-            const session = 
-            ChatSessionService.getSessionContent(sessionIdNumber).then((res) => {
-                console.log(res);
-                const initialMessages = mapSessionContentDtoToMessages(res);
-                setMessages(initialMessages);
-            }).catch((err) => {
+            const session =
+                ChatSessionService.getSessionContent(sessionIdNumber).then((res) => {
+                    console.log(res);
+                    const initialMessages = mapSessionContentDtoToMessages(res);
+                    setMessages(initialMessages);
+                }).catch((err) => {
 
-                toast({
-                    title: 'Error',
-                    description: err.message,
-                });
-                ChatSessionService.createSession().then((res) => {
-                    const newChatId = res.id;
                     toast({
-                        title: 'Chat Created',
-                        description: `Chat with ID ${newChatId} created.`,
-
+                        title: 'Error',
+                        description: err.message,
                     });
-                    ChatSessionService.getSessionContent(sessionIdNumber).then((res) => {
-                        console.log(res);
-                        const initialMessages = mapSessionContentDtoToMessages(res);
-                        setMessages(initialMessages);
-                    }
-                );
-                    // navigate({to:`/chat/${newChatId}`});
-                    
-            }).catch((err) => {
-                toast({
-                    title: 'Error',
-                    description: err.message,
+                    ChatSessionService.createSession().then((res) => {
+                        const newChatId = res.id;
+                        toast({
+                            title: 'Chat Created',
+                            description: `Chat with ID ${newChatId} created.`,
+
+                        });
+                        ChatSessionService.getSessionContent(sessionIdNumber).then((res) => {
+                            console.log(res);
+                            const initialMessages = mapSessionContentDtoToMessages(res);
+                            setMessages(initialMessages);
+                        }
+                        );
+                        // navigate({to:`/chat/${newChatId}`});
+
+                    }).catch((err) => {
+                        toast({
+                            title: 'Error',
+                            description: err.message,
+                        });
+                        navigate({ to: '/' });
+                    });
+                }).catch((err) => {
+                    toast({
+                        title: 'Error',
+                        description: err.message,
+                    });
                 });
-                navigate({to:'/'});
-            });
-        }).catch((err) => {
-            toast({
-                title: 'Error',
-                description: err.message,
-            });
-        });
-    }
+        }
     }, [sessionIdNumber]);
 
     // Initialize WebSocket and handle incoming messages
@@ -194,33 +194,33 @@ const ChatInterface = observer(() => {
 
     return (
         <div className="flex h-screen">
-          <AppSidebar />
-          <div className="flex flex-col flex-grow">
-            <ScrollArea className="flex-grow p-4 space-y-4" ref={scrollAreaRef}>
-              {messages.map((message, index) => chatMessage(message, index))}
-            </ScrollArea>
-            <div className="p-4 border-t">
-              <div className="flex space-x-2">
-                <Input
-                  type="text"
-                  placeholder="Type your message..."
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSendMessage();
-                    }
-                  }}
-                  className="flex-grow"
-                />
-                <Button onClick={handleSendMessage}>
-                  <Send className="w-4 h-4" />
-                </Button>
-              </div>
+            <AppSidebar />
+            <div className="flex flex-col flex-grow">
+                <ScrollArea className="flex-grow p-4 space-y-4" ref={scrollAreaRef}>
+                    {messages.map((message, index) => chatMessage(message, index))}
+                </ScrollArea>
+                <div className="p-4 border-t">
+                    <div className="flex space-x-2">
+                        <Input
+                            type="text"
+                            placeholder="Type your message..."
+                            value={inputMessage}
+                            onChange={(e) => setInputMessage(e.target.value)}
+                            onKeyPress={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleSendMessage();
+                                }
+                            }}
+                            className="flex-grow"
+                        />
+                        <Button onClick={handleSendMessage}>
+                            <Send className="w-4 h-4" />
+                        </Button>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      );
+    );
 });
 
 export default ChatInterface;

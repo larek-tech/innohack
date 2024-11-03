@@ -69,3 +69,26 @@ export interface ResponseDto {
     error: string
     isLast: boolean
 }
+
+
+export interface Filter {
+    startDate: Date;
+    endDate: Date;
+}
+
+export interface ChartReport {
+    charts: Chart[];
+    multipliers: Multiplier[];
+    description: string;
+    startDate: Date;
+    endDate: Date;
+}
+
+export enum ChartType {
+    UndefinedChart = 0,
+    BarChart,
+    PieChart,
+    LineChart
+}
+
+function ConvertChartData(data: ChartReport): Chart[] {
