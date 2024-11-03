@@ -7,6 +7,7 @@ import grpc
 from analytics import analytics_pb2, analytics_pb2_grpc
 from process.process import preprocess_xlsx
 from process.form_graphs import get_analitics_report
+from process.get_report_summary import form_report_description
 
 from rag.rag_model import RagClient
 
@@ -14,7 +15,8 @@ from rag.rag_model import RagClient
 class Analytics(analytics_pb2_grpc.AnalyticsServicer):
     def __init__(self):
         super().__init__()
-        preprocess_xlsx()
+        # Data preporation - USE ONLY ONCE
+        # preprocess_xlsx()
 
         self.rag = RagClient()
 

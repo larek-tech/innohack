@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 import bson
 from pymongo import MongoClient
+import os
+import json
 
 from process.compute_business_metrics import (
     read_excel,
@@ -15,11 +17,13 @@ from process.compute_business_metrics import (
     coefficients_3years,
 )
 from process.const import CODE_NAME, MULTYPLIER_NAME
+from process.get_report_summary import form_report_description
 
 
 mongo = MongoClient("mongodb://46.138.243.191:27017/data", timeoutMS=30000**2)
 records_col = mongo.get_database("data").get_collection("records")
 multipliers_col = mongo.get_database("data").get_collection("multipliers")
+summary_col = mongo.get_database("data").get_collection("report_summary")
 
 s3 = Minio(
     "s3.larek.tech",
@@ -92,14 +96,42 @@ def parse_multy_to_dict(records: dict, df: pd.DataFrame) -> dict:
     return records
 
 
-def save_data(records: dict, multipliers: dict):
+def save_data(records: dict, multipliers: dict, summary_dict: dict):
     has_records = len([r for r in records_col.find({})]) > 0
     has_multipliers = len([m for m in multipliers_col.find({})]) > 0
-
+    has_summary_dict = len([s for s in summary_col.find({})]) > 0
+    
     if not has_records:
         records_col.insert_one(records)
     if not has_multipliers:
         multipliers_col.insert_one(multipliers)
+    if not has_summary_dict:
+        summary_col.insert_one(summary_dict)
+
+def generate_summaries(records: dict, multipliers: dict):
+    all_years = set()
+    for years_data in multipliers.values():
+        all_years.update(years_data.keys())
+
+    sorted_years = sorted(all_years, key=int)
+
+    summary_dict = {}
+    for i in range(len(sorted_years)):
+        year1 = sorted_years[i]
+
+        if year1 not in summary_dict:
+            summary_dict[year1] = {}
+
+        for j in range(i, len(sorted_years)):
+            year2 = sorted_years[j]
+            description = form_report_description(records, multipliers, year1, year2)
+            if year2 not in summary_dict[year1]:
+                summary_dict[year1][year2] = description
+
+            with open("summary_json.json", 'w', encoding='utf-8') as f:
+                json.dump(summary_dict, f, ensure_ascii=False, indent=4)
+ 
+    return summary_dict
 
 
 def preprocess_xlsx():
@@ -128,4 +160,5 @@ def preprocess_xlsx():
         )
         multipliers = parse_multy_to_dict(multipliers, metrics_for_chart)
 
-    save_data(records, multipliers)
+    summary_dict = generate_summaries(records, multipliers)
+    save_data(records, multipliers, summary_dict)
