@@ -42,4 +42,9 @@ def serve():
 
 
 if __name__ == "__main__":
-    serve()
+    # serve()
+    rag = RagClient()
+
+    promt = "Какие были активы компании в 2023 году?"
+
+    print(rag.llm_client.get_response(promt))
