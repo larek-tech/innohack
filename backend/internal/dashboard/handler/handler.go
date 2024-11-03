@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/larek-tech/innohack/backend/internal/dashboard/model"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type dashboardController interface {
@@ -11,9 +12,13 @@ type dashboardController interface {
 }
 
 type Handler struct {
-	ctrl dashboardController
+	ctrl   dashboardController
+	tracer trace.Tracer
 }
 
-func New(ctrl dashboardController) *Handler {
-	return &Handler{ctrl: ctrl}
+func New(tracer trace.Tracer, ctrl dashboardController) *Handler {
+	return &Handler{
+		tracer: tracer,
+		ctrl:   ctrl,
+	}
 }

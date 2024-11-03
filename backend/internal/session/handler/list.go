@@ -17,12 +17,15 @@ import (
 //	@Success		200	{object}	[]model.Session
 //	@Router			/api/session/list [get]
 func (h *Handler) ListSessions(c *fiber.Ctx) error {
+	ctx, span := h.tracer.Start(c.Context(), "session.handler.list_sessions")
+	defer span.End()
+
 	userID, err := strconv.ParseInt(c.Locals(shared.UserIDKey).(string), 10, 64)
 	if err != nil {
 		return err
 	}
 
-	sessions, err := h.ctrl.ListSessions(c.Context(), userID)
+	sessions, err := h.ctrl.ListSessions(ctx, userID)
 	if err != nil {
 		return err
 	}

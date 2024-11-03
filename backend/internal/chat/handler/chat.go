@@ -32,6 +32,11 @@ func (h *Handler) respondError(c *websocket.Conn, err error) {
 }
 
 func (h *Handler) ProcessConn(c *websocket.Conn) {
+	ctx := context.Background()
+
+	ctx, span := h.tracer.Start(ctx, "chat.handler.process_conn")
+	defer span.End()
+
 	log.Info().Str("addr", c.LocalAddr().String()).Msg("new conn")
 	c.SetCloseHandler(h.closeHandler)
 
@@ -42,8 +47,6 @@ func (h *Handler) ProcessConn(c *websocket.Conn) {
 		}
 		log.Info().Msg("conn closed")
 	}()
-
-	ctx := context.Background()
 
 	// первое сообщение содержит access token
 	authQuery := model.QueryDto{}

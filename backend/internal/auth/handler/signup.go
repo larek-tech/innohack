@@ -16,17 +16,19 @@ import (
 // @Success		201		{object}	model.TokenResp
 // @Router			/auth/signup [post]
 func (h *Handler) Signup(c *fiber.Ctx) error {
+	ctx, span := h.tracer.Start(c.Context(), "auth.handler.signup")
+	defer span.End()
+	
 	var req model.SignupReq
 
 	if err := c.BodyParser(&req); err != nil {
 		return err
 	}
-
 	if err := h.validate.Struct(&req); err != nil {
 		return err
 	}
 
-	token, err := h.ctrl.Signup(c.Context(), req)
+	token, err := h.ctrl.Signup(ctx, req)
 	if err != nil {
 		return err
 	}
