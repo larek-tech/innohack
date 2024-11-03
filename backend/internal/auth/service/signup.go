@@ -9,10 +9,10 @@ import (
 	"github.com/larek-tech/innohack/backend/pkg/jwt"
 )
 
-func (s *Service) SignUp(ctx context.Context, req model.SignUpReq) (string, error) {
+func (s *Service) Signup(ctx context.Context, req model.SignupReq) (model.TokenResp, error) {
 	hashedPass, err := hashPassword(req.Password)
 	if err != nil {
-		return "", pkg.WrapErr(err)
+		return model.TokenResp{}, pkg.WrapErr(err, "generate hash")
 	}
 
 	userID, err := s.repo.InsertUser(ctx, model.User{
@@ -21,15 +21,18 @@ func (s *Service) SignUp(ctx context.Context, req model.SignUpReq) (string, erro
 	})
 	if err != nil {
 		if pkg.CheckDuplicateKey(err) {
-			return "", pkg.WrapErr(shared.ErrDuplicateKey, err.Error())
+			return model.TokenResp{}, pkg.WrapErr(shared.ErrDuplicateKey, err.Error())
 		}
-		return "", pkg.WrapErr(shared.ErrStorageInternal, err.Error())
+		return model.TokenResp{}, pkg.WrapErr(shared.ErrStorageInternal, err.Error())
 	}
 
 	token, err := jwt.CreateAccessToken(userID, req.Email, s.jwtSecret)
 	if err != nil {
-		return "", pkg.WrapErr(err, "create access token")
+		return model.TokenResp{}, pkg.WrapErr(err, "create access token")
 	}
 
-	return token, nil
+	return model.TokenResp{
+		Token: token,
+		Type:  shared.BearerType,
+	}, nil
 }

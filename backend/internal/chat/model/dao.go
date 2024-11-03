@@ -15,6 +15,14 @@ type Session struct {
 	IsDeleted bool      `db:"is_deleted"`
 }
 
+func (s *Session) ToDto() *SessionDto {
+	return &SessionDto{
+		ID:        s.ID,
+		Title:     "Новый чат", // TODO: поменять
+		CreatedAt: s.CreatedAt,
+	}
+}
+
 type Query struct {
 	ID        int64     `db:"id"`
 	SessionID int64     `db:"session_id"`
@@ -26,8 +34,8 @@ type Response struct {
 	ID          int64     `db:"id"`
 	SessionID   int64     `db:"session_id"`
 	QueryID     int64     `db:"query_id"`
-	Source      string    `db:"source"` // s3 link
-	Filename    string    `db:"filename"`
+	Sources     []string  `db:"sources"` // s3 link
+	Filenames   []string  `db:"filenames"`
 	Charts      []byte    `db:"charts"`
 	Description string    `db:"description"` // llm response
 	Multipliers []byte    `db:"multipliers"`
@@ -61,8 +69,8 @@ func (c *SessionContent) ToDto() (*SessionContentDto, error) {
 		},
 		Response: ResponseDto{
 			QueryID:     c.Query.ID,
-			Source:      c.Response.Source,
-			Filename:    c.Response.Filename,
+			Sources:     c.Response.Sources,
+			Filenames:   c.Response.Filenames,
 			Charts:      charts,
 			Description: c.Response.Description,
 			Multipliers: multipliers,

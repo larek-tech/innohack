@@ -20,8 +20,8 @@ const insertResponse = `
 	insert into response(
 		session_id, 
 		query_id, 
-		source, 
-		filename, 
+		sources, 
+		filenames, 
 		charts, 
 		description,
 		multipliers
@@ -35,8 +35,8 @@ func (r *ResponseRepo) InsertResponse(ctx context.Context, data model.Response) 
 		insertResponse,
 		data.SessionID,
 		data.QueryID,
-		data.Source,
-		data.Filename,
+		data.Sources,
+		data.Filenames,
 		data.Charts,
 		data.Description,
 		data.Multipliers,

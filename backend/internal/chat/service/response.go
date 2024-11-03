@@ -26,8 +26,8 @@ func (s *Service) InsertResponse(ctx context.Context, sessionID int64, resp mode
 	if err = s.rr.InsertResponse(ctx, model.Response{
 		SessionID:   sessionID,
 		QueryID:     resp.QueryID,
-		Source:      resp.Source,
-		Filename:    resp.Filename,
+		Sources:     resp.Sources,
+		Filenames:   resp.Filenames,
 		Charts:      charts,
 		Description: resp.Description,
 		Multipliers: multipliers,

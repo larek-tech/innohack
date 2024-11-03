@@ -4,6 +4,8 @@ from concurrent import futures
 import grpc
 
 from analytics import analytics_pb2, analytics_pb2_grpc
+from process.process import preprocess_xlsx
+from process.form_graphs import get_analitics_report
 
 from rag.rag_model import RagClient
 
@@ -11,8 +13,13 @@ from rag.rag_model import RagClient
 rag = RagClient()
 
 class Analytics(analytics_pb2_grpc.AnalyticsServicer):
+    def __init__(self):
+        super().__init__()
+        preprocess_xlsx()
+
+
     def GetCharts(self, request: analytics_pb2.Params, context: grpc.ServicerContext):
-        return analytics_pb2.Report()
+        return get_analitics_report(request)
 
     def GetDescriptionStream(
         self, request: analytics_pb2.Params, context: grpc.ServicerContext
