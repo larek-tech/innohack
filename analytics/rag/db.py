@@ -6,8 +6,8 @@ from typing import List
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams, PointStruct
 
-from utils.bi_encode import str_to_vec
-from utils.chunks import file_to_chunks
+from rag.utils.bi_encode import str_to_vec
+from rag.utils.chunks import file_to_chunks
 
 from loguru import logger
 
@@ -82,42 +82,41 @@ def save_chunks(
     )
 
 
-    def files_to_vecdb(self, 
-                       files, 
-                       bi_encoder, 
-                       vec_size, 
-                       sep, 
-                       chunk_size, 
-                       chunk_overlap
+def files_to_vecdb(
+            files, 
+            bi_encoder, 
+            vec_size, 
+            sep, 
+            chunk_size, 
+            chunk_overlap
     ):
+        # Коллекция для чанков
+        qdrant_client.delete_collection(collection_name=COLL_NAME)
+        qdrant_client.create_collection(
+            collection_name=COLL_NAME,
+            vectors_config=VectorParams(size=vec_size, distance=Distance.COSINE),
+        )
 
-    # Коллекция для чанков
-    qdrant_client.delete_collection(collection_name=COLL_NAME)
-    qdrant_client.create_collection(
-        collection_name=COLL_NAME,
-        vectors_config=VectorParams(size=vec_size, distance=Distance.COSINE),
-    )
+        # Коллекция для вопросов к чанкам
+        qdrant_client.delete_collection(collection_name=COLL_QUESTION_NAME)
+        qdrant_client.create_collection(
+            collection_name=COLL_QUESTION_NAME,
+            vectors_config=VectorParams(size=vec_size, distance=Distance.COSINE),
+        )
 
-    # Коллекция для вопросов к чанкам
-    qdrant_client.delete_collection(collection_name=COLL_QUESTION_NAME)
-    qdrant_client.create_collection(
-        collection_name=COLL_QUESTION_NAME,
-        vectors_config=VectorParams(size=vec_size, distance=Distance.COSINE),
-    )
+        logger.info("Collections created successfully")
 
-    logger.info("Collections created successfully")
+        for file_name in files:
+            chunks = file_to_chunks(file_name, sep, chunk_size, chunk_overlap)
 
-    for file_name in files:
-        chunks = file_to_chunks(file_name, sep, chunk_size, chunk_overlap)
+            questions_for_chunk = []
+            for chunk in chunks:
+                questions_for_chunk += [get_questions_for_chunk(chunk)]
+                logger.info("Questions was created successfully")
 
-        questions_for_chunk = []
-        for chunk in chunks:
-            questions_for_chunk += [get_questions_for_chunk(chunk)]
-            logger.info("Questions was created successfully")
-
-        # помещаем чанки в векторную БД
-        save_chunks(bi_encoder, chunks, file_name, questions_for_chunk)
-        logger.info("chunks saved successfully")
+            # помещаем чанки в векторную БД
+            save_chunks(bi_encoder, chunks, file_name, questions_for_chunk)
+            logger.info("chunks saved successfully")
 
 
 def vec_search(bi_encoder, query, n_top_cos, n_top_cos_question):

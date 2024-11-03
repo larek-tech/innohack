@@ -5,7 +5,7 @@ import ollama
 from loguru import logger
 
 from rag.utils.bi_encode import get_bi_encoder
-from rag.db import QdrantBase
+from rag.db import vec_search
 from rag.config import BI_ENCODE_NAME, QDRANT_HOST, QDRANT_PORT
 
 

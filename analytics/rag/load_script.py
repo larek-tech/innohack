@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from db import files_to_vecdb
+from rag.db import files_to_vecdb
 from utils.bi_encode import get_bi_encoder
 
 from loguru import logger

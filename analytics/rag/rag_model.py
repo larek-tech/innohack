@@ -3,7 +3,7 @@ from pathlib import Path
 from loguru import logger
 
 from rag.minio_client import MinioClient
-from rag.db import QdrantBase
+from rag.db import qdrant_client, files_to_vecdb
 from rag.utils.bi_encode import get_bi_encoder
 from rag.model import LLMClient
 from rag.convert import format_data
@@ -30,7 +30,7 @@ class RagClient:
     def __init__(self):
 
         # minio_client = MinioClient(MINIO_HOST, MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
-        qdrant_client = QdrantBase(QDRANT_HOST, QDRANT_PORT)
+        self.qdrant_client = qdrant_client
 
         # Загркзка json из Mongo
         records, multipliers = load_json()
@@ -56,7 +56,7 @@ class RagClient:
         file_paths = list(dir_path.glob('*'))
 
         # Вектаризация данных
-        qdrant_client.files_to_vecdb(
+        files_to_vecdb(
             files=file_paths,
             bi_encoder=bi_encoder,
             vec_size=vec_dim,
