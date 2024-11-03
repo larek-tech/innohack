@@ -29,20 +29,15 @@ class LLMClient:
         self.api_url = (
             "https://mts-aidocprocessing-case.olymp.innopolis.university/generate"
         )
-        self.bi_encoder, self.vect_dim = get_bi_encoder(BI_ENCODE_NAME)
-        self.qdrant = QdrantBase(QDRANT_HOST, QDRANT_PORT)
-        self.n_top_cos = 8
+        self.bi_encoder, self.vect_dim = get_bi_encoder("cointegrated/LaBSE-en-ru")
 
-    def clear_line(self, n: int = 1) -> None:
-        LINE_UP = "\033[1A"
-        LINE_CLEAR = "\x1b[2K"
-        for _ in range(n):
-            print(LINE_UP, end=LINE_CLEAR, flush=True)
+        self.n_top_cos = 2
+        self.n_top_cos_question = 7
 
     def get_response(self, prompt):
 
-        top_chunks, top_files = self.qdrant.vec_search(
-            self.bi_encoder, prompt, self.n_top_cos
+        top_chunks, top_files = vec_search(
+            self.bi_encoder, prompt, self.n_top_cos, self.n_top_cos_question
         )
         top_chunks_join = "\n".join(top_chunks)
         logger.info(top_chunks)
