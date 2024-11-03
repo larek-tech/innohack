@@ -34,7 +34,7 @@ def extract_tables(pdf_paths: list[str]):
         print(reports)
         report_saver.save_reports_to_excel(reports)
 
-    result.append(pdf_tables)
+        result.append(reports)
     return result
   
 def main():
