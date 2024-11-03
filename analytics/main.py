@@ -5,6 +5,7 @@ import grpc
 
 from analytics import analytics_pb2, analytics_pb2_grpc
 from process.process import preprocess_xlsx
+from process.form_graphs import get_analitics_report
 
 
 class Analytics(analytics_pb2_grpc.AnalyticsServicer):
@@ -14,7 +15,7 @@ class Analytics(analytics_pb2_grpc.AnalyticsServicer):
 
 
     def GetCharts(self, request: analytics_pb2.Params, context: grpc.ServicerContext):
-        return analytics_pb2.Report()
+        return get_analitics_report(request)
 
     def GetDescriptionStream(
         self, request: analytics_pb2.Params, context: grpc.ServicerContext

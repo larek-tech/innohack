@@ -82,16 +82,16 @@ def preprocess_xlsx():
         for df in dfs:
             records = parse_df_to_dict(records, df, year)
 
-    metrics_for_chart = pd.concat(
-        [
-            get_liquidity(dfs, year),
-            profitability_of_sales(dfs, year),
-            profitability_of_assets(dfs, year),
-            coefficients(dfs, year),
-            coefficients_3years(dfs, year),
-        ]
-    )
-    multipliers = parse_multy_to_dict(multipliers, metrics_for_chart)
+        metrics_for_chart = pd.concat(
+            [
+                get_liquidity(dfs, year),
+                profitability_of_sales(dfs, year),
+                profitability_of_assets(dfs, year),
+                coefficients(dfs, year),
+                coefficients_3years(dfs, year),
+            ]
+        )
+        multipliers = parse_multy_to_dict(multipliers, metrics_for_chart)
 
     return records, multipliers
 
@@ -100,7 +100,6 @@ col = mongo.get_database("data").get_collection("excel")
 
 def save_data():
     records, multipliers = preprocess_xlsx()
-    print(records, multipliers)
 
     col.insert_many([records, multipliers])
 
