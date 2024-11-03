@@ -50,11 +50,9 @@ def generate_str_from_json_multy(filtered_multipliers):
     
     return " ".join(report)
 
-def form_report_description(request: analytics_pb2.Params):
-    records, multipliers = load_json()
-
-    start_date = int(request.start_date)
-    end_date = int(request.end_date)
+def form_report_description(records: dict, multipliers: dict, start_date: str, end_date: str):
+    start_date = int(start_date)
+    end_date = int(end_date)
 
     filtered_records = {}
     for code, years_data in records.items():
@@ -73,15 +71,3 @@ def form_report_description(request: analytics_pb2.Params):
     multy_report = get_multy_analysis(generate_str_from_json_multy(filtered_multipliers))
     return multy_report
 
-def main():
-    request = analytics_pb2.Params(
-        query_id=1,
-        start_date="2011",
-        end_date="2024",
-        prompt=""
-    )
-    
-    resp = form_report_description(request)
-    print(resp)
-
-main()
