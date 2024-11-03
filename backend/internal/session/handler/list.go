@@ -7,6 +7,15 @@ import (
 	"github.com/larek-tech/innohack/backend/internal/shared"
 )
 
+// ListSessions godoc
+//
+//	@Summary		Получение списка сессий
+//	@Description	Получение списка сессий
+//	@Tags			session
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	[]model.Session
+//	@Router			/api/session/list [get]
 func (h *Handler) ListSessions(c *fiber.Ctx) error {
 	userID, err := strconv.ParseInt(c.Locals(shared.UserIDKey).(string), 10, 64)
 	if err != nil {

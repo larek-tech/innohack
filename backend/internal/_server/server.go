@@ -31,6 +31,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 
+	"github.com/gofiber/swagger"
 	"github.com/larek-tech/innohack/backend/config"
 	"github.com/larek-tech/innohack/backend/pkg/grpc_client"
 	"github.com/larek-tech/innohack/backend/pkg/storage/postgres"
@@ -72,6 +73,7 @@ func New(cfg config.Config) Server {
 	app.Use(recovermw.New())
 
 	app.Get("/health", healtCheckHandler(uuid.NewString()))
+	app.Get("/swagger/*", swagger.HandlerDefault) // default
 
 	exporter := tracing.MustNewExporter(context.Background(), cfg.Jaeger.URL())
 	provider := tracing.MustNewTraceProvider(exporter, "chat")

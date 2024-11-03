@@ -16,28 +16,15 @@ type ChartReport struct {
 	Charts      []Chart      `json:"charts"`
 	Multipliers []Multiplier `json:"multipliers"`
 	Description string       `json:"description"`
-	StartDate   time.Time    `json:"startDate"`
-	EndDate     time.Time    `json:"endDate"`
+	StartDate   int          `json:"startDate"`
+	EndDate     int          `json:"endDate"`
 }
 
 type Chart struct {
-	Title       string    `json:"title"`
-	Records     []Record  `json:"records"`     // для отрисовки графа
-	Type        ChartType `json:"type"`        // пока что bar chart
-	Description string    `json:"description"` // llm response TODO: возможно, не получится
-}
-
-func (c Chart) GetType() string {
-	switch c.Type {
-	case BarChart:
-		return "bar"
-	case PieChart:
-		return "pie"
-	case LineChart:
-		return "line"
-	default:
-		panic(fmt.Sprintf("unexpected model.ChartType: %#v", c.Type))
-	}
+	Title       string   `json:"title"`
+	Records     []Record `json:"records"`     // для отрисовки графа
+	Type        string   `json:"type"`        // пока что bar chart
+	Description string   `json:"description"` // llm response TODO: возможно, не получится
 }
 
 func ChartFromPb(in *pb.Chart) Chart {
@@ -50,7 +37,7 @@ func ChartFromPb(in *pb.Chart) Chart {
 	return Chart{
 		Title:       in.GetTitle(),
 		Records:     records,
-		Type:        ChartType(in.GetType()),
+		Type:        ChartType(in.GetType()).ToString(),
 		Description: in.GetDescription(),
 	}
 }
@@ -63,6 +50,19 @@ const (
 	PieChart
 	LineChart
 )
+
+func (t ChartType) ToString() string {
+	switch t {
+	case BarChart:
+		return "bar"
+	case PieChart:
+		return "pie"
+	case LineChart:
+		return "line"
+	default:
+		panic(fmt.Sprintf("unexpected model.ChartType: %#v", t))
+	}
+}
 
 type Record struct {
 	X string  `json:"x"` // формат: квартал - год

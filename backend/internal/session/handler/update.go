@@ -8,6 +8,17 @@ import (
 	"github.com/larek-tech/innohack/backend/internal/shared"
 )
 
+// UpdateSessionTitle godoc
+//
+// @Summary		Обновление названия сессии
+// @Description	Обновление названия сессии
+// @Tags			session
+// @Accept			json
+// @Produce		json
+// @Param			session_id	path	string	true	"ID сессии в формате UUID"
+// @Param			title		path	string	true	"Название сессии"
+// @Success		200
+// @Router			/api/session/{session_id}/{title} [put]
 func (h *Handler) UpdateSessionTitle(c *fiber.Ctx) error {
 	userID, err := strconv.ParseInt(c.Locals(shared.UserIDKey).(string), 10, 64)
 	if err != nil {

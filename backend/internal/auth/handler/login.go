@@ -5,6 +5,16 @@ import (
 	"github.com/larek-tech/innohack/backend/internal/auth/model"
 )
 
+// Login godoc
+//
+//	@Summary		Login
+//	@Description	Логин пользователя
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		model.LoginReq	true	"Запрос на логин"
+//	@Success		200		{object}	model.TokenResp
+//	@Router			/auth/login [post]
 func (h *Handler) Login(c *fiber.Ctx) error {
 	var req model.LoginReq
 

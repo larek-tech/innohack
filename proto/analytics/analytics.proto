@@ -21,8 +21,8 @@ message DescriptionReport {
 };
 
 message Filter {
-    string start_date = 1;
-    string end_date = 2;
+    int64 start_date = 1;
+    int64 end_date = 2;
 };
 
 message ChartReport {
