@@ -1,4 +1,4 @@
-import json
+import datetime as dt
 from analytics import analytics_pb2, analytics_pb2_grpc
 from process.const import CODE_NAME, MULTYPLIER_NAME
 import math
@@ -68,7 +68,7 @@ def count_records_percentage(
 
 
 def form_graph_info(
-    records: dict, multipliers: dict, request: analytics_pb2.Params
+    records: dict, multipliers: dict, request: analytics_pb2.Filter
 ) -> list[analytics_pb2.Chart]:
     charts = []
     start_date = request.start_date
@@ -544,6 +544,8 @@ def get_analitics_report(request: analytics_pb2.Filter) -> analytics_pb2.ChartRe
     return_multy = []
     if request.start_date == request.end_date:
         for k, v in multipliers.items():
+            if k == "_id":
+                continue
             year = str(request.start_date)
             value = v.get(str(year), None)
             if value is not None and not math.isnan(value):

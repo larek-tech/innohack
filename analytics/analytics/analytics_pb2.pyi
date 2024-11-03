@@ -39,9 +39,9 @@ class Filter(_message.Message):
     __slots__ = ("start_date", "end_date")
     START_DATE_FIELD_NUMBER: _ClassVar[int]
     END_DATE_FIELD_NUMBER: _ClassVar[int]
-    start_date: str
-    end_date: str
-    def __init__(self, start_date: _Optional[str] = ..., end_date: _Optional[str] = ...) -> None: ...
+    start_date: int
+    end_date: int
+    def __init__(self, start_date: _Optional[int] = ..., end_date: _Optional[int] = ...) -> None: ...
 
 class ChartReport(_message.Message):
     __slots__ = ("charts", "multipliers", "description")

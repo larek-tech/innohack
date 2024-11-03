@@ -9,8 +9,8 @@ import (
 
 func (ctrl *Controller) GetCharts(ctx context.Context, filter model.Filter) (model.ChartReport, error) {
 	report, err := ctrl.analytics.GetCharts(ctx, &pb.Filter{
-		StartDate: filter.StartDate.String(),
-		EndDate:   filter.EndDate.String(),
+		StartDate: int64(filter.StartDate.Year()),
+		EndDate:   int64(filter.EndDate.Year()),
 	})
 	if err != nil {
 		return model.ChartReport{}, err
@@ -21,8 +21,8 @@ func (ctrl *Controller) GetCharts(ctx context.Context, filter model.Filter) (mod
 
 	res := model.ChartReport{
 		Description: report.GetDescription(),
-		StartDate:   filter.StartDate,
-		EndDate:     filter.EndDate,
+		StartDate:   filter.StartDate.Year(),
+		EndDate:     filter.EndDate.Year(),
 		Charts:      make([]model.Chart, len(charts)),
 		Multipliers: make([]model.Multiplier, len(multipliers)),
 	}
