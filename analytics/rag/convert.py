@@ -1,36 +1,8 @@
-# import json
-# from loguru import logger
-
-
-# def format_data(data):
-#     result = ""
-#     # Извлекаем ключ и значения
-#     keys = list(data.keys())
-#     for key in keys:
-#         values = data[key]
-#         logger.info(key)
-#         # Формируем строку
-#         result += f" Показатель {key} "
-#         for year, value in values.items():
-#             result += f"в {year} году имел значение {value}, "
-        
-#         # Убираем последнюю запятую и пробел
-#         # result += result.rstrip(', ')
-    
-#     return result
-
-# if __name__ == "__main__":
-#     js_ph = "records.json"
-#     with open(js_ph, 'r', encoding='utf-8') as file:
-#         json_data = json.load(file)
-#     print(format_data(json_data))
-
-
 import json
 import random
 from loguru import logger
 
-from const import CODE_NAME
+from rag.const_data import CODE_NAME
 
 
 
@@ -67,6 +39,8 @@ def format_data(data):
     # Извлекаем ключ и значения
     keys = list(data.keys())
     for key in keys:
+        if key == "_id":
+            continue
         values = data[key]
         logger.info(key)
         
@@ -75,7 +49,7 @@ def format_data(data):
         significance = random.choice(significance_phrases)
         conclusion = random.choice(conclusion_phrases)
         
-        result += f"{intro} '{CODE_NAME[int(key)]}' {significance} "
+        result += f"{intro} '{CODE_NAME[key]}' {significance} "
         result += f"В течение следующих лет его значения изменялись следующим образом: "
         
         for year, value in values.items():

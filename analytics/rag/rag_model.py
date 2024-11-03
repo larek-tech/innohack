@@ -1,10 +1,12 @@
 from pathlib import Path
 
+from loguru import logger
+
 from rag.minio_client import MinioClient
 from rag.db import QdrantBase
 from rag.utils.bi_encode import get_bi_encoder
 from rag.model import LLMClient
-
+from rag.convert import format_data
 from rag.config import (
     MINIO_HOST, 
     MINIO_ACCESS_KEY, 
@@ -16,6 +18,11 @@ from rag.config import (
     CHUNK_SIZE
 )
 
+
+from process.form_graphs import load_json
+
+
+
 class RagClient:
 
     llm_client = LLMClient()
@@ -24,6 +31,20 @@ class RagClient:
 
         # minio_client = MinioClient(MINIO_HOST, MINIO_ACCESS_KEY, MINIO_SECRET_KEY)
         qdrant_client = QdrantBase(QDRANT_HOST, QDRANT_PORT)
+
+        # Загркзка json из Mongo
+        records, multipliers = load_json()
+
+        logger.info(records)
+
+        new_records = format_data(records)
+        new_multipliers = format_data(multipliers)
+        dir_path = str(Path(__file__).parent  / "data")
+        with open(dir_path + "/new_records.txt", 'w', encoding='utf-8') as file:
+            file.write(new_records)
+
+        with open(dir_path + "/multipliers.txt", 'w', encoding='utf-8') as file:
+            file.write(new_multipliers)
 
         bi_encoder, vec_dim = get_bi_encoder(BI_ENCODE_NAME)
 
