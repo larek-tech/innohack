@@ -33,7 +33,8 @@ class LLMClient:
             return random.choice(vars)
 
         # MultiQwestion stage
-        questions = get_qwestions(prompt)
+        # questions = get_qwestions(prompt)
+        questions = [prompt]
 
         # Find chunks stage
         top_chunks = vec_search(
@@ -41,7 +42,7 @@ class LLMClient:
             prompt,
             self.n_top_cos,
         )
-        logger.info(top_chunks)
+        # logger.info(top_chunks)
         top_query_chank = []
         for question in questions:
             top_query_chank += vec_search_qwery(
@@ -54,15 +55,14 @@ class LLMClient:
         # ReRanking stage
         top_merge_chunks = top_chunks + top_query_chank
 
-        logger.info(top_merge_chunks)
+        # logger.info(top_merge_chunks)
 
-        reranked_chunks = rerank_documents(
-            prompt,
-            top_merge_chunks,
-        )
+        # reranked_chunks = rerank_documents(
+        #     prompt,
+        #     top_merge_chunks,
+        # )
 
-        reranked_chunks_joint = "\n".join(reranked_chunks)
-        logger.info(f"\n\n\n\n{reranked_chunks_joint}")
+        reranked_chunks_joint = "\n".join(top_merge_chunks)
         # Generate Stage
         content = f"""
             Используй только следующий контекст, чтобы ответить на вопрос.
