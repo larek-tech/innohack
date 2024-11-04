@@ -23,6 +23,12 @@ services:
       - QDRANT__SERVICE__API_KEY=z)A(nE5<77mi^4L*V_;F(:-u|Lay&Ho6[jk%Sb6/&s1vK#-v(m
     volumes:
       - ./data/qdrant_data:/qdrant/storage
+  ml:
+    build:
+      context: ../analytics/
+      dockerfile: Dockerfile
+    ports:
+      - "9990:9990"
   ui:
     image: ghcr.io/larek-tech/innohack/ui:dev-79cc33a
     build:
