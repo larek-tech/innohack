@@ -249,4 +249,4 @@ def main():
     resp = get_analitics_report(request)
     print(resp)
 
-main()
+# main()
