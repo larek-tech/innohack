@@ -81,7 +81,7 @@ def form_group_chart(records: dict, codes: list[int], start_date: int, end_date:
                 new_chart = analytics_pb2.Chart(
                     color=color,
                     type=chart_type,
-                    records=count_records_percentage(recs)
+                    records=recs
                 )
             else:
                 new_chart = analytics_pb2.Chart(
@@ -111,7 +111,7 @@ def form_group_chart_multy(records: dict, m_keys: list[str], start_date: int, en
                 new_chart = analytics_pb2.Chart(
                     color=color,
                     type=chart_type,
-                    records=count_records_percentage(recs)
+                    records=recs
                 )
             else:
                 new_chart = analytics_pb2.Chart(
@@ -248,5 +248,6 @@ def main():
     )
     resp = get_analitics_report(request)
     print(resp)
+
 
 # main()
