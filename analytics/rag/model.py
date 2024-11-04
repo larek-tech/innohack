@@ -10,6 +10,8 @@ from rag.utils.bi_encode import get_bi_encoder
 from rag.db import vec_search, define_question_topic, vec_search_qwery
 from rag.multi_qwery import get_qwestions
 from rag.reranking import rerank_documents
+from rag.utils.variants_of_answer import vars
+
 
 class LLMClient:
     def __init__(self, model="llama3.2"):  # meta-llama/Llama-3.2-11B-Vision-Instruct
@@ -24,18 +26,20 @@ class LLMClient:
 
     def get_response(self, prompt):
 
+        # Classification stage, checking for compliance with the topic
+        classificator_response = define_question_topic(prompt)
+        logger.info(classificator_response)
+        if "нет" in classificator_response.lower():
+            return random.choice([vars])
+
         # MultiQwestion stage
         questions = get_qwestions(prompt)
 
-
-        # # Classification stage
-        # classificator_response = define_question_topic(prompt)
-        # if "нет" in classificator_response.lower():
-        #     return random.choice()
-
-        # Find chunks stage 
-        top_chunks= vec_search(
-            self.bi_encoder, prompt, self.n_top_cos,
+        # Find chunks stage
+        top_chunks = vec_search(
+            self.bi_encoder,
+            prompt,
+            self.n_top_cos,
         )
         logger.info(top_chunks)
         top_query_chank = []
@@ -44,7 +48,7 @@ class LLMClient:
                 self.bi_encoder,
                 question,
                 self.n_top_cos_question,
-                )
+            )
         logger.info(top_query_chank)
 
         # ReRanking stage
@@ -53,7 +57,7 @@ class LLMClient:
         logger.info(top_merge_chunks)
 
         reranked_chunks = rerank_documents(
-            prompt, 
+            prompt,
             top_merge_chunks,
         )
 
@@ -82,7 +86,7 @@ class LLMClient:
 
         max_tokens = 512
         temperature = 0.8
-        client = Client(host='http://10.92.9.164:11434')
+        client = Client(host="http://10.92.9.164:11434")
 
         response = client.chat(
             model="llama3.2",

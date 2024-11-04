@@ -45,6 +45,8 @@ if __name__ == "__main__":
     # serve()
     rag = RagClient()
 
-    promt = "Какие были активы компании в 2023 году?"
+    # prompt = "Какой был резервный капитал в 2012 и 2013 годах?"
+    prompt = "Напиши функцию на Python, которая складывает два числа"
+    # promt = "Какие были активы компании в 2023 году?"
 
-    print(rag.llm_client.get_response(promt))
+    print(rag.llm_client.get_response(prompt))
