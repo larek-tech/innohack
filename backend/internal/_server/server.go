@@ -108,16 +108,16 @@ func (s *Server) Serve() {
 	authHandler := ah.New(s.tracer, authCtrl)
 	auth.InitRoutes(s.app, authHandler)
 
-	queryRepo := cr.NewQueryRepo(s.pg)
-	respRepo := cr.NewResponseRepo(s.pg)
-	chatCtrl := cc.New(s.cfg.Server.JwtSecret, s.grpcConn.GetConn(), queryRepo, respRepo)
-	chatHandler := ch.New(s.tracer, s.cfg.Server.JwtSecret, chatCtrl)
-	chat.InitRoutes(api, chatHandler, s.cfg.Server.JwtSecret)
-
 	sessionRepo := sr.New(s.pg)
 	sessionCtrl := sc.New(sessionRepo)
 	sessionHandler := sh.New(s.tracer, sessionCtrl)
 	session.InitRoutes(api, sessionHandler, s.cfg.Server.JwtSecret, s.tracer)
+
+	queryRepo := cr.NewQueryRepo(s.pg)
+	respRepo := cr.NewResponseRepo(s.pg)
+	chatCtrl := cc.New(s.cfg.Server.JwtSecret, s.grpcConn.GetConn(), queryRepo, respRepo)
+	chatHandler := ch.New(s.tracer, s.cfg.Server.JwtSecret, chatCtrl, sessionCtrl)
+	chat.InitRoutes(api, chatHandler, s.cfg.Server.JwtSecret)
 
 	dashboardCtrl := dc.New(s.grpcConn.GetConn())
 	dashboardHandler := dh.New(s.tracer, dashboardCtrl)

@@ -111,7 +111,7 @@ class LLMClient:
             "system_prompt": system_prompt,
             "max_tokens": 512,
             "n": 1,
-            "temperature": 0.8,
+            "temperature": 0.4,
         }
 
         headers = {"Content-Type": "application/json"}

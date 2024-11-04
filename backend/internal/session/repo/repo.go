@@ -22,12 +22,9 @@ const insertSession = `
 	values ($1, $2)
 `
 
-func (r *Repo) InsertSession(ctx context.Context, sessionID uuid.UUID, userID int64) (uuid.UUID, error) {
-	err := r.pg.Query(ctx, &sessionID, insertSession, sessionID, userID)
-	if err != nil {
-		return sessionID, err
-	}
-	return sessionID, nil
+func (r *Repo) InsertSession(ctx context.Context, sessionID uuid.UUID, userID int64) error {
+	_, err := r.pg.Exec(ctx, insertSession, sessionID, userID)
+	return err
 }
 
 const getSessionByID = `

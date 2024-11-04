@@ -8,7 +8,7 @@ import (
 )
 
 type sessionRepo interface {
-	InsertSession(ctx context.Context, sessionID uuid.UUID, userID int64) (uuid.UUID, error)
+	InsertSession(ctx context.Context, sessionID uuid.UUID, userID int64) error
 	GetSessionByID(ctx context.Context, sessionID uuid.UUID) (model.Session, error)
 	GetSessionContent(ctx context.Context, sessionID uuid.UUID) ([]model.SessionContent, error)
 	ListSessions(ctx context.Context, userID int64) ([]model.Session, error)

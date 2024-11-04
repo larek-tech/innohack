@@ -25,9 +25,10 @@ type Handler struct {
 	jwtSecret string
 }
 
-func New(tracer trace.Tracer, jwtSecret string, ctrl chatController) *Handler {
+func New(tracer trace.Tracer, jwtSecret string, cc chatController, sc sessionController) *Handler {
 	return &Handler{
-		cc:        ctrl,
+		cc:        cc,
+		sc:        sc,
 		tracer:    tracer,
 		jwtSecret: jwtSecret,
 	}

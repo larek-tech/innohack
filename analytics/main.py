@@ -1,7 +1,7 @@
 import logging
 from concurrent import futures
 
-import ollama
+import time
 import grpc
 
 from analytics import analytics_pb2, analytics_pb2_grpc
@@ -10,6 +10,23 @@ from process.form_graphs import get_analitics_report
 from process.get_report_summary import form_report_description
 
 from rag.rag_model import RagClient
+
+import random
+
+
+def random_chunking(text: str, min_chunk_size: int = 1, max_chunk_size: int = 5):
+    tokens = text.split()
+
+    start_index = 0
+
+    while start_index < len(tokens):
+        chunk_size = random.randint(min_chunk_size, max_chunk_size)
+
+        end_index = min(start_index + chunk_size, len(tokens))
+
+        yield " ".join(tokens[start_index:end_index])
+
+        start_index = end_index
 
 
 class Analytics(analytics_pb2_grpc.AnalyticsServicer):
@@ -26,9 +43,11 @@ class Analytics(analytics_pb2_grpc.AnalyticsServicer):
     def GetDescriptionStream(
         self, request: analytics_pb2.Params, context: grpc.ServicerContext
     ):
-        for chunk in self.rag.llm_client.get_response(request.prompt):
+        resp = self.rag.llm_client.get_response(request.prompt)
+        for chunk in random_chunking(resp):
+            time.sleep(0.1 * random.random())
             res = analytics_pb2.DescriptionReport()
-            res.description = chunk["message"]["content"]
+            res.description = f"{chunk} "
             print(res.description)
             yield res
 
@@ -46,32 +65,4 @@ def serve():
 
 
 if __name__ == "__main__":
-    # serve()
-    rag = RagClient()
-
-    # prompt = "Какой был резервный капитал в 2012 и 2013 годах?"
-    # prompt = "Напиши функцию на Python, которая складывает два числа"
-    # promt = "Какие были активы компании в 2023 году?"
-
-    # bad_prompts = [
-    #     "Какие продукты есть в экосистеме МТС?",
-    #     "Сколько стоит отправка СМС в сети МТС?",
-    #     "Какие есть тарифы в МТС?",
-    #     "Расскажи о самом выгодном предложении в комании",
-    #     "Посоветуй, какой тариф выгоднее всего приобрести",
-    #     "Напиши код на Rust",
-    #     "Реши пример: 2 + 2 = ",
-    #     "Продолжи стих: У Лукоморья дуб зеленый",
-    #     "Что взять с собой в похож?",
-    #     "Где лучше купить сумку?",
-    # ]
-
-    good_prompts = [
-        "Какой был резервный капитал в 2012 и 2013 годах?",
-        "Какие были активы компании в 2023 году?",
-    ]
-
-    with open("result_rag.txt", "w") as file:
-        for prompt in good_prompts:
-            file.write(prompt + "\n")
-            file.write(rag.llm_client.get_response(prompt) + "\n")
+    serve()

@@ -79,7 +79,7 @@ func (h *Handler) ProcessConn(c *websocket.Conn) {
 	}
 
 	defer func() {
-		if err := h.sc.Cleanup(ctx, sessionID, userID); err != nil {
+		if err := h.sc.Cleanup(context.Background(), sessionID, userID); err != nil {
 			log.Warn().Err(err).Msg("cleanup session")
 		}
 	}()
