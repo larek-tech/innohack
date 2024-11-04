@@ -23,7 +23,16 @@ services:
       - QDRANT__SERVICE__API_KEY=z)A(nE5<77mi^4L*V_;F(:-u|Lay&Ho6[jk%Sb6/&s1vK#-v(m
     volumes:
       - ./data/qdrant_data:/qdrant/storage
-
+  ui:
+    image: ghcr.io/larek-tech/innohack/ui:dev-79cc33a
+    build:
+      context: ../ui
+      dockerfile: Dockerfile
+    environment:
+      - VITE_API_URL=http://localhost:9999
+      - VITE_WS_URL=http://localhost:9999/api/chat/ws
+    ports:
+      - "80:80"
 
   backend:
     image: ghcr.io/larek-tech/innohack/control:dev-d1e1d5a
