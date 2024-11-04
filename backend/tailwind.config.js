@@ -1,8 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./view/**/*.templ"], // this is where our templates are located
+  content: ["./**/*.templ"], // this is where our templates are located
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: colors.lime, 
+      }
+    },
   },
   plugins: [],
 }

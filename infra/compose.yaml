@@ -1,0 +1,129 @@
+volumes:
+  pg_admin:
+
+services:
+  mongo:
+    image: mongo:5.0
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/mongo_data:/data/db
+  qdrant:
+    image: qdrant/qdrant:latest
+    restart: always
+    container_name: vector_store
+    ports:
+      - 6333:6333
+      - 6334:6334
+    expose:
+      - 6333
+      - 6334
+    environment:
+      - QDRANT__SERVICE__API_KEY=z)A(nE5<77mi^4L*V_;F(:-u|Lay&Ho6[jk%Sb6/&s1vK#-v(m
+    volumes:
+      - ./data/qdrant_data:/qdrant/storage
+  ui:
+    image: ghcr.io/larek-tech/innohack/ui:dev-79cc33a
+    build:
+      context: ../ui
+      dockerfile: Dockerfile
+    environment:
+      - VITE_API_URL=http://localhost:9999
+      - VITE_WS_URL=http://localhost:9999/api/chat/ws
+    ports:
+      - "80:80"
+
+  backend:
+    image: ghcr.io/larek-tech/innohack/control:dev-d1e1d5a
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    command: ./main
+    volumes:
+      - ./config.yaml:/root/config/config.yaml
+    ports:
+      - "9999:9999"
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "4000:3000"
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_ADMIN_USER:-cisco}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_ADMIN_PASSWORD:-cisco}
+    volumes:
+      - ./grafana:/etc/grafana/provisioning/datasources
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yaml"
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - ./data/prom:/prometheus
+
+  jaeger:
+    image: jaegertracing/all-in-one
+    container_name: jaeger
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "5775:5775"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "14250:14250"
+      - "9411:9411"
+      - "4317:4317"
+      - "4318:4318"
+
+  pg:
+    image: postgres:17
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-cisco}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-cisco}
+      - POSTGRES_DB=${POSTGRES_DB:-inno-dev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/pg:/var/lib/postgresql/data
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - pg_admin:/var/lib/pgadmin
+    ports:
+      - "8888:80"
+
+  minio:
+   image: minio/minio:latest
+   command: server --console-address ":9001" /data/
+   ports:
+     - "9000:9000"
+     - "9001:9001"
+   environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-cisco}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_USER:-ciscocisco}
+   volumes:
+     - ./data/minio:/data
+     - ./minio/config.json:/root/.minio/config.json
+   healthcheck:
+     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+     interval: 30s
+     timeout: 20s
+     retries: 3

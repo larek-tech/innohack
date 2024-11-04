@@ -1,21 +1,21 @@
 package main
 
 import (
+	"time"
+
 	"github.com/larek-tech/innohack/backend/config"
-	"github.com/larek-tech/innohack/backend/internal/server"
+	_ "github.com/larek-tech/innohack/backend/docs"
+	server "github.com/larek-tech/innohack/backend/internal/_server"
 )
 
+// @title			MTS AI Docs
+// @version		1.0
+// @description	Документация для сервиса решения команды MISIS Banach Space к задаче MTS AI Docs.
+// @host			localhost:9999
+// @BasePath		/
 func main() {
-	cfg, err := config.LoadConfig("./config/config.yaml")
-	if err != nil {
-		panic(err)
-	}
-	srv, err := server.New(cfg.Server)
-	if err != nil {
-		panic(err)
-	}
-	err = srv.Serve()
-	if err != nil {
-		panic(err)
-	}
+	time.LoadLocation("Europe/Moscow")
+	cfg := config.MustNewConfig("./config/config.yaml")
+	srv := server.New(cfg)
+	srv.Serve()
 }

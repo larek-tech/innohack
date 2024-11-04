@@ -1,0 +1,60 @@
+syntax="proto3";
+
+package analytics;
+
+option go_package="internal/analytics/pb";
+
+service Analytics {
+    rpc GetCharts(Filter) returns (ChartReport) {};
+    rpc GetDescriptionStream(Params) returns (stream DescriptionReport) {};
+};
+
+message Params {
+    int64 query_id = 1;
+    string prompt = 2;
+};
+
+message DescriptionReport {
+    repeated string sources = 1;
+    repeated string filenames = 2;
+    string description = 3;
+};
+
+message Filter {
+    int64 start_date = 1;
+    int64 end_date = 2;
+};
+
+message ChartReport {
+    map<string, ListChartsLegend> info = 1;
+    repeated Multiplier multipliers = 2;
+    string summary = 3;
+};
+
+message ListChartsLegend {
+    repeated Chart charts = 1;
+    map<string, string> legend = 2;
+}
+
+message Chart {
+    string color = 1;
+    ChartType type = 2;
+    repeated Record records = 3;
+};
+
+enum ChartType {
+    UNDEFINED = 0;
+    BAR_CHART = 1;
+    PIE_CHART = 2;
+    LINE_CHART = 3;
+};
+
+message Multiplier {
+    string key = 1;
+    double value = 2;
+};
+
+message Record {
+    string x = 1;
+    double y = 2;
+};

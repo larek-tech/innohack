@@ -1,3 +1,9 @@
 tmp/
 .vscode
 .idea/
+infra/data/
+.venv
+.DS_Store
+__pycache__
+*.xlsx
+*.docx

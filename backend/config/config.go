@@ -2,18 +2,24 @@ package config
 
 import (
 	"github.com/ilyakaznacheev/cleanenv"
-	"github.com/larek-tech/innohack/backend/internal/server"
+	server "github.com/larek-tech/innohack/backend/internal/_server/config"
+
+	"github.com/larek-tech/innohack/backend/pkg/grpc_client"
+	"github.com/larek-tech/innohack/backend/pkg/storage/postgres"
+	"github.com/larek-tech/innohack/backend/pkg/tracing"
 )
 
 type Config struct {
-	Server *server.Config `yaml:"http"`
+	Server    *server.Config      `yaml:"server"`
+	Postgres  *postgres.Config    `yaml:"postgres"`
+	Jaeger    *tracing.Config     `yaml:"jaeger"`
+	Analytics *grpc_client.Config `yaml:"analytics"`
 }
 
-func LoadConfig(path string) (*Config, error) {
+func MustNewConfig(path string) Config {
 	var cfg Config
-	err := cleanenv.ReadConfig(path, &cfg)
-	if err != nil {
-		return nil, err
+	if err := cleanenv.ReadConfig(path, &cfg); err != nil {
+		panic(err)
 	}
-	return &cfg, nil
+	return cfg
 }
