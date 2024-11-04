@@ -1,7 +1,6 @@
 import logging
 from concurrent import futures
 
-import time
 import grpc
 
 from analytics import analytics_pb2, analytics_pb2_grpc
@@ -43,13 +42,9 @@ class Analytics(analytics_pb2_grpc.AnalyticsServicer):
     def GetDescriptionStream(
         self, request: analytics_pb2.Params, context: grpc.ServicerContext
     ):
-        resp = self.rag.llm_client.get_response(request.prompt)
-        for chunk in random_chunking(resp):
-            time.sleep(0.1 * random.random())
-            res = analytics_pb2.DescriptionReport()
-            res.description = f"{chunk} "
-            print(res.description)
-            yield res
+        res = analytics_pb2.DescriptionReport()
+        res.description = self.rag.llm_client.get_response(request.prompt)
+        yield res
 
 
 logging.basicConfig(level=logging.INFO)
