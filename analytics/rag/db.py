@@ -18,8 +18,8 @@ qdrant_client = QdrantClient(
 )  # https://qdrant.larek.tech
 
 
-COLL_NAME = "test_chuncks"
-COLL_QUESTION_NAME = "test_questions_chuncks"
+COLL_NAME = "test_chuncks_1"
+COLL_QUESTION_NAME = "test_questions_chuncks_1"
 
 
 def get_questions_for_chunk(chunk_text: str) -> str:

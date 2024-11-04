@@ -16,9 +16,9 @@ from rag.utils.variants_of_answer import vars
 class LLMClient:
     def __init__(self, model="llama3.2"):  # meta-llama/Llama-3.2-11B-Vision-Instruct
         self.model = model
-        # self.api_url = (
-        #     "https://mts-aidocprocessing-case.olymp.innopolis.university/generate"
-        # )
+        self.api_url = (
+            "https://mts-aidocprocessing-case.olymp.innopolis.university/generate"
+        )
         self.bi_encoder, self.vect_dim = get_bi_encoder("cointegrated/LaBSE-en-ru")
 
         self.n_top_cos = 2
@@ -67,8 +67,7 @@ class LLMClient:
         content = f"""
             Используй только следующий контекст, чтобы ответить на вопрос.
             Не пытайся выдумывать ответ.
-            Не отвечай на вопросы, не связанные с финансами.
-            Не отвечай на вопросы, не связанные с финансами.
+            Не отвечай на вопросы, не связанные с финансами. Численные ответы пиши в тысячах рублей.
             Контекст:
             ===========
             {reranked_chunks_joint}
@@ -86,24 +85,44 @@ class LLMClient:
 
         max_tokens = 512
         temperature = 0.8
-        client = Client(host="http://10.92.9.164:11434")
 
-        response = client.chat(
-            model="llama3.2",
-            messages=[
-                {
-                    "role": "user",
-                    "content": content,
-                },
-            ],
-            options={
-                "system_prompt": system_prompt,
-                "max_tokens": max_tokens,
-                "temperature": temperature,
-            },
-        )
+        # client = Client(host="http://localhost:11434")
 
-        return response["message"]["content"]
+        # response = client.chat(
+        #     model="llama3.1:8b-instruct-q8_0",
+        #     messages=[
+        #         {
+        #             "role": "user",
+        #             "content": content,
+        #         },
+        #     ],
+        #     options={
+        #         "system_prompt": system_prompt,
+        #         "max_tokens": max_tokens,
+        #         "temperature": temperature,
+        #     },
+        # )
+
+        # return response["message"]["content"]
+
+        data = {
+            "prompt": content,
+            "apply_chat_template": True,
+            "system_prompt": system_prompt,
+            "max_tokens": 512,
+            "n": 1,
+            "temperature": 0.8,
+        }
+
+        headers = {"Content-Type": "application/json"}
+
+        response = requests.post(self.api_url, data=json.dumps(data), headers=headers)
+
+        if response.status_code == 200:
+            logger.info(response.json())
+            return response.json()
+        else:
+            return f"Error: {response.status_code} - {response.text}"
 
 
 # Пример использования
