@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send } from 'lucide-react';
+import { Send, Plus } from 'lucide-react'; // Import Plus icon for the New Chat button
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -11,7 +11,6 @@ import { LOCAL_STORAGE_KEY } from '@/auth/AuthProvider';
 import ChatSessionService from '@/api/ChatSessionService';
 import { SessionDto, QueryDto, ResponseDto, SessionContentDto } from '@/api/models';
 import Markdown from 'react-markdown';
-
 
 interface ChatMessage {
     data: ResponseDto;
@@ -52,10 +51,11 @@ const chatMessage = (msg: ChatMessage, index: number) => (
     </div>
 );
 
-const ChatInterface = observer((sessionId: string) => {
+const ChatInterface = observer(() => {
     const navigate = useNavigate();
-    const sessionIdNumber = Number(sessionId);
     const { toast } = useToast();
+    const [sessionId, setSessionId] = useState<string | null>(null);
+    const [sessions, setSessions] = useState<SessionDto[]>([]);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputMessage, setInputMessage] = useState('');
     const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -68,10 +68,29 @@ const ChatInterface = observer((sessionId: string) => {
         }
     }, [messages]);
 
+    useEffect(() => {
+        // Fetch sessions from server; if none exist, create a new session
+        if (sessions.length === 0) {
+            ChatSessionService.getSessions().then((response) => {
+                setSessions(response);
+                if (response.length === 0) {
+                    createNewSession();
+                } else {
+                    setSessionId(response[0].id);
+                }
+            }).catch((err) => {
+                toast({
+                    title: 'Error',
+                    description: err.message,
+                });
+            });
+        }
+    }, [sessions.length]);
+
     // Load initial messages from the server
     useEffect(() => {
-        if (sessionIdNumber) {
-            ChatSessionService.getSessionContent(sessionIdNumber).then((res) => {
+        if (sessionId != null) {
+            ChatSessionService.getSessionContent(sessionId).then((res) => {
                 const initialMessages = mapSessionContentDtoToMessages(res);
                 setMessages(initialMessages);
             }).catch((err) => {
@@ -79,29 +98,15 @@ const ChatInterface = observer((sessionId: string) => {
                     title: 'Error',
                     description: err.message,
                 });
-                ChatSessionService.createSession().then((res) => {
-                    const newChatId = res.id;
-                    toast({
-                        title: 'Chat Created',
-                        description: `Chat with ID ${newChatId} created.`,
-                    });
-                    navigate({ to: `/chat/${newChatId}` });
-                    window.location.reload();
-                }).catch((err) => {
-                    toast({
-                        title: 'Error',
-                        description: err.message,
-                    });
-                    navigate({ to: '/' });
-                });
+                createNewSession();
             });
         }
-    }, [sessionIdNumber]);
+    }, [sessionId]);
 
     // Initialize WebSocket and handle incoming messages
     useEffect(() => {
-        if (sessionIdNumber) {
-            const ws = new WebSocket(`${WS_URL}/${sessionIdNumber}`);
+        if (sessionId != null) {
+            const ws = new WebSocket(`${WS_URL}/${sessionId}`);
             setSocket(ws);
 
             const req: QueryDto = {
@@ -142,7 +147,28 @@ const ChatInterface = observer((sessionId: string) => {
                 ws.close();
             };
         }
-    }, [sessionIdNumber]);
+    }, [sessionId]);
+
+    // Function to create a new chat session
+    const createNewSession = () => {
+        ChatSessionService.createSession().then((res) => {
+            const newChatId = res.id;
+            toast({
+                title: 'Chat Created',
+                description: `Chat with ID ${newChatId} created.`,
+            });
+            navigate({ to: `/chat/${newChatId}` });
+            // Optionally update the sessions list
+            setSessions((prevSessions) => [...prevSessions, res]);
+            setSessionId(newChatId);
+        }).catch((err) => {
+            toast({
+                title: 'Error',
+                description: err.message,
+            });
+            navigate({ to: '/' });
+        });
+    };
 
     const handleSendMessage = () => {
         const req: QueryDto = {
@@ -176,6 +202,15 @@ const ChatInterface = observer((sessionId: string) => {
 
     return (
         <div className="flex flex-col flex-grow w-full h-full">
+            {/* Header Section with "New Chat" Button */}
+            <div className="flex justify-between items-center p-4 border-b">
+                <h2 className="text-xl font-semibold">Chat Interface</h2>
+                <Button onClick={createNewSession} variant="outline">
+                    <Plus className="w-4 h-4 mr-2" />
+                    New Chat
+                </Button>
+            </div>
+
             <ScrollArea className="flex-grow p-4 space-y-4" ref={scrollAreaRef}>
                 {messages.map((message, index) => chatMessage(message, index))}
             </ScrollArea>

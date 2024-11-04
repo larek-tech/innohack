@@ -13,7 +13,7 @@ function RouteComponent() {
   return <RequireAuth>
     <div className="flex h-screen w-full">
       <AppSidebar />
-      <ChatInterface sessionId={{ sessionId: "123" }} />
+      <ChatInterface sessionId="123" />
     </div>
   </RequireAuth>
 }
