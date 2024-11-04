@@ -24,6 +24,11 @@
 - `GetCharts` - построение графиков по финансовым документов.
 - `GetDescriptionStream` - получение ответов на запросы в чате, с генерацией по токенам.
 
+запуск сервиса
+```bash
+docker compose -f infra/compose.yaml up -d --build  
+```
+
 ## Стек технологий
 
 ### Backend
