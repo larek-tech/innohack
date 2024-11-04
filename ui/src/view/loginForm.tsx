@@ -36,7 +36,7 @@ export function LoginForm() {
         setLoading(true);
 
         auth.login({ email: email, password }, () => {
-            navigate({ from, to: "/" })
+            navigate({ from, to: "/chat" })
         })
             .catch(() => {
                 toast({

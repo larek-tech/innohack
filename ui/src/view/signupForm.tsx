@@ -38,7 +38,7 @@ export function SignUp() {
         setLoading(true);
 
         auth.signup({ email: email, password }, () => {
-            navigate({ from, to: "/" })
+            navigate({ from, to: "/chat" })
         })
             .catch(() => {
                 toast({

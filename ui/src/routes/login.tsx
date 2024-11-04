@@ -9,5 +9,5 @@ export const Route = createFileRoute('/login')({
 
 function RouteComponent() {
     return <LoginForm />
-    
+
 }

@@ -18,20 +18,15 @@ import { ChatSessionList } from "@/components/chatSessionList";
 // Menu items
 const items = [
   {
-    title: "Home",
+    title: "Дашборд",
     url: "/dash",
     icon: ChartNoAxesCombined,
   },
   {
-    title: "Chat",
+    title: "Чат",
     url: "/chat",
     icon: MessagesSquare,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
+  }
 ];
 
 export function AppSidebar() {
@@ -51,7 +46,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>misis banch space</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
