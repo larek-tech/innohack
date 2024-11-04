@@ -1,6 +1,6 @@
-import { QueryDto, ResponseDto } from "@/api/models";
-import { LOCAL_STORAGE_KEY } from "@/auth/AuthProvider";
-import { makeAutoObservable, runInAction } from "mobx";
+import { ResponseDto } from "@/api/models";
+
+import { makeAutoObservable } from "mobx";
 
 export class RootStore {
 

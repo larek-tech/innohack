@@ -1,4 +1,4 @@
-import { Calendar, ChartNoAxesCombined, MessagesSquare } from "lucide-react";
+import { ChartNoAxesCombined, MessagesSquare } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -18,20 +18,15 @@ import { ChatSessionList } from "@/components/chatSessionList";
 // Menu items
 const items = [
   {
-    title: "Home",
+    title: "Дашборд",
     url: "/dash",
     icon: ChartNoAxesCombined,
   },
   {
-    title: "Chat",
+    title: "Чат",
     url: "/chat",
     icon: MessagesSquare,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
+  }
 ];
 
 export function AppSidebar() {
@@ -48,10 +43,10 @@ export function AppSidebar() {
   }, [isChatPage]);
 
   return (
-    <Sidebar>
+    <Sidebar className="w-">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>misis banch space</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (

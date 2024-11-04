@@ -5,7 +5,7 @@ import { Search, BarChart, PieChart, TrendingUp, Building } from "lucide-react"
 
 export const Landing = () => {
     return (
-        <div className="flex flex-col min-h-screen" >
+        <div className="flex flex-col min-h-screen">
             <header className="px-4 lg:px-6 h-14 flex items-center">
                 <Link className="flex items-center justify-center" href="#">
                     <Building className="h-6 w-6" />
@@ -24,7 +24,7 @@ export const Landing = () => {
                 </nav>
             </header>
             <main className="flex-1">
-                <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
+                <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 flex justify-center items-center">
                     <div className="container px-4 md:px-6">
                         <div className="flex flex-col items-center space-y-4 text-center">
                             <div className="space-y-2">
@@ -47,7 +47,7 @@ export const Landing = () => {
                         </div>
                     </div>
                 </section>
-                <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
+                <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800 flex justify-center items-center">
                     <div className="container px-4 md:px-6">
                         <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-center mb-12">Ключевые Функции</h2>
                         <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3">
@@ -75,7 +75,7 @@ export const Landing = () => {
                         </div>
                     </div>
                 </section>
-                <section className="w-full py-12 md:py-24 lg:py-32">
+                <section className="w-full py-12 md:py-24 lg:py-32 flex justify-center items-center">
                     <div className="container px-4 md:px-6">
                         <div className="grid gap-10 lg:grid-cols-2 items-center">
                             <div className="space-y-4">
@@ -90,7 +90,7 @@ export const Landing = () => {
                         </div>
                     </div>
                 </section>
-                <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
+                <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800 flex justify-center items-center">
                     <div className="container px-4 md:px-6">
                         <div className="flex flex-col items-center justify-center space-y-4 text-center">
                             <div className="space-y-2">
@@ -105,7 +105,6 @@ export const Landing = () => {
                                 <Link to="/signup">
                                     <Button className="w-full" size="lg">
                                         Начать
-
                                     </Button>
                                 </Link>
                             </div>
@@ -124,6 +123,6 @@ export const Landing = () => {
                     </Link>
                 </nav>
             </footer>
-        </div >
+        </div>
     )
 }

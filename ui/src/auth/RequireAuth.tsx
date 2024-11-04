@@ -1,7 +1,7 @@
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { useAuth } from '.';
 import { useNavigate } from '@tanstack/react-router'
-import { AppSidebar } from '@/components/app-sidebar';
+
 
 
 export function RequireAuth({ children }: { children: JSX.Element }) {
@@ -16,6 +16,6 @@ export function RequireAuth({ children }: { children: JSX.Element }) {
     }
 
     return <SidebarProvider>
-        { children }
+        {children}
     </SidebarProvider>;
 }

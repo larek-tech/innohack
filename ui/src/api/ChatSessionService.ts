@@ -15,7 +15,7 @@ class ChatSessionService {
         return response
     }
 
-    public async getSessionContent(sessionId: number) {
+    public async getSessionContent(sessionId: string) {
         const response = await get<SessionContentDto[]>(`${API_URL}/api/session/${sessionId}`);
         return response
     }

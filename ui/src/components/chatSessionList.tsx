@@ -16,13 +16,13 @@ interface ChatSessionListProps {
 export function ChatSessionList({ sessions }: ChatSessionListProps) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Chat Sessions</SidebarGroupLabel>
+      <SidebarGroupLabel>История чата</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           {sessions.map((session) => (
             <SidebarMenuItem key={session.id}>
               <SidebarMenuButton asChild>
-                <Link to={`/chat/${session.id}`}>
+                <Link to={`/chat?sessionId=${session.id}`}>
                   <span>{session.title}</span>
                 </Link>
               </SidebarMenuButton>

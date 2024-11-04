@@ -17,6 +17,7 @@ export interface SignUpParams {
 export interface QueryDto {
     id: number
     prompt: string
+    // @ts-ignore
     createdAt: Date
 }
 
@@ -38,24 +39,10 @@ export interface SessionContentDto {
 }
 
 
-
-export interface Record {
-    x: string
-    y: number
-}
-
-export interface Chart {
-    title: string
-    records: Record[]
-    type: string // pie, chart, bar
-    description: string
-}
-
 export interface Multiplier {
     key: string
     value: number
 }
-
 
 
 export interface ResponseDto {
@@ -68,4 +55,39 @@ export interface ResponseDto {
     createdAt: Date
     error: string
     isLast: boolean
+}
+
+export interface Record {
+    x: string;
+    y: number;
+}
+
+export interface Chart {
+    color: string;
+    records: Record[];
+    type: string; // pie, chart, bar
+}
+
+export interface Legend {
+    [key: string]: string;
+}
+
+export interface Info {
+    charts: Chart[];
+    legend: Legend;
+}
+
+export interface ChartReport {
+    summary: string;
+    info: {
+        [key: string]: Info;
+    };
+    multipliers: Multiplier[];
+    startDate: number;
+    endDate: number;
+}
+
+export interface Multiplier {
+    key: string;
+    value: number;
 }

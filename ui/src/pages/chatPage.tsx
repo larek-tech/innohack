@@ -6,20 +6,22 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { observer } from 'mobx-react-lite';
 import { useToast } from '@/hooks/use-toast';
 import { WS_URL } from '@/config';
-import { Route, useNavigate, useParams } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { LOCAL_STORAGE_KEY } from '@/auth/AuthProvider';
 import ChatSessionService from '@/api/ChatSessionService';
 import { SessionDto, QueryDto, ResponseDto, SessionContentDto } from '@/api/models';
 import Markdown from 'react-markdown';
 
-import { AppSidebar } from '@/components/app-sidebar';
 
 interface ChatMessage {
     data: ResponseDto;
     sender: 'user' | 'chat';
+    // graph data for line chart
+    // graphData?: any;
 }
 
 function mapSessionContentDtoToMessages(data: SessionContentDto[]): ChatMessage[] {
+    // @ts-ignore
     return data.flatMap(item => [
         {
             data: {
@@ -47,7 +49,7 @@ const chatMessage = (msg: ChatMessage, index: number) => (
         key={index}
         className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
     >
-        <div className={`max-w-[70%] p-3 rounded-lg ${msg.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
+        <div className={`max-w-[70%] p-3 rounded-lg ${msg.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} px-3`}>
             <Markdown>{msg.data.description}</Markdown>
         </div>
     </div>
@@ -55,10 +57,9 @@ const chatMessage = (msg: ChatMessage, index: number) => (
 
 const ChatInterface = observer(() => {
     const navigate = useNavigate();
-    const { sessionId } = useParams({ strict: false });
-    const sessionIdNumber = Number(sessionId);
-    console.log(sessionIdNumber);
     const { toast } = useToast();
+    const [sessionId, setSessionId] = useState<string | null>(null);
+    const [sessions, setSessions] = useState<SessionDto[]>([]);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputMessage, setInputMessage] = useState('');
     const [socket, setSocket] = useState<WebSocket | null>(null);
@@ -71,16 +72,41 @@ const ChatInterface = observer(() => {
         }
     }, [messages]);
 
+    useEffect(() => {
+        // fetch session from server if they are empty send request to create a new session
+        if (sessions.length === 0) {
+            ChatSessionService.getSessions().then((response) => {
+                setSessions(response);
+                if (response.length === 0) {
+                    ChatSessionService.createSession().then((res) => {
+                        const newChatId = res.id;
+                        toast({
+                            title: 'Chat Created',
+                            description: `Chat with ID ${newChatId} created.`,
+                        });
+                        navigate({ to: `/chat?sessionId=${newChatId}` });
+                        window.location.reload();
+                    }).catch((err) => {
+                        toast({
+                            title: 'Error',
+                            description: err.message,
+                        });
+                        navigate({ to: '/' });
+                    });
+                } else {
+                    // @ts-ignore
+                    setSessionId(response[0].id);
+                }
+            });
+        }
+    }, []);
     // Load initial messages from the server
     useEffect(() => {
-        if (sessionIdNumber) {
-            const session = 
-            ChatSessionService.getSessionContent(sessionIdNumber).then((res) => {
-                console.log(res);
+        if (sessionId != null) {
+            ChatSessionService.getSessionContent(sessionId).then((res) => {
                 const initialMessages = mapSessionContentDtoToMessages(res);
                 setMessages(initialMessages);
             }).catch((err) => {
-
                 toast({
                     title: 'Error',
                     description: err.message,
@@ -90,41 +116,30 @@ const ChatInterface = observer(() => {
                     toast({
                         title: 'Chat Created',
                         description: `Chat with ID ${newChatId} created.`,
-
                     });
-                    ChatSessionService.getSessionContent(sessionIdNumber).then((res) => {
-                        console.log(res);
-                        const initialMessages = mapSessionContentDtoToMessages(res);
-                        setMessages(initialMessages);
-                    }
-                );
-                    // navigate({to:`/chat/${newChatId}`});
-                    
-            }).catch((err) => {
-                toast({
-                    title: 'Error',
-                    description: err.message,
+                    navigate({ to: `/chat/${newChatId}` });
+                    window.location.reload();
+                }).catch((err) => {
+                    toast({
+                        title: 'Error',
+                        description: err.message,
+                    });
+                    navigate({ to: '/' });
                 });
-                navigate({to:'/'});
             });
-        }).catch((err) => {
-            toast({
-                title: 'Error',
-                description: err.message,
-            });
-        });
-    }
-    }, [sessionIdNumber]);
+        }
+    }, [sessionId]);
 
     // Initialize WebSocket and handle incoming messages
     useEffect(() => {
-        if (sessionIdNumber) {
-            const ws = new WebSocket(`${WS_URL}/${sessionIdNumber}`);
+        if (sessionId != null) {
+            const ws = new WebSocket(`${WS_URL}/${sessionId}`);
             setSocket(ws);
 
             const req: QueryDto = {
                 id: 0,
                 prompt: `${JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) as string)?.user?.token}`,
+                // @ts-ignore
                 createdAt: null,
             };
 
@@ -160,12 +175,13 @@ const ChatInterface = observer(() => {
                 ws.close();
             };
         }
-    }, [sessionIdNumber]);
+    }, [sessionId]);
 
     const handleSendMessage = () => {
         const req: QueryDto = {
             id: 0,
             prompt: inputMessage,
+            // @ts-ignore
             createdAt: null,
         };
 
@@ -193,34 +209,32 @@ const ChatInterface = observer(() => {
     };
 
     return (
-        <div className="flex h-screen">
-          <AppSidebar />
-          <div className="flex flex-col flex-grow">
+        <div className="flex flex-col flex-grow w-full h-full">
             <ScrollArea className="flex-grow p-4 space-y-4" ref={scrollAreaRef}>
-              {messages.map((message, index) => chatMessage(message, index))}
+                {messages.map((message, index) => chatMessage(message, index))}
+                <div />
             </ScrollArea>
             <div className="p-4 border-t">
-              <div className="flex space-x-2">
-                <Input
-                  type="text"
-                  placeholder="Type your message..."
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSendMessage();
-                    }
-                  }}
-                  className="flex-grow"
-                />
-                <Button onClick={handleSendMessage}>
-                  <Send className="w-4 h-4" />
-                </Button>
-              </div>
+                <div className="flex space-x-2">
+                    <Input
+                        type="text"
+                        placeholder="Введите сообщение..."
+                        value={inputMessage}
+                        onChange={(e) => setInputMessage(e.target.value)}
+                        onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                                handleSendMessage();
+                            }
+                        }}
+                        className="flex-grow"
+                    />
+                    <Button onClick={handleSendMessage}>
+                        <Send className="w-4 h-4" />
+                    </Button>
+                </div>
             </div>
-          </div>
         </div>
-      );
+    );
 });
 
 export default ChatInterface;
