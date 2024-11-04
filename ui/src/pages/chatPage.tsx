@@ -6,7 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { observer } from 'mobx-react-lite';
 import { useToast } from '@/hooks/use-toast';
 import { WS_URL } from '@/config';
-import { Route, useNavigate, useParams } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { LOCAL_STORAGE_KEY } from '@/auth/AuthProvider';
 import ChatSessionService from '@/api/ChatSessionService';
 import { SessionDto, QueryDto, ResponseDto, SessionContentDto } from '@/api/models';
@@ -17,10 +17,11 @@ interface ChatMessage {
     data: ResponseDto;
     sender: 'user' | 'chat';
     // graph data for line chart
-    graphData?: any;
+    // graphData?: any;
 }
 
 function mapSessionContentDtoToMessages(data: SessionContentDto[]): ChatMessage[] {
+    // @ts-ignore
     return data.flatMap(item => [
         {
             data: {
@@ -48,7 +49,7 @@ const chatMessage = (msg: ChatMessage, index: number) => (
         key={index}
         className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
     >
-        <div className={`max-w-[70%] p-3 rounded-lg ${msg.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}>
+        <div className={`max-w-[70%] p-3 rounded-lg ${msg.sender === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} px-3`}>
             <Markdown>{msg.data.description}</Markdown>
         </div>
     </div>
@@ -93,6 +94,7 @@ const ChatInterface = observer(() => {
                         navigate({ to: '/' });
                     });
                 } else {
+                    // @ts-ignore
                     setSessionId(response[0].id);
                 }
             });
@@ -137,6 +139,7 @@ const ChatInterface = observer(() => {
             const req: QueryDto = {
                 id: 0,
                 prompt: `${JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) as string)?.user?.token}`,
+                // @ts-ignore
                 createdAt: null,
             };
 
@@ -178,6 +181,7 @@ const ChatInterface = observer(() => {
         const req: QueryDto = {
             id: 0,
             prompt: inputMessage,
+            // @ts-ignore
             createdAt: null,
         };
 

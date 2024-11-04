@@ -1,5 +1,4 @@
 import * as React from "react"
-import { Button } from "@/components/ui/button"
 import {
     Card,
     CardContent,
@@ -9,7 +8,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Link, useNavigate } from "@tanstack/react-router"
+import { Link, useLocation, useNavigate } from "@tanstack/react-router"
 import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth } from "@/auth"
@@ -17,11 +16,12 @@ import { LoaderButton } from "@/components/ui/loader-button"
 
 export function SignUp() {
     const navigate = useNavigate();
+    const location = useLocation();
     const auth = useAuth();
     const { toast } = useToast();
 
     const [loading, setLoading] = useState<boolean>(false);
-
+    // @ts-ignore
     const from = location.state?.from?.pathname || '/';
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {

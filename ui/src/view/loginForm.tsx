@@ -1,10 +1,8 @@
 import * as React from "react"
 import { useState } from 'react';
-import { Button } from "@/components/ui/button"
 import {
     Card,
     CardContent,
-    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
@@ -12,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Link, useNavigate } from "@tanstack/react-router"
-import { API_URL } from '@/config';
+
 import { useAuth } from "@/auth"
 import { useToast } from "@/hooks/use-toast"
 import { LoaderButton } from "@/components/ui/loader-button";
@@ -23,7 +21,7 @@ export function LoginForm() {
     const { toast } = useToast();
 
     const [loading, setLoading] = useState<boolean>(false);
-
+    // @ts-ignore
     const from = location.state?.from?.pathname || '/';
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {

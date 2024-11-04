@@ -17,6 +17,7 @@ export interface SignUpParams {
 export interface QueryDto {
     id: number
     prompt: string
+    // @ts-ignore
     createdAt: Date
 }
 

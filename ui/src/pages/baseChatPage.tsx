@@ -5,7 +5,8 @@ import { AppSidebar } from '@/components/app-sidebar';
 
 const BaseChatPage: React.FC = () => {
   const navigate = useNavigate();
-  const { sessionId } = useParams({strict: false});
+  // @ts-ignore
+  const { sessionId } = useParams({ strict: false });
   console.log(sessionId);
   const createNewChat = async () => {
     try {

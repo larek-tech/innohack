@@ -1,4 +1,4 @@
-import { Calendar, ChartNoAxesCombined, MessagesSquare } from "lucide-react";
+import { ChartNoAxesCombined, MessagesSquare } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -43,7 +43,7 @@ export function AppSidebar() {
   }, [isChatPage]);
 
   return (
-    <Sidebar>
+    <Sidebar className="w-">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>misis banch space</SidebarGroupLabel>
