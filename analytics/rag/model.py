@@ -86,10 +86,10 @@ class LLMClient:
         max_tokens = 512
         temperature = 0.8
 
-        # client = Client(host="http://localhost:11434")
+        # client = Client(host="http://10.92.9.223:11434")
 
         # response = client.chat(
-        #     model="llama3.1:8b-instruct-q8_0",
+        #     model="hf.co/IlyaGusev/saiga_nemo_12b_gguf:Q8_0",
         #     messages=[
         #         {
         #             "role": "user",

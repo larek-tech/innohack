@@ -175,7 +175,7 @@ def define_question_topic(query: str) -> str:
 
     headers = {"Content-Type": "application/json"}
 
-    response = httpx.post(url, data=json.dumps(data), headers=headers)
+    response = httpx.post(url, data=json.dumps(data), headers=headers, timeout=40000)
 
     if response.status_code == 200:
         return response.json()
