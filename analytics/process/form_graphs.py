@@ -73,30 +73,44 @@ def form_group_chart(records: dict, codes: list[int], start_date: int, end_date:
                     chart_type: analytics_pb2.ChartType) -> analytics_pb2.ListChartsLegend:
     legend_element = {}
     charts: list[analytics_pb2.Chart] = []
-    for i, code in enumerate(codes):
-        color = availableColors[i % len(availableColors)]
-        recs = get_one_param_records(records, code, start_date, end_date)
-        if len(recs) > 0:
-            if chart_type == analytics_pb2.PIE_CHART:
-                new_chart = analytics_pb2.Chart(
-                    color=color,
-                    type=chart_type,
-                    records=recs
-                )
-            else:
-                new_chart = analytics_pb2.Chart(
-                    color=color,
-                    type=chart_type,
-                    records=recs
-                )
-            legend_element[color] = CODE_NAME[int(code)]
-            charts.append(new_chart)
 
-    chart_list = analytics_pb2.ListChartsLegend(
-        charts=charts,
-        legend=legend_element,
-    )
+    if chart_type != analytics_pb2.PIE_CHART:
+        for i, code in enumerate(codes):
+            color = availableColors[i % len(availableColors)]
+            recs = get_one_param_records(records, code, start_date, end_date)
+            if len(recs) > 0:
+                new_chart = analytics_pb2.Chart(
+                        color=color,
+                        type=chart_type,
+                        records=recs
+                    )
+                legend_element[color] = CODE_NAME[int(code)]
+                charts.append(new_chart)
+
+        chart_list = analytics_pb2.ListChartsLegend(
+            charts=charts,
+            legend=legend_element,
+        )
+    else:
+        all_recs = []
+        for i, code in enumerate(codes):
+            color = availableColors[i % len(availableColors)]
+            recs = get_one_param_records(records, code, start_date, end_date, return_year=False)
+            all_recs.extend(recs)
+
+        color = availableColors[0]
+        new_chart = analytics_pb2.Chart(
+                        color=color,
+                        type=chart_type,
+                        records=all_recs
+                    )
+        charts.append(new_chart)
+        chart_list = analytics_pb2.ListChartsLegend(
+            charts=charts,
+            legend=legend_element,
+        )
     return chart_list
+        
 
 def form_group_chart_multy(records: dict, m_keys: list[str], start_date: int, end_date: int, 
                     chart_type: analytics_pb2.ChartType) -> analytics_pb2.ListChartsLegend:
@@ -244,10 +258,10 @@ def get_analitics_report(request: analytics_pb2.Filter) -> analytics_pb2.ChartRe
 def main():
     request = analytics_pb2.Filter(
         start_date=2022,
-        end_date=2022
+        end_date=2024
     )
     resp = get_analitics_report(request)
     print(resp)
 
 
-# main()
+main()
