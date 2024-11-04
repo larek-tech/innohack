@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 
-mongo = MongoClient("mongodb://46.138.243.191:27017/data", timeoutMS=30000**2)
+mongo = MongoClient("mongodb://10.0.1.80:27017/data", timeoutMS=30000**2)
 records_col = mongo.get_database("data").get_collection("records")
 multipliers_col = mongo.get_database("data").get_collection("multipliers")
 summary_col = mongo.get_database("data").get_collection("report_summary")

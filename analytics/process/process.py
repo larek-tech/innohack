@@ -20,7 +20,7 @@ from process.const import CODE_NAME, MULTYPLIER_NAME
 from process.get_report_summary import form_report_description
 
 
-mongo = MongoClient("mongodb://46.138.243.191:27017/data", timeoutMS=30000**2)
+mongo = MongoClient("mongodb://10.0.1.80:27017/data", timeoutMS=30000**2)
 records_col = mongo.get_database("data").get_collection("records")
 multipliers_col = mongo.get_database("data").get_collection("multipliers")
 summary_col = mongo.get_database("data").get_collection("report_summary")
@@ -141,7 +141,10 @@ def preprocess_xlsx():
     if has_records and has_multipliers:
         return
 
-    excel_paths = list_files()
+    # excel_paths = list_files()
+    dir_path = "/home/hope/Hope/Innohack/excel_data/"
+    excel_paths = [dir_path + path for path in os.listdir(dir_path)]
+    
     records = {}
     multipliers = {}
     for file in excel_paths:
@@ -160,5 +163,8 @@ def preprocess_xlsx():
         )
         multipliers = parse_multy_to_dict(multipliers, metrics_for_chart)
 
-    summary_dict = generate_summaries(records, multipliers)
+    summary_dict = {}
+    # summary_dict = generate_summaries(records, multipliers)
     save_data(records, multipliers, summary_dict)
+
+preprocess_xlsx()
