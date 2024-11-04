@@ -16,7 +16,7 @@ interface ChatSessionListProps {
 export function ChatSessionList({ sessions }: ChatSessionListProps) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Chat Sessions</SidebarGroupLabel>
+      <SidebarGroupLabel>История чата</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           {sessions.map((session) => (
