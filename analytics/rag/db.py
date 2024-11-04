@@ -13,11 +13,13 @@ from rag.utils.chunks import file_to_chunks
 from loguru import logger
 
 # Создаем подключение к векторной БД
-qdrant_client = QdrantClient("https://qdrant.larek.tech", port=443)
+qdrant_client = QdrantClient(
+    "http://10.0.1.80:6333", port=443
+)  # https://qdrant.larek.tech
 
 
-COLL_NAME = "test_chuncks"
-COLL_QUESTION_NAME = "test_questions_chuncks"
+COLL_NAME = "test_chuncks_1"
+COLL_QUESTION_NAME = "test_questions_chuncks_1"
 
 
 def get_questions_for_chunk(chunk_text: str) -> str:
@@ -123,6 +125,7 @@ def files_to_vecdb(files, bi_encoder, vec_size, sep, chunk_size, chunk_overlap):
         save_chunks(bi_encoder, chunks, file_name, questions_for_chunk)
         logger.info("chunks saved successfully")
 
+
 def vec_search_qwery(bi_encoder, query, n_top_cos_question):
 
     query_emb = str_to_vec(bi_encoder, query)
@@ -136,8 +139,9 @@ def vec_search_qwery(bi_encoder, query, n_top_cos_question):
     )
 
     top_question_chunks = [x.payload["chunk"] for x in search_questions_result]
-    
+
     return top_question_chunks
+
 
 def vec_search(bi_encoder, query, n_top_cos):
     # Кодируем запрос в вектор
@@ -151,7 +155,6 @@ def vec_search(bi_encoder, query, n_top_cos):
         with_vectors=False,
     )
 
-
     top_chunks = [x.payload["chunk"] for x in search_result]
 
     return top_chunks
@@ -161,13 +164,13 @@ def define_question_topic(query: str) -> str:
 
     url = "https://mts-aidocprocessing-case.olymp.innopolis.university/generate"
     data = {
-        "prompt": query,
+        "prompt": "Определи, относится ли текст к теме финансовой отчётности и бухгалтерии. \
+              Напиши 'Да', если относится, 'Нет', если не относится\n\nТекст:\n"
+        + query,
         "apply_chat_template": True,
-        "system_prompt": "Твоя задача определть, относится ли предложение к теме финансов, бухгалтерии, отчетов, \
-            финансовых данных и анализов. Напиши 'Да' или 'Нет'",
         "max_tokens": 256,
         "n": 1,
-        "temperature": 0.5,
+        "temperature": 0.2,
     }
 
     headers = {"Content-Type": "application/json"}
