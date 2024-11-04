@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import BaseChatPage from '@/pages/baseChatPage'
 import { RequireAuth } from '@/auth/RequireAuth'
 import ChatInterface from '@/pages/chatPage'
+import { AppSidebar } from '@/components/app-sidebar'
 
 export const Route = createFileRoute('/chat')({
   component: RouteComponent,
@@ -10,6 +11,9 @@ export const Route = createFileRoute('/chat')({
 
 function RouteComponent() {
   return <RequireAuth>
-    <ChatInterface />
+    <div className="flex h-screen w-full">
+      <AppSidebar />
+      <ChatInterface sessionId={{ sessionId: "123" }} />
+    </div>
   </RequireAuth>
 }

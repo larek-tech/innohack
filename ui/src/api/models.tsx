@@ -38,24 +38,10 @@ export interface SessionContentDto {
 }
 
 
-
-export interface Record {
-    x: string
-    y: number
-}
-
-export interface Chart {
-    title: string
-    records: Record[]
-    type: string // pie, chart, bar
-    description: string
-}
-
 export interface Multiplier {
     key: string
     value: number
 }
-
 
 
 export interface ResponseDto {
@@ -70,25 +56,37 @@ export interface ResponseDto {
     isLast: boolean
 }
 
+export interface Record {
+    x: string;
+    y: number;
+}
 
-export interface Filter {
-    startDate: Date;
-    endDate: Date;
+export interface Chart {
+    color: string;
+    records: Record[];
+    type: string; // pie, chart, bar
+}
+
+export interface Legend {
+    [key: string]: string;
+}
+
+export interface Info {
+    charts: Chart[];
+    legend: Legend;
 }
 
 export interface ChartReport {
-    charts: Chart[];
+    summary: string;
+    info: {
+        [key: string]: Info;
+    };
     multipliers: Multiplier[];
-    description: string;
-    startDate: Date;
-    endDate: Date;
+    startDate: number;
+    endDate: number;
 }
 
-export enum ChartType {
-    UndefinedChart = 0,
-    BarChart,
-    PieChart,
-    LineChart
+export interface Multiplier {
+    key: string;
+    value: number;
 }
-
-function ConvertChartData(data: ChartReport): Chart[] {

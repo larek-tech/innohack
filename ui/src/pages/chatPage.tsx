@@ -12,7 +12,6 @@ import ChatSessionService from '@/api/ChatSessionService';
 import { SessionDto, QueryDto, ResponseDto, SessionContentDto } from '@/api/models';
 import Markdown from 'react-markdown';
 
-import { AppSidebar } from '@/components/app-sidebar';
 
 interface ChatMessage {
     data: ResponseDto;
@@ -53,11 +52,9 @@ const chatMessage = (msg: ChatMessage, index: number) => (
     </div>
 );
 
-const ChatInterface = observer(() => {
+const ChatInterface = observer((sessionId: string) => {
     const navigate = useNavigate();
-    const { sessionId } = useParams({ strict: false });
     const sessionIdNumber = Number(sessionId);
-    console.log(sessionIdNumber);
     const { toast } = useToast();
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputMessage, setInputMessage] = useState('');
@@ -74,45 +71,30 @@ const ChatInterface = observer(() => {
     // Load initial messages from the server
     useEffect(() => {
         if (sessionIdNumber) {
-            const session =
-                ChatSessionService.getSessionContent(sessionIdNumber).then((res) => {
-                    console.log(res);
-                    const initialMessages = mapSessionContentDtoToMessages(res);
-                    setMessages(initialMessages);
-                }).catch((err) => {
-
-                    toast({
-                        title: 'Error',
-                        description: err.message,
-                    });
-                    ChatSessionService.createSession().then((res) => {
-                        const newChatId = res.id;
-                        toast({
-                            title: 'Chat Created',
-                            description: `Chat with ID ${newChatId} created.`,
-
-                        });
-                        ChatSessionService.getSessionContent(sessionIdNumber).then((res) => {
-                            console.log(res);
-                            const initialMessages = mapSessionContentDtoToMessages(res);
-                            setMessages(initialMessages);
-                        }
-                        );
-                        // navigate({to:`/chat/${newChatId}`});
-
-                    }).catch((err) => {
-                        toast({
-                            title: 'Error',
-                            description: err.message,
-                        });
-                        navigate({ to: '/' });
-                    });
-                }).catch((err) => {
-                    toast({
-                        title: 'Error',
-                        description: err.message,
-                    });
+            ChatSessionService.getSessionContent(sessionIdNumber).then((res) => {
+                const initialMessages = mapSessionContentDtoToMessages(res);
+                setMessages(initialMessages);
+            }).catch((err) => {
+                toast({
+                    title: 'Error',
+                    description: err.message,
                 });
+                ChatSessionService.createSession().then((res) => {
+                    const newChatId = res.id;
+                    toast({
+                        title: 'Chat Created',
+                        description: `Chat with ID ${newChatId} created.`,
+                    });
+                    navigate({ to: `/chat/${newChatId}` });
+                    window.location.reload();
+                }).catch((err) => {
+                    toast({
+                        title: 'Error',
+                        description: err.message,
+                    });
+                    navigate({ to: '/' });
+                });
+            });
         }
     }, [sessionIdNumber]);
 
@@ -193,30 +175,27 @@ const ChatInterface = observer(() => {
     };
 
     return (
-        <div className="flex h-screen">
-            <AppSidebar />
-            <div className="flex flex-col flex-grow">
-                <ScrollArea className="flex-grow p-4 space-y-4" ref={scrollAreaRef}>
-                    {messages.map((message, index) => chatMessage(message, index))}
-                </ScrollArea>
-                <div className="p-4 border-t">
-                    <div className="flex space-x-2">
-                        <Input
-                            type="text"
-                            placeholder="Type your message..."
-                            value={inputMessage}
-                            onChange={(e) => setInputMessage(e.target.value)}
-                            onKeyPress={(e) => {
-                                if (e.key === 'Enter') {
-                                    handleSendMessage();
-                                }
-                            }}
-                            className="flex-grow"
-                        />
-                        <Button onClick={handleSendMessage}>
-                            <Send className="w-4 h-4" />
-                        </Button>
-                    </div>
+        <div className="flex flex-col flex-grow w-full h-full">
+            <ScrollArea className="flex-grow p-4 space-y-4" ref={scrollAreaRef}>
+                {messages.map((message, index) => chatMessage(message, index))}
+            </ScrollArea>
+            <div className="p-4 border-t">
+                <div className="flex space-x-2">
+                    <Input
+                        type="text"
+                        placeholder="Type your message..."
+                        value={inputMessage}
+                        onChange={(e) => setInputMessage(e.target.value)}
+                        onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                                handleSendMessage();
+                            }
+                        }}
+                        className="flex-grow"
+                    />
+                    <Button onClick={handleSendMessage}>
+                        <Send className="w-4 h-4" />
+                    </Button>
                 </div>
             </div>
         </div>
