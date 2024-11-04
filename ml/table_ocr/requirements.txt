@@ -1,0 +1,4 @@
+img2table[easyocr] 
+opencv-python 
+pdf2image 
+python-poppler

@@ -3,34 +3,31 @@ package handler
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/larek-tech/innohack/backend/internal/chat/model"
-	"github.com/larek-tech/innohack/backend/internal/chat/service"
-	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/trace"
 )
 
-type chatService interface {
-	GetCharts(ctx context.Context, req model.QueryDto, out chan<- model.ResponseDto)
+type chatController interface {
 	GetDescription(ctx context.Context, req model.QueryDto, out chan<- model.ResponseDto, cancel <-chan int64)
-	InsertSession(ctx context.Context, userID int64) (model.SessionDto, error)
-	InsertQuery(ctx context.Context, sessionID int64, query model.QueryDto) (int64, error)
-	InsertResponse(ctx context.Context, sessionID int64, resp model.ResponseDto) error
-	GetSessionContent(ctx context.Context, sessionID int64) ([]*model.SessionContentDto, error)
-	ListSessions(ctx context.Context, userID int64) ([]*model.SessionDto, error)
-	UpdateSessionTitle(ctx context.Context, sessionID, userID int64, title string) error
+	InsertQuery(ctx context.Context, sessionID uuid.UUID, query model.QueryDto) (int64, error)
+	InsertResponse(ctx context.Context, sessionID uuid.UUID, resp model.ResponseDto) error
+}
+
+type sessionController interface {
+	Cleanup(ctx context.Context, sessionID uuid.UUID, userID int64) error
 }
 
 type Handler struct {
-	service   chatService
-	log       *zerolog.Logger
+	cc        chatController
+	sc        sessionController
 	tracer    trace.Tracer
 	jwtSecret string
 }
 
-func New(tracer trace.Tracer, jwtSecret string, log *zerolog.Logger, s *service.Service) *Handler {
+func New(tracer trace.Tracer, jwtSecret string, ctrl chatController) *Handler {
 	return &Handler{
-		service:   s,
-		log:       log,
+		cc:        ctrl,
 		tracer:    tracer,
 		jwtSecret: jwtSecret,
 	}
