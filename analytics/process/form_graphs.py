@@ -166,236 +166,49 @@ def form_graph_info(
         )
         return chart_map
     else:
-        chart_map["Динамика рентабельности собственного капитала"] = form_group_chart(
-            records, ["ROE"], start_date, end_date,
+        chart_map["Динамика рентабельности собственного капитала"] = form_group_chart_multy(
+            multipliers, ["ROE"], start_date, end_date,
+            analytics_pb2.LINE_CHART
+        )
+        chart_map["Динамика рентабельности продаж"] = form_group_chart_multy(
+            multipliers, ["GP_Margin", "OP_Margin", "NP_Margin", ], start_date, end_date,
+            analytics_pb2.LINE_CHART
+        )
+        chart_map["Динамика рентабельности активов"] = form_group_chart_multy(
+            multipliers, ["ROA", "ROCA", "RONCA"], start_date, end_date,
+            analytics_pb2.LINE_CHART
+        )
+        chart_map["Динамика ликвидности"] = form_group_chart_multy(
+            multipliers, ["CR", "QR", "AR"], start_date, end_date,
+            analytics_pb2.LINE_CHART
+        )
+        chart_map["Динамика показателей финансовой устойчивости"] = form_group_chart_multy(
+            multipliers, ["Autonomy_Ratio", 
+                          "Capitalization_Ratio", 
+                          "Investment_Coverage_Ratio", 
+                          "Inventory_Security_Ratio",
+                            "Financial_Dependency_Ratio",
+                            "Financial_Leverage_Ratio"
+                          ], start_date, end_date,
+            analytics_pb2.LINE_CHART
+        )
+        chart_map[f"Динамика показателя: {CODE_NAME[2110]}"] = form_group_chart(
+            records, [2110], start_date, end_date,
+            analytics_pb2.BAR_CHART
+        )
+        chart_map[f"Динамика показателя: {CODE_NAME[2120]}"] = form_group_chart(
+            records, [2120], start_date, end_date,
+            analytics_pb2.BAR_CHART
+        )
+        chart_map[f"Динамика показателя: {CODE_NAME[2200]}"] = form_group_chart(
+            records, [2200], start_date, end_date,
+            analytics_pb2.BAR_CHART
+        )
+        chart_map[f"Динамика показателя: {CODE_NAME[2400]}"] = form_group_chart(
+            records, [2400], start_date, end_date,
             analytics_pb2.BAR_CHART
         )
         return chart_map
-    #     # profitability
-    #     # single line
-    #     recs = get_one_multipl_records(multipliers, "ROE", start_date, end_date)
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика рентабельности собственного капитала",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description="",
-    #             )
-    #         )
-    #     # group line chart 1
-    #     recs = get_one_multipl_records(multipliers, "GP_Margin", start_date, end_date)
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика рентабельности продаж",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=MULTYPLIER_NAME["GP_Margin"],
-    #             )
-    #         )
-    #     recs = get_one_multipl_records(multipliers, "OP_Margin", start_date, end_date)
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика рентабельности продаж",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=MULTYPLIER_NAME["OP_Margin"],
-    #             )
-    #         )
-    #     recs = get_one_multipl_records(multipliers, "NP_Margin", start_date, end_date)
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика рентабельности продаж",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=MULTYPLIER_NAME["NP_Margin"],
-    #             )
-    #         )
-    #     # group line chart 2
-    #     recs = get_one_multipl_records(multipliers, "ROA", start_date, end_date)
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика рентабельности активов",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=MULTYPLIER_NAME["ROA"],
-    #             )
-    #         )
-    #     recs = get_one_multipl_records(multipliers, "ROCA", start_date, end_date)
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика рентабельности активов",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=MULTYPLIER_NAME["ROCA"],
-    #             )
-    #         )
-    #     recs = get_one_multipl_records(multipliers, "RONCA", start_date, end_date)
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика рентабельности активов",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=MULTYPLIER_NAME["RONCA"],
-    #             )
-    #         )
-
-    #     # liquidity
-    #     # group line
-    #     recs = get_one_multipl_records(multipliers, "CR", start_date, end_date)
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика ликвидности",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=MULTYPLIER_NAME["CR"],
-    #             )
-    #         )
-    #     recs = get_one_multipl_records(multipliers, "QR", start_date, end_date)
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика ликвидности",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=MULTYPLIER_NAME["QR"],
-    #             )
-    #         )
-    #     recs = get_one_multipl_records(multipliers, "AR", start_date, end_date)
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика ликвидности",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=MULTYPLIER_NAME["AR"],
-    #             )
-    #         )
-    #     # coefs
-    #     # group line
-    #     recs = get_one_multipl_records(
-    #         multipliers, "Autonomy_Ratio", start_date, end_date
-    #     )
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика показателей финансовой устойчивости",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=MULTYPLIER_NAME["Autonomy_Ratio"],
-    #             )
-    #         )
-    #     recs = get_one_multipl_records(
-    #         multipliers, "Capitalization_Ratio", start_date, end_date
-    #     )
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика показателей финансовой устойчивости",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=MULTYPLIER_NAME["Capitalization_Ratio"],
-    #             )
-    #         )
-    #     recs = get_one_multipl_records(
-    #         multipliers, "Investment_Coverage_Ratio", start_date, end_date
-    #     )
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика показателей финансовой устойчивости",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=MULTYPLIER_NAME["Investment_Coverage_Ratio"],
-    #             )
-    #         )
-    #     recs = get_one_multipl_records(
-    #         multipliers, "Inventory_Security_Ratio", start_date, end_date
-    #     )
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика показателей финансовой устойчивости",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=MULTYPLIER_NAME["Inventory_Security_Ratio"],
-    #             )
-    #         )
-    #     recs = get_one_multipl_records(
-    #         multipliers, "Financial_Dependency_Ratio", start_date, end_date
-    #     )
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика показателей финансовой устойчивости",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=MULTYPLIER_NAME["Financial_Dependency_Ratio"],
-    #             )
-    #         )
-    #     recs = get_one_multipl_records(
-    #         multipliers, "Financial_Leverage_Ratio", start_date, end_date
-    #     )
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика показателей финансовой устойчивости",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=MULTYPLIER_NAME["Financial_Leverage_Ratio"],
-    #             )
-    #         )
-    #     # table params
-    #     # group bar chart
-    #     recs = get_one_param_records(records, 2110, start_date, end_date)
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика экономических показателей",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=CODE_NAME[int(2110)],
-    #             )
-    #         )
-    #     recs = get_one_param_records(records, 2120, start_date, end_date)
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика экономических показателей",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=CODE_NAME[int(2120)],
-    #             )
-    #         )
-    #     recs = get_one_param_records(records, 2200, start_date, end_date)
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика экономических показателей",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=CODE_NAME[int(2200)],
-    #             )
-    #         )
-    #     recs = get_one_param_records(records, 2400, start_date, end_date)
-    #     if len(recs) > 0:
-    #         charts.append(
-    #             analytics_pb2.Chart(
-    #                 title="Динамика экономических показателей",
-    #                 records=recs,
-    #                 type=analytics_pb2.BAR_CHART,
-    #                 description=CODE_NAME[int(2400)],
-    #             )
-    #         )
-    #     return charts
-
 
 def get_analitics_report(request: analytics_pb2.Filter) -> analytics_pb2.ChartReport:
     records, multipliers, report_summary = load_json()
