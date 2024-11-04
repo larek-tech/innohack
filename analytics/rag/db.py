@@ -164,13 +164,13 @@ def define_question_topic(query: str) -> str:
 
     url = "https://mts-aidocprocessing-case.olymp.innopolis.university/generate"
     data = {
-        "prompt": query,
+        "prompt": "Определи, относится ли текст к теме финансовой отчётности и бухгалтерии. \
+              Напиши 'Да', если относится, 'Нет', если не относится\n\nТекст:\n"
+        + query,
         "apply_chat_template": True,
-        "system_prompt": "Твоя задача определть, относится ли предложение к теме финансов, бухгалтерии, отчетов, \
-            финансовых данных и анализов. Напиши 'Да' или 'Нет'",
         "max_tokens": 256,
         "n": 1,
-        "temperature": 0.5,
+        "temperature": 0.2,
     }
 
     headers = {"Content-Type": "application/json"}

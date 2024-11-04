@@ -22,7 +22,7 @@ class LLMClient:
         self.bi_encoder, self.vect_dim = get_bi_encoder("cointegrated/LaBSE-en-ru")
 
         self.n_top_cos = 2
-        self.n_top_cos_question = 5
+        self.n_top_cos_question = 3
 
     def get_response(self, prompt):
 
@@ -30,7 +30,7 @@ class LLMClient:
         classificator_response = define_question_topic(prompt)
         logger.info(classificator_response)
         if "нет" in classificator_response.lower():
-            return random.choice([vars])
+            return random.choice(vars)
 
         # MultiQwestion stage
         questions = get_qwestions(prompt)
