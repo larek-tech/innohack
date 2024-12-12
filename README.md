@@ -1,10 +1,18 @@
-# Решение команды misis banach space | Система аналитики финансовых электронных документов RAG-инструментами
+# Решение команды misis banach space | Система аналитики финансовых электронных документов RAG-инструментами | Кейс МТС
 
 Система обработки и построения аналитики финансовых электронных документов содержит 2 микросервиса и реализует функционал в виде построения отчетных графиков и чат-бота.
 
 ## Архитектура
 
 ![Архитектура](./images/architecture.png)
+
+## Дашборд
+
+![Дашборд](./images/dashboard.png)
+
+## Чат
+
+![Чат](./imgaes/chat.png)
 
 ## Работа с данными
 
@@ -24,7 +32,10 @@
 - `GetCharts` - построение графиков по финансовым документов.
 - `GetDescriptionStream` - получение ответов на запросы в чате, с генерацией по токенам.
 
-запуск сервиса
+## Запуск сервиса
+
+Для локального запуска требуются утилиты make и docker-compose.
+
 ```bash
 docker compose -f infra/compose.yaml up -d --build  
 ```
@@ -60,3 +71,11 @@ docker compose -f infra/compose.yaml up -d --build
 - [Ежеквартальные отчеты](https://moskva.mts.ru/about/investoram-i-akcioneram/korporativnoe-upravlenie/raskritie-informacii/ezhekvartalnie-otcheti)
 - [Отчеты эмитента эмиссионных ценных бумаг](https://moskva.mts.ru/about/investoram-i-akcioneram/korporativnoe-upravlenie/raskritie-informacii/otchety-emitenta-emissionnyh-cennyh-bumag)
 - [Инсайдерская информация ПАО МТС](https://moskva.mts.ru/about/investoram-i-akcioneram/korporativnoe-upravlenie/raskritie-informacii/insajderskaya-informacii-pao-mts)
+
+## Состав команды
+
+- Мария Ульянова - ML
+- Надежда Анисимова - ML
+- Егор Тарасов - fullstack
+- Евгений Гуров - backend
+- Артем Цыканов - ML
